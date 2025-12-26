@@ -35,6 +35,7 @@
 ## 7. アバター仕様（3D/動画/PNGTuber）
 - Mode3(参考: public_files): 状態 01_normal/02_smile/03_oko/04_sleep/05_on、無操作15分→sleep、click→smile/oko/on、10秒でnormal復帰、直前画像除外ランダム。
 - Mode1/2も状態イベントを共有。リソース: `<character>/<state>/*`。
+- 参照: `docs/02-architecture/avatar/avatar-renderer.md`, `data/templates/assets/pngtuber_mode3/README.md`, `docs/02-architecture/assets/asset-handling.md`.
 
 ## 8. ウィンドウ仕様
 - フレームレス/透過、ドラッグ移動、位置/サイズ保存/復元。Topmost ON/OFF。クリック透過はオプション＋安全ホットキー。最小/最大サイズガード。
@@ -44,6 +45,7 @@
 
 ## 10. コンポーネント構成
 - Core(LLM/TTS/STT/Embedding, MCP)、Memory(DB/埋め込み/リマインド/話者/監査)、Shell(UI/Audio/Avatar/Window)、Scheduler(リマインド/バックアップ/ヘルス)、AudioRenderer、AvatarRenderer。
+- IPC/DTO: `docs/02-architecture/interfaces/ipc-contract.md`, dtoサンプル `docs/02-architecture/interfaces/dto/*.json`
 
 ## 11. データ配置/Git運用
 - Gitルート: workspace。refsは外・read-only。Git除外: venv, db.sqlite3, staticfiles, settings.py, logs, secrets, data/db, assets_user。

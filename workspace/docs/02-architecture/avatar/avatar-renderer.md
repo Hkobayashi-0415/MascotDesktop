@@ -22,3 +22,7 @@
 
 ## 他モードとの整合
 - Mode1/2（3D/動画）でも同じ状態イベントをハブとして共有。状態イベントの発火は Core/Shell イベントバス経由で通知。
+
+## 参照
+- DTO: AvatarSetStateRequest.json
+- アセットテンプレ: data/templates/assets/pngtuber_mode3/README.md

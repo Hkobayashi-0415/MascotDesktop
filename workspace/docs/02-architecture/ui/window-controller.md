@@ -17,3 +17,8 @@
 8. Given 無操作タイマーON, When 一定時間操作なし, Then 省リソースモード(描画/更新抑制)へ遷移する。
 9. Given 最小/最大サイズガード, When ユーザが極端なリサイズを試みる, Then ガード範囲内に制限される。
 10. Given 終了処理, When ウィンドウを閉じる, Then 保存失敗時はエラーをログ/通知しつつ終了またはキャンセルを選択できる。
+
+## 対応DTO/イベント
+- WindowEvent.json (topmost_toggle, clickthrough_toggle, safe_unlock)
+- WindowPositionSave.json (位置/サイズ保存)
+- ConfigSet/ConfigGet (Topmost/透過/スクショ除外等)
