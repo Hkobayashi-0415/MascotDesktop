@@ -1,0 +1,68 @@
+# Environments / dependencies
+venv/
+**/venv/
+node_modules/
+__pycache__/
+**/__pycache__/
+
+# Builds / artifacts
+dist/
+build/
+*.log
+logs/
+secrets/
+
+# Databases / assets (user data)
+data/db/
+data/assets_user/
+**/db.sqlite3
+
+# Static build outputs
+**/staticfiles/
+
+# Configs with secrets
+**/settings.py
+
+# OS cruft
+*.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Executables
+*.exe
+*.dll
+*.pdb
+*.lib
+
+# Unity/Game files
+*.dat
+GameAssembly.dll
+UnityPlayer.dll
+UnityCrashHandler64.exe
+
+# Large binary files
+*.mp4
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+
+# User data
+UserData/
+UserDataM/
+
+# Reference files
+refs/
