@@ -27,31 +27,31 @@ data/assets_user/
 *.DS_Store
 Thumbs.db
 
-# IDE
+# IDE / editors
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Python
+# Python bytecode
 *.pyc
 *.pyo
 *.pyd
 .Python
 
-# Executables
+# Executables / libs
 *.exe
 *.dll
 *.pdb
 *.lib
 
-# Unity/Game files
+# Unity/Game binaries (keep templates out of repo)
 *.dat
 GameAssembly.dll
 UnityPlayer.dll
 UnityCrashHandler64.exe
 
-# Large binary files
+# Large binary defaults (allow template assets explicitly)
 *.mp4
 *.png
 *.jpg
@@ -59,10 +59,11 @@ UnityCrashHandler64.exe
 *.gif
 *.ico
 *.svg
+!data/templates/assets/**
 
-# User data
+# User data (runtime)
 UserData/
 UserDataM/
 
-# Reference files
+# Reference files (not in repo by design, sibling dir)
 refs/
