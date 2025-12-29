@@ -10,7 +10,7 @@ from tkinter import ttk
 from urllib import request
 from urllib.error import HTTPError
 
-sys.path.append(os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)), "apps"))
+sys.path.append(os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir)), "apps"))
 from common.observability.context import clear_context, ensure_request_id, set_context  # noqa: E402
 from common.observability.logging import bootstrap_logging, get_logger, log_extra  # noqa: E402
 from common.observability.sanitize import summarize_payload  # noqa: E402
@@ -18,7 +18,7 @@ from common.observability.sanitize import summarize_payload  # noqa: E402
 
 def workspace_root() -> str:
     here = os.path.abspath(os.path.dirname(__file__))
-    return os.path.abspath(os.path.join(here, os.pardir, os.pardir))
+    return os.path.abspath(os.path.join(here, os.pardir, os.pardir, os.pardir))
 
 
 WS_ROOT = workspace_root()
@@ -46,6 +46,17 @@ def set_feature_ctx(feature: str):
 def ensure_dirs():
     os.makedirs(USER_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(IMG_PATH), exist_ok=True)
+
+
+def warn_if_non_ascii_path():
+    paths = [os.getcwd(), WS_ROOT]
+    if any(any(ord(ch) > 127 for ch in p) for p in paths):
+        msg = "Non-ASCII path detected. Recommend copying repo to ASCII path (e.g., C:\\dev\\MascotDesktop\\workspace)."
+        logging.warning(msg)
+        try:
+            print(msg)
+        except Exception:
+            pass
 
 
 def placeholder_image():
@@ -507,6 +518,7 @@ class ShellApp:
 
 def main():
     bootstrap_logging("shell", LOG_DIR)
+    warn_if_non_ascii_path()
     ensure_dirs()
     app = ShellApp()
     app.run()

@@ -10,6 +10,7 @@
 - ChatSendRequest/Response: テキスト送信、LLM応答（音声クリップ優先/TTSフォールバックのメタ含む）。
 - AudioPlayRequest: クリップID or カテゴリ指定、割込み許可フラグ、音量。
 - AvatarSetStateRequest: state遷移要求（idle/talk/notify/sleep/on/smile/oko 等）、avatar_mode指定可。
+- AvatarLoadModelRequest / AvatarPlayMotionRequest: Mode1 (MMD) 向けのロード/モーション再生要求。HealthCheckで viewer の生存を確認。
 - WindowEvent: drag/move/position-save/topmost-toggle/clickthrough-toggle/safe-unlock。
 - ReminderUpsertRequest: リマインド登録/更新/削除フラグ。
 - HealthCheck: service=core/memory/shell/audio/avatar/scheduler。

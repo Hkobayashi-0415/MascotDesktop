@@ -8,7 +8,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-WS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+WS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
 sys.path.append(os.path.join(WS_ROOT, "apps"))
 
 from common.observability.context import clear_context, ensure_request_id, set_context  # noqa: E402
@@ -29,6 +29,13 @@ DEFAULT_CONFIG = {
 
 def ensure_dirs():
     os.makedirs(os.path.dirname(USER_CONFIG), exist_ok=True)
+    # Non-ASCII path guard (warn only)
+    cwd = os.getcwd()
+    if any(ord(ch) > 127 for ch in cwd):
+        logging.warning(
+            "Non-ASCII path detected (%s). Recommend using ASCII path like C:\\dev\\MascotDesktop\\workspace",
+            cwd,
+        )
 
 
 def load_config():

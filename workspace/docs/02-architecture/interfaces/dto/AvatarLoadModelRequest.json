@@ -1,0 +1,8 @@
+{
+  "dto_version": "0.1.0",
+  "request_id": "req-avatar-load-1",
+  "model_path": "data/assets_user/characters/sample/mmd/model.pmx",
+  "textures_root": "data/assets_user/characters/sample/mmd/textures",
+  "scale": 1.0,
+  "initial_state": "idle"
+}

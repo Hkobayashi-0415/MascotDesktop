@@ -8,21 +8,23 @@
 ## 実行
 ```powershell
 cd "C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace"
-python apps/core/poc_core_http.py   # 先に起動（別ターミナルで）
-python apps/shell/poc_shell.py      # 後で起動
+python apps/core/poc/poc_core_http.py   # 先に起動（別ターミナルで）
+python apps/shell/poc/poc_shell.py      # 後で起動
+python apps/avatar/poc/poc_avatar_mmd_viewer.py  # Avatar Mode1 viewer（別ターミナル可、表示のみPoC）
 ```
 - Escで終了。キー `t` でTopmost切替。
 
 ### 詰まり検知用スモーク
 ```powershell
 cd "C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace"
-python apps/core/poc_core_http.py   # ターミナルAで起動
+python apps/core/poc/poc_core_http.py   # ターミナルAで起動
 # もう1つのターミナルで
 scripts/dev/smoke_ipc.ps1           # health / bad json / missing fields を叩く
 ```
 - 3ケースとも JSON が返り、`request_id` が付くこと。
 - 異常系は `error_code` が付くこと（例: CORE.IPC.BAD_REQUEST.INVALID_JSON）。
 - ログ追跡は `logs/core/ipc.log` と `logs/shell/ipc.log` を `request_id` で grep/jq。
+- Avatar viewer を起動して `/avatar/health` を叩くと `logs/avatar/avatar.health.log` に記録される（現状はプレースホルダ表示のみ）。`/avatar/load` でモデルパスを送るとロード完了メタを返す。
 
 ## 期待動作（受入条件チェック）
 - フレームレスで画像が表示される（01_normal）。
@@ -39,3 +41,4 @@ scripts/dev/smoke_ipc.ps1           # health / bad json / missing fields を叩�
 - OneDriveパス: 日本語パスに起因する不具合があれば、ASCIIパス側に丸ごとコピーして実行。
 - 画像なし: `data/templates/assets/pngtuber_mode3/states/01_normal.png` が無ければ自動生成のプレースホルダを使用。
 - ポート競合: Coreデフォルト8765が埋まっている場合は `poc_core_http.py` を修正、または環境変数で上書き。
+- Avatar viewer のデフォルトポートは 8770。競合時は `poc_avatar_mmd_viewer.py` を修正。
