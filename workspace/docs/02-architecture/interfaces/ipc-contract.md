@@ -25,3 +25,12 @@
 ## バージョニング
 - `dto_version`: string (例 "0.1.0")。破壊的変更時にメジャー更新。
 - Transportは後日確定。エンドポイント/pipe名は `core/chat`, `core/config`, `shell/window`, `shell/avatar`, `shell/audio`, `scheduler/reminder`, `health` などを想定。
+
+## 相関 (Correlation)
+- リクエストIDはヘッダ `X-Request-Id` に載せ、Bodyの `request_id` と同一にする。存在しなければCore/Shellが生成。
+- ログは component/feature 単位で出力しつつ request_id で横断追跡可能にする。
+
+## ログ方針（抜粋）
+- payload全文は記録せずメタ情報のみ（キー一覧、サイズ、content_length）。
+- error_code がある場合はレスポンスとログに載せる（後方互換のためcodeは任意フィールド）。
+- エラーコードの一覧は `docs/02-architecture/interfaces/error-codes.md` を参照。

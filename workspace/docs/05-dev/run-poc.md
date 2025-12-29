@@ -13,13 +13,26 @@ python apps/shell/poc_shell.py      # 後で起動
 ```
 - Escで終了。キー `t` でTopmost切替。
 
+### 詰まり検知用スモーク
+```powershell
+cd "C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace"
+python apps/core/poc_core_http.py   # ターミナルAで起動
+# もう1つのターミナルで
+scripts/dev/smoke_ipc.ps1           # health / bad json / missing fields を叩く
+```
+- 3ケースとも JSON が返り、`request_id` が付くこと。
+- 異常系は `error_code` が付くこと（例: CORE.IPC.BAD_REQUEST.INVALID_JSON）。
+- ログ追跡は `logs/core/ipc.log` と `logs/shell/ipc.log` を `request_id` で grep/jq。
+
 ## 期待動作（受入条件チェック）
 - フレームレスで画像が表示される（01_normal）。
 - 左ドラッグでウィンドウ移動。
-- ドラッグ中は `/v1/config/set` を送らず、ボタンを離した瞬間に1回だけ送信される（Coreログで確認）。
+- ドラッグ中は `/v1/config/set` を送らず、ボタンを離した瞬間に1回だけ送信される（reason=drag_end を Coreログで確認）。
 - 終了時に位置/サイズが `data/user/config.json` に保存され、再起動で復元。
 - `t`キーでTopmost ON/OFFが切り替わり、状態は終了時に保存。
-- Core連携: 起動時に `/health`、`/v1/config/get` を叩き、位置/Topmostを反映。移動/Topmost変更で `/v1/config/set` を送る。
+- Core連携: 起動時に `/health`、`/v1/config/get` を叩き、位置/Topmostを反映。移動/Topmost変更で `/v1/config/set` を送る（reason=drag_end/topmost_toggle）。
+- ログ追跡: drag_end/topmost は `logs/shell/window.log` と `logs/core/config.log` に同じ `request_id` が出る。
+- エラー確認: 失敗時はレスポンスに `error_code` が入る（例: CORE.IPC.BAD_REQUEST.INVALID_JSON）。`logs/core/config.log` などに同じ `request_id` と `error_code` が出る。
 
 ## トラブルシュート
 - 透過しない: WindowsテーマやGPU設定で透明色が効かない場合あり。背景色が白であることを確認。
