@@ -16,6 +16,8 @@ secrets/
 data/db/
 data/assets_user/
 **/db.sqlite3
+*.sqlite3
+attic/
 
 # Static build outputs
 **/staticfiles/
