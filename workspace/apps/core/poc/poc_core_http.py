@@ -23,8 +23,12 @@ DEFAULT_CONFIG = {
     "window_y": 100,
     "width": 320,
     "height": 320,
-    "topmost": True,
+    "pinned": True,
 }
+
+# simple dedup cache: request_id -> timestamp
+RECENT_REQUESTS: dict[str, float] = {}
+DEDUP_TTL_SECONDS = 10
 
 
 def ensure_dirs():
@@ -47,6 +51,9 @@ def load_config():
             data = json.load(f)
         merged = DEFAULT_CONFIG.copy()
         merged.update(data)
+        # backward compatibility: if pinned missing but topmost exists, map it
+        if "pinned" not in merged and "topmost" in merged:
+            merged["pinned"] = bool(merged.get("topmost"))
         return merged
     except Exception as e:
         get_logger("config").exception(
@@ -261,6 +268,40 @@ class Handler(BaseHTTPRequestHandler):
             # config.set
             if parsed.path == "/v1/config/set":
                 set_context(feature="config")
+                # dedup by request_id within TTL
+                now_ts = time.time()
+                # purge expired
+                expired = [k for k, v in RECENT_REQUESTS.items() if now_ts - v > DEDUP_TTL_SECONDS]
+                for k in expired:
+                    RECENT_REQUESTS.pop(k, None)
+                if req_id in RECENT_REQUESTS:
+                    cfg = load_config()
+                    body = success_envelope(
+                        {
+                            "dto_version": payload.get("dto_version", "0.1.0"),
+                            "status": "ok",
+                            "config": cfg,
+                            "reason": payload.get("reason"),
+                            "dedup": True,
+                        },
+                        req_id,
+                    )
+                    self._set_headers(200, request_id=req_id)
+                    self.wfile.write(json.dumps(body, ensure_ascii=False).encode("utf-8"))
+                    duration_ms = int((time.perf_counter() - start) * 1000)
+                    get_logger("config").info(
+                        "config.set.dedup",
+                        extra=log_extra(
+                            "config",
+                            "config.set.dedup",
+                            request_id=req_id,
+                            duration_ms=duration_ms,
+                            status_code=200,
+                            reason=payload.get("reason"),
+                        ),
+                    )
+                    return
+
                 cfg = load_config()
                 updates = payload.get("entries")
                 if not isinstance(updates, dict) or not updates:
@@ -282,6 +323,7 @@ class Handler(BaseHTTPRequestHandler):
                         ),
                     )
                     return
+                RECENT_REQUESTS[req_id] = now_ts
                 cfg.update(updates)
                 ok = save_config(cfg)
                 status_code = 200 if ok else 500

@@ -5,6 +5,8 @@
 |---|---|
 | 2025-12-26 | public_files-main を参照に追加。WindowController受入条件/AvatarRenderer(Mode3)状態遷移を反映。マッピング表を更新。 |
 | 2025-12-30 | PoCエントリを apps/*/poc に整理、ASCIIパス警告を追加。Avatar Mode1 (MMD) を別プロセスViewerで縦切りPoC開始、MMDアセット配置規約を追記。 |
+| 2025-12-30 | Topmost切替をUI操作（ボタン/右クリック）に変更。tキー無効化、idempotentな set_topmost で1操作1送信に統一。 |
+| 2025-12-30 | Topmost操作を「Pinned/Normal」の2モードに整理。UIボタン/右クリックで切替。pinnedがconfigの正に。 |
 
 ## 1. 背景・目的
 - Windowsローカル専用の常駐AIマスコット。CocoroAIはブラックボックス参照のみ。日本語パス非対応リスクを回避（ASCII前提）。
@@ -40,7 +42,7 @@
 - 参照: `docs/02-architecture/avatar/avatar-renderer.md`, `data/templates/assets/pngtuber_mode3/README.md`, `docs/02-architecture/assets/asset-handling.md`.
 
 ## 8. ウィンドウ仕様
-- フレームレス/透過、ドラッグ移動、位置/サイズ保存/復元。Topmost ON/OFF。クリック透過はオプション＋安全ホットキー。最小/最大サイズガード。
+- フレームレス/透過、ドラッグ移動、位置/サイズ保存/復元。Topmostは「Pinned/Normal」の2モードをUI（ボタン/右クリックメニュー）で操作し、キー依存を排除。クリック透過はオプション＋安全ホットキー。最小/最大サイズガード。ドラッグ中送信なし、リリース時1回のみconfig.set。pinnedをsource of truthとしてCore/Shellで保存・復元。
 
 ## 9. DBデータモデル案
 - characters, character_versions, character_prompts, character_voice_profiles, character_audio_clips, character_assets, tags/character_tags, memory_items, reminders, speaker_profiles, audit_logs, user_character_affinity。

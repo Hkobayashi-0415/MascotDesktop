@@ -1,7 +1,9 @@
 {
-  "window_x": 715,
-  "window_y": 51,
+  "window_x": -330,
+  "window_y": 288,
   "width": 320,
   "height": 320,
-  "topmost": true
+  "topmost": true,
+  "pinned": true,
+  "image_fit_mode": "contain"
 }
