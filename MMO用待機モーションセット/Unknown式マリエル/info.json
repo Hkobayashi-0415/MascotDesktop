@@ -1,0 +1,13 @@
+{
+	"name": "char:マリエル:Unknown式",
+	"character":
+		{
+			"height":1.40,
+			"motions":
+				{
+					"stand":"marieru_stand.vmd",
+					"walk": 	"basic_walk.vmd",
+					"run":	"basic_run.vmd"
+				}
+		}
+}

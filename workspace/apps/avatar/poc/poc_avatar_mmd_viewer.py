@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 import sys
 import threading
 import tkinter as tk
@@ -9,6 +10,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 import webbrowser
+import time
 
 # Workspace root (three levels up: apps/avatar/poc -> workspace)
 WS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
@@ -19,110 +21,18 @@ from common.observability.logging import bootstrap_logging, get_logger, log_extr
 
 LOG_DIR = Path(WS_ROOT) / "logs" / "avatar"
 CURRENT_MODEL_PATH = None
+VIEWER_DIR = Path(WS_ROOT) / "viewer"
+STATE = {
+    "model_path": None,
+    "current_motion_path": None,
+    "current_slot": None,
+    "motion": None,
+    "last_error": None,
+    "updated_at": None,
+}
 DEFAULT_MODEL = "data/assets_user/characters/kanata_official_v1/mmd/model.pmx"
 # Browser auto-openはデフォルトOFF。必要なら環境変数 AVATAR_OPEN_BROWSER=1 をセット。
 DEFAULT_OPEN_BROWSER = os.environ.get("AVATAR_OPEN_BROWSER", "0") == "1"
-
-# Simple HTML viewer using three.js + MMDLoader (CDN)
-VIEWER_HTML = """<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>MMD Viewer PoC</title>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
-      }
-    }
-  </script>
-  <style>
-    body, html { margin: 0; padding: 0; overflow: hidden; background: #111; color: #eee; }
-    #info { position: absolute; top: 8px; left: 8px; z-index: 10; font-family: Arial, sans-serif; background: rgba(0,0,0,0.5); padding: 6px 8px; border-radius: 4px; }
-  </style>
-</head>
-<body>
-  <div id="info">MMD Viewer PoC<br/>Loading model...</div>
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
-
-    const info = document.getElementById('info');
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111111);
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
-    camera.position.set(0, 10, 40);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
-    hemi.position.set(0, 20, 0);
-    scene.add(hemi);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-    dir.position.set(20, 20, 10);
-    scene.add(dir);
-
-    let mesh = null;
-
-    async function fetchModel() {
-      const res = await fetch('/avatar/current_model');
-      if (!res.ok) throw new Error('no model set');
-      const data = await res.json();
-      if (!data.model_url || !data.resource_base) throw new Error('invalid model info');
-      return data;
-    }
-
-    async function loadModel() {
-      try {
-        info.textContent = 'Loading model...';
-        const { model_url, resource_base } = await fetchModel();
-        const loader = new MMDLoader();
-        loader.setResourcePath(resource_base);
-        loader.load(
-          model_url,
-          (obj) => {
-            if (mesh) scene.remove(mesh);
-            mesh = obj;
-            mesh.position.y = -10;
-            scene.add(mesh);
-            info.textContent = 'Loaded: ' + model_url;
-          },
-          (xhr) => { info.textContent = 'Loading... ' + (xhr.total ? Math.floor((xhr.loaded / xhr.total) * 100) : '?') + '%'; },
-          (err) => { info.textContent = 'Load error: ' + err; console.error(err); }
-        );
-      } catch (e) {
-        info.textContent = 'No model loaded. POST /avatar/load first.';
-        console.warn(e);
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
-    loadModel();
-    setInterval(loadModel, 3000); // simple poll for new model
-  </script>
-</body>
-</html>
-"""
 
 
 def warn_if_non_ascii_path():
@@ -134,6 +44,109 @@ def warn_if_non_ascii_path():
             print(msg)
         except Exception:
             pass
+
+
+def find_default_motion(model_path: str | None):
+    """Try to find a default idle motion relative to the model."""
+    if not model_path:
+        return None
+    base = Path(WS_ROOT) / model_path
+    candidates = [
+        base.with_suffix(".vmd"),
+        base.parent / "motions" / "idle.vmd",
+        base.parent / "idle.vmd",
+    ]
+    for c in candidates:
+        if c.exists():
+            return str(c.relative_to(WS_ROOT)).replace("\\", "/")
+    return None
+
+
+def load_manifest(model_path: str | None):
+    """manifest.json を model と同階層から読み込む（存在しない場合は None）。"""
+    if not model_path:
+        return None, None
+    manifest_path = (Path(WS_ROOT) / model_path).parent / "manifest.json"
+    if not manifest_path.exists():
+        return None, None
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data, manifest_path
+    except Exception as e:
+        get_logger("avatar.ipc").warning(
+            "avatar.manifest.load_failed",
+            extra=log_extra(
+                "avatar.ipc",
+                "avatar.manifest.load_failed",
+                request_id=ensure_request_id(),
+                error=str(e),
+                manifest=str(manifest_path),
+            ),
+        )
+        return None, manifest_path
+
+
+def build_motion_dict(motion_path: str, slot: str | None = None, variant: dict | None = None):
+    variant = variant or {}
+    return {
+        "motion_path": motion_path,
+        "slot": slot,
+        "loop": bool(variant.get("loop", True)),
+        "time_scale": float(variant.get("time_scale", 1.0)),
+        "root_lock": bool(variant.get("root_lock", False)),
+        "crossfade_sec": float(variant.get("crossfade_sec", 0.35)),
+        "physics": bool(variant.get("physics", False)),
+    }
+
+
+def resolve_motion_from_slot(slot: str, model_path: str):
+    manifest, manifest_path = load_manifest(model_path)
+    if manifest and "motions" in manifest and "slots" in manifest["motions"]:
+        slot_info = manifest["motions"]["slots"].get(slot)
+        if slot_info and slot_info.get("variants"):
+            variants = slot_info["variants"]
+            weights = [v.get("weight", 1) for v in variants]
+            total = sum(weights)
+            r = random.uniform(0, total)
+            upto = 0
+            chosen = variants[0]
+            for v, w in zip(variants, weights):
+                if upto + w >= r:
+                    chosen = v
+                    break
+                upto += w
+            path = chosen.get("path")
+            if path:
+                base_dir = manifest_path.parent if manifest_path else Path(WS_ROOT)
+                resolved = (base_dir / path).resolve()
+                try:
+                    rel = resolved.relative_to(WS_ROOT)
+                    rel_str = str(rel).replace("\\", "/")
+                except Exception:
+                    rel_str = str(resolved).replace("\\", "/")
+                return build_motion_dict(rel_str, slot=slot, variant=chosen)
+    if slot == "idle":
+        fallback = find_default_motion(model_path)
+        if fallback:
+            return build_motion_dict(fallback, slot="idle", variant={})
+    return None
+
+
+def update_state(model_path=None, motion_path=None, motion=None, slot=None, error=None):
+    global STATE, CURRENT_MODEL_PATH
+    if model_path is not None:
+        CURRENT_MODEL_PATH = model_path
+        STATE["model_path"] = model_path
+    if motion is not None:
+        STATE["motion"] = motion
+        STATE["current_motion_path"] = motion.get("motion_path") if motion else None
+    elif motion_path is not None:
+        STATE["current_motion_path"] = motion_path
+    if slot is not None:
+        STATE["current_slot"] = slot
+    STATE["last_error"] = error
+    STATE["updated_at"] = time.time()
 
 
 class ViewerUI:
@@ -215,12 +228,66 @@ class Handler(BaseHTTPRequestHandler):
                 "avatar.health", extra=log_extra("avatar.health", "avatar.health", request_id=req_id, status_code=200)
             )
             return
-        if parsed.path == "/viewer":
-            # Serve inline HTML viewer
+        if parsed.path == "/viewer" or parsed.path == "/viewer/":
+            index_file = VIEWER_DIR / "index.html"
+            if not index_file.exists():
+                self.send_error(500, "viewer files not found")
+                return
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
-            self.wfile.write(VIEWER_HTML.encode("utf-8"))
+            with open(index_file, "rb") as f:
+                self.wfile.write(f.read())
+            return
+        if parsed.path == "/viewer/state":
+            # ensure some baseline state
+            if not STATE.get("model_path"):
+                if CURRENT_MODEL_PATH:
+                    update_state(model_path=CURRENT_MODEL_PATH, motion=STATE.get("motion"), error=None)
+                elif os.path.exists(os.path.join(WS_ROOT, DEFAULT_MODEL)):
+                    motion_dict = resolve_motion_from_slot("idle", DEFAULT_MODEL) or (
+                        lambda p: build_motion_dict(p, slot="idle") if p else None
+                    )(find_default_motion(DEFAULT_MODEL))
+                    update_state(model_path=DEFAULT_MODEL, motion=motion_dict, error=None)
+            payload = success(
+                {
+                    "status": "ok",
+                    "dto_version": "0.1.0",
+                    "model_path": STATE.get("model_path"),
+                    "current_motion_path": STATE.get("current_motion_path") or (STATE.get("motion") or {}).get("motion_path"),
+                    "current_slot": STATE.get("current_slot") or (STATE.get("motion") or {}).get("slot"),
+                    "motion": STATE.get("motion"),
+                    "last_error": STATE.get("last_error"),
+                    "updated_at": STATE.get("updated_at"),
+                },
+                req_id,
+            )
+            self._set_headers(200, request_id=req_id)
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+            return
+        if parsed.path.startswith("/viewer/"):
+            rel = parsed.path[len("/viewer/") :]
+            rel = "index.html" if rel == "" else rel
+            target = (VIEWER_DIR / rel).resolve()
+            if not str(target).startswith(str(VIEWER_DIR.resolve())):
+                self.send_error(403, "forbidden")
+                return
+            if not target.exists() or not target.is_file():
+                self.send_error(404, "not found")
+                return
+            ct = "application/octet-stream"
+            lower = target.name.lower()
+            if lower.endswith(".html"):
+                ct = "text/html; charset=utf-8"
+            elif lower.endswith(".js"):
+                ct = "text/javascript; charset=utf-8"
+            elif lower.endswith(".css"):
+                ct = "text/css; charset=utf-8"
+            self.send_response(200)
+            self.send_header("Content-Type", ct)
+            self.end_headers()
+            with open(target, "rb") as f:
+                self.wfile.write(f.read())
             return
         if parsed.path == "/favicon.ico":
             self.send_response(204)
@@ -293,28 +360,56 @@ class Handler(BaseHTTPRequestHandler):
 
         if parsed.path == "/avatar/play":
             motion_path = payload.get("motion_path")
-            note = "motion playback not implemented (stub)"
+            slot = payload.get("slot")
+            if not motion_path and not slot:
+                self._set_headers(400, request_id=req_id)
+                payload_err = error(req_id, "AVATAR.PLAY.MISSING_PARAM", "slot or motion_path is required", 400)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+            if not STATE.get("model_path"):
+                self._set_headers(400, request_id=req_id)
+                payload_err = error(req_id, "AVATAR.PLAY.NO_MODEL", "model is not loaded", 400)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+
+            motion = None
+            if slot:
+                motion = resolve_motion_from_slot(slot, STATE.get("model_path"))
+                if not motion:
+                    self._set_headers(404, request_id=req_id)
+                    payload_err = error(
+                        req_id,
+                        "MOTION_NOT_FOUND",
+                        f"motion not found for slot '{slot}'",
+                        404,
+                    )
+                    self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                    return
+            if motion_path:
+                motion = build_motion_dict(motion_path, slot=slot or (motion.get("slot") if motion else None))
+
+            update_state(motion=motion, slot=motion.get("slot") if motion else slot, error=None)
+            note = "motion set; viewer will pick up on next poll"
             self._set_headers(200, request_id=req_id)
             payload_ok = success(
                 {
                     "status": "ok",
                     "dto_version": payload.get("dto_version", "0.1.0"),
-                    "request_id": req_id,
                     "note": note,
-                    "motion_path": motion_path,
+                    "motion": motion,
                 },
                 req_id,
             )
             self.wfile.write(json.dumps(payload_ok, ensure_ascii=False).encode("utf-8"))
             get_logger("avatar.ipc").info(
-                "avatar.play.stub",
+                "avatar.play",
                 extra=log_extra(
                     "avatar.ipc",
-                    "avatar.play.stub",
+                    "avatar.play",
                     request_id=req_id,
                     status_code=200,
-                    motion_path=motion_path,
-                    note=note,
+                    motion_path=motion.get("motion_path") if motion else motion_path,
+                    slot=motion.get("slot") if motion else slot,
                 ),
             )
             return
@@ -335,14 +430,42 @@ class Handler(BaseHTTPRequestHandler):
                     ),
                 )
                 return
-            global CURRENT_MODEL_PATH
-            CURRENT_MODEL_PATH = model_path
+            motion = None
+            if payload.get("default_motion_path"):
+                motion = build_motion_dict(payload["default_motion_path"], slot="idle")
+            else:
+                motion = resolve_motion_from_slot("idle", model_path) or (
+                    lambda p: build_motion_dict(p, slot="idle") if p else None
+                )(find_default_motion(model_path))
+            if not motion:
+                self._set_headers(404, request_id=req_id)
+                payload_err = error(
+                    req_id,
+                    "MOTION_NOT_FOUND",
+                    "idle motion not found (manifest missing and idle.vmd absent)",
+                    404,
+                )
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                update_state(model_path=model_path, motion=None, slot=None, error=payload_err["error_code"])
+                get_logger("avatar.ipc").warning(
+                    "avatar.load.motion_missing",
+                    extra=log_extra(
+                        "avatar.ipc",
+                        "avatar.load.motion_missing",
+                        request_id=req_id,
+                        model_path=model_path,
+                        error_code="MOTION_NOT_FOUND",
+                    ),
+                )
+                return
+            update_state(model_path=model_path, motion=motion, slot=motion.get("slot") if motion else None, error=None)
             self._set_headers(200, request_id=req_id)
             payload_ok = success(
                 {
                     "status": "ok",
                     "dto_version": payload.get("dto_version", "0.1.0"),
                     "loaded_model": model_path,
+                    "default_motion": motion.get("motion_path") if motion else None,
                     "note": "Viewer will attempt to load model via /viewer page.",
                 },
                 req_id,
@@ -391,9 +514,11 @@ def run_server(host="127.0.0.1", port=8770):
 def main():
     server = run_server()
     # auto-load default model if exists
-    global CURRENT_MODEL_PATH
     if os.path.exists(os.path.join(WS_ROOT, DEFAULT_MODEL)):
-        CURRENT_MODEL_PATH = DEFAULT_MODEL
+        motion = resolve_motion_from_slot("idle", DEFAULT_MODEL) or (
+            lambda p: build_motion_dict(p, slot="idle") if p else None
+        )(find_default_motion(DEFAULT_MODEL))
+        update_state(model_path=DEFAULT_MODEL, motion=motion, slot=motion.get("slot") if motion else None, error=None)
         get_logger("avatar.ipc").info(
             "avatar.load.default",
             extra=log_extra(
@@ -401,6 +526,7 @@ def main():
                 "avatar.load.default",
                 request_id="auto-default",
                 model_path=DEFAULT_MODEL,
+                motion_path=motion.get("motion_path") if motion else None,
             ),
         )
     else:

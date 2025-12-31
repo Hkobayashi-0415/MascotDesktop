@@ -1,0 +1,13 @@
+{
+	"name": "char:さぼてんミクVS2:さぼてん式",
+	"character":
+		{
+			"height":1.70,
+			"motions":
+				{
+					"stand":"ten_stand.vmd",
+					"walk": 	"basic_walk.vmd",
+					"run":	"basic_run.vmd"
+				}
+		}
+}

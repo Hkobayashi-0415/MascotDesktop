@@ -1,0 +1,13 @@
+{
+	"name": "char:小悪魔(こあ):アールビット式",
+	"character":
+		{
+			"height":1.60,
+			"motions":
+				{
+					"stand":"koa_stand.vmd",
+					"walk": 	"basic_walk.vmd",
+					"run":	"basic_run.vmd"
+				}
+		}
+}
