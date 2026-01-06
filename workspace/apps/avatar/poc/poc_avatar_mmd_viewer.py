@@ -33,6 +33,7 @@ STATE = {
 DEFAULT_MODEL = "data/assets_user/characters/kanata_official_v1/mmd/model.pmx"
 # Browser auto-openはデフォルトOFF。必要なら環境変数 AVATAR_OPEN_BROWSER=1 をセット。
 DEFAULT_OPEN_BROWSER = os.environ.get("AVATAR_OPEN_BROWSER", "0") == "1"
+_UNSET = object()
 
 
 def warn_if_non_ascii_path():
@@ -51,11 +52,7 @@ def find_default_motion(model_path: str | None):
     if not model_path:
         return None
     base = Path(WS_ROOT) / model_path
-    candidates = [
-        base.with_suffix(".vmd"),
-        base.parent / "motions" / "idle.vmd",
-        base.parent / "idle.vmd",
-    ]
+    candidates = [base.parent / "idle.vmd"]
     for c in candidates:
         if c.exists():
             return str(c.relative_to(WS_ROOT)).replace("\\", "/")
@@ -65,14 +62,14 @@ def find_default_motion(model_path: str | None):
 def load_manifest(model_path: str | None):
     """manifest.json を model と同階層から読み込む（存在しない場合は None）。"""
     if not model_path:
-        return None, None
+        return None, None, "MANIFEST_NOT_FOUND"
     manifest_path = (Path(WS_ROOT) / model_path).parent / "manifest.json"
     if not manifest_path.exists():
-        return None, None
+        return None, manifest_path, "MANIFEST_NOT_FOUND"
     try:
         with open(manifest_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return data, manifest_path
+        return data, manifest_path, None
     except Exception as e:
         get_logger("avatar.ipc").warning(
             "avatar.manifest.load_failed",
@@ -84,7 +81,7 @@ def load_manifest(model_path: str | None):
                 manifest=str(manifest_path),
             ),
         )
-        return None, manifest_path
+        return None, manifest_path, "MANIFEST_NOT_FOUND"
 
 
 def build_motion_dict(motion_path: str, slot: str | None = None, variant: dict | None = None):
@@ -101,7 +98,7 @@ def build_motion_dict(motion_path: str, slot: str | None = None, variant: dict |
 
 
 def resolve_motion_from_slot(slot: str, model_path: str):
-    manifest, manifest_path = load_manifest(model_path)
+    manifest, manifest_path, manifest_err = load_manifest(model_path)
     if manifest and "motions" in manifest and "slots" in manifest["motions"]:
         slot_info = manifest["motions"]["slots"].get(slot)
         if slot_info and slot_info.get("variants"):
@@ -120,32 +117,39 @@ def resolve_motion_from_slot(slot: str, model_path: str):
             if path:
                 base_dir = manifest_path.parent if manifest_path else Path(WS_ROOT)
                 resolved = (base_dir / path).resolve()
+                if not resolved.exists():
+                    return None, "MOTION_NOT_FOUND"
                 try:
                     rel = resolved.relative_to(WS_ROOT)
                     rel_str = str(rel).replace("\\", "/")
                 except Exception:
                     rel_str = str(resolved).replace("\\", "/")
-                return build_motion_dict(rel_str, slot=slot, variant=chosen)
+                return build_motion_dict(rel_str, slot=slot, variant=chosen), None
+        return None, "MOTION_NOT_FOUND"
     if slot == "idle":
         fallback = find_default_motion(model_path)
         if fallback:
-            return build_motion_dict(fallback, slot="idle", variant={})
-    return None
+            return build_motion_dict(fallback, slot="idle", variant={}), None
+        return None, "MOTION_NOT_FOUND"
+    if manifest_err:
+        return None, "MANIFEST_NOT_FOUND"
+    return None, "MOTION_NOT_FOUND"
 
 
-def update_state(model_path=None, motion_path=None, motion=None, slot=None, error=None):
+def update_state(model_path=_UNSET, motion_path=_UNSET, motion=_UNSET, slot=_UNSET, error=_UNSET):
     global STATE, CURRENT_MODEL_PATH
-    if model_path is not None:
+    if model_path is not _UNSET:
         CURRENT_MODEL_PATH = model_path
         STATE["model_path"] = model_path
-    if motion is not None:
+    if motion is not _UNSET:
         STATE["motion"] = motion
         STATE["current_motion_path"] = motion.get("motion_path") if motion else None
-    elif motion_path is not None:
+    elif motion_path is not _UNSET:
         STATE["current_motion_path"] = motion_path
-    if slot is not None:
+    if slot is not _UNSET:
         STATE["current_slot"] = slot
-    STATE["last_error"] = error
+    if error is not _UNSET:
+        STATE["last_error"] = error
     STATE["updated_at"] = time.time()
 
 
@@ -245,10 +249,13 @@ class Handler(BaseHTTPRequestHandler):
                 if CURRENT_MODEL_PATH:
                     update_state(model_path=CURRENT_MODEL_PATH, motion=STATE.get("motion"), error=None)
                 elif os.path.exists(os.path.join(WS_ROOT, DEFAULT_MODEL)):
-                    motion_dict = resolve_motion_from_slot("idle", DEFAULT_MODEL) or (
-                        lambda p: build_motion_dict(p, slot="idle") if p else None
-                    )(find_default_motion(DEFAULT_MODEL))
-                    update_state(model_path=DEFAULT_MODEL, motion=motion_dict, error=None)
+                    motion_dict, motion_err = resolve_motion_from_slot("idle", DEFAULT_MODEL)
+                    update_state(
+                        model_path=DEFAULT_MODEL,
+                        motion=motion_dict,
+                        slot=motion_dict.get("slot") if motion_dict else None,
+                        error=None if motion_dict else motion_err,
+                    )
             payload = success(
                 {
                     "status": "ok",
@@ -374,12 +381,13 @@ class Handler(BaseHTTPRequestHandler):
 
             motion = None
             if slot:
-                motion = resolve_motion_from_slot(slot, STATE.get("model_path"))
+                motion, motion_err = resolve_motion_from_slot(slot, STATE.get("model_path"))
                 if not motion:
+                    code = motion_err or "MOTION_NOT_FOUND"
                     self._set_headers(404, request_id=req_id)
                     payload_err = error(
                         req_id,
-                        "MOTION_NOT_FOUND",
+                        code,
                         f"motion not found for slot '{slot}'",
                         404,
                     )
@@ -430,18 +438,34 @@ class Handler(BaseHTTPRequestHandler):
                     ),
                 )
                 return
+            abs_model = os.path.join(WS_ROOT, model_path)
+            if not os.path.exists(abs_model):
+                self._set_headers(404, request_id=req_id)
+                payload_err = error(req_id, "MODEL_NOT_FOUND", "model file not found", 404)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                update_state(error=payload_err["error_code"])
+                get_logger("avatar.ipc").warning(
+                    "avatar.load.model_missing",
+                    extra=log_extra(
+                        "avatar.ipc",
+                        "avatar.load.model_missing",
+                        request_id=req_id,
+                        model_path=model_path,
+                        error_code="MODEL_NOT_FOUND",
+                    ),
+                )
+                return
+
             motion = None
             if payload.get("default_motion_path"):
                 motion = build_motion_dict(payload["default_motion_path"], slot="idle")
             else:
-                motion = resolve_motion_from_slot("idle", model_path) or (
-                    lambda p: build_motion_dict(p, slot="idle") if p else None
-                )(find_default_motion(model_path))
+                motion, motion_err = resolve_motion_from_slot("idle", model_path)
             if not motion:
                 self._set_headers(404, request_id=req_id)
                 payload_err = error(
                     req_id,
-                    "MOTION_NOT_FOUND",
+                    motion_err or "MOTION_NOT_FOUND",
                     "idle motion not found (manifest missing and idle.vmd absent)",
                     404,
                 )
@@ -515,10 +539,13 @@ def main():
     server = run_server()
     # auto-load default model if exists
     if os.path.exists(os.path.join(WS_ROOT, DEFAULT_MODEL)):
-        motion = resolve_motion_from_slot("idle", DEFAULT_MODEL) or (
-            lambda p: build_motion_dict(p, slot="idle") if p else None
-        )(find_default_motion(DEFAULT_MODEL))
-        update_state(model_path=DEFAULT_MODEL, motion=motion, slot=motion.get("slot") if motion else None, error=None)
+        motion, motion_err = resolve_motion_from_slot("idle", DEFAULT_MODEL)
+        update_state(
+            model_path=DEFAULT_MODEL,
+            motion=motion,
+            slot=motion.get("slot") if motion else None,
+            error=None if motion else motion_err,
+        )
         get_logger("avatar.ipc").info(
             "avatar.load.default",
             extra=log_extra(

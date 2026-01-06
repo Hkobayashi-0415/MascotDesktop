@@ -16,6 +16,15 @@
 <body>
   <div id="overlay">
     <div id="status">Loading viewer...</div>
+    <div id="diag-controls" class="diag-group">
+      <span class="label">Diag:</span>
+      <button data-diag="base">Base</button>
+      <button data-diag="raw">Raw</button>
+      <button data-diag="solid">Solid</button>
+      <button data-diag="nearest">Nearest</button>
+      <button data-diag="premul">Premul</button>
+      <button data-diag="mipmap_on">Mip</button>
+    </div>
     <button id="reload">Reload</button>
   </div>
   <canvas id="canvas"></canvas>

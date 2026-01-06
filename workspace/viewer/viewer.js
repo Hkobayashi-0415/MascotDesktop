@@ -17,6 +17,181 @@ let currentRootBone = null;
 let baseRootPosition = null;
 let currentModelPath = null;
 let alphaToCoverageSupported = false;
+let diagOverlay = null;
+let diagPreset = 'base';
+
+const baseConfig = {
+  diag: 'base',
+  seamFix: {
+    enabled: true,
+    bias: 0.0015,
+    repeatMin: 0.995,
+    alphaTest: 0.5,
+    useAlphaToCoverage: true,
+    anisotropy: 'max', // number or 'max'
+    magFilterMode: 'linear', // linear | nearest
+    premultiplyAlpha: true,
+    alphaBleed: true,
+    alphaBleedRadius: 4,
+    alphaBleedPasses: 2,
+    allowMipMap: false,
+  },
+};
+
+let config = JSON.parse(JSON.stringify(baseConfig));
+
+function parseQueryOverrides() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('diag')) config.diag = params.get('diag');
+  const sf = config.seamFix;
+  if (params.has('seamFix')) sf.enabled = params.get('seamFix') === 'true';
+  if (params.has('bias')) sf.bias = parseFloat(params.get('bias'));
+  if (params.has('repeatMin')) sf.repeatMin = parseFloat(params.get('repeatMin'));
+  if (params.has('alphaTest')) sf.alphaTest = parseFloat(params.get('alphaTest'));
+  if (params.has('mag')) sf.magFilterMode = params.get('mag');
+  if (params.has('premul')) sf.premultiplyAlpha = params.get('premul') === 'true';
+  if (params.has('alphableed')) sf.alphaBleed = params.get('alphableed') === 'true';
+  if (params.has('alphableedRadius')) sf.alphaBleedRadius = parseInt(params.get('alphableedRadius'), 10);
+  if (params.has('alphableedpasses')) sf.alphaBleedPasses = parseInt(params.get('alphableedpasses'), 10);
+  if (params.has('alphableedPasses')) sf.alphaBleedPasses = parseInt(params.get('alphableedPasses'), 10);
+  if (params.has('allowMipMap')) sf.allowMipMap = params.get('allowMipMap') === 'true';
+  if (params.has('aniso')) {
+    const a = params.get('aniso');
+    sf.anisotropy = a === 'max' ? 'max' : parseInt(a, 10);
+  }
+}
+
+function updateDiagOverlay() {
+  if (!diagOverlay) {
+    diagOverlay = document.createElement('div');
+    diagOverlay.style.position = 'absolute';
+    diagOverlay.style.right = '8px';
+    diagOverlay.style.top = '32px';
+    diagOverlay.style.padding = '6px 8px';
+    diagOverlay.style.background = 'rgba(0,0,0,0.5)';
+    diagOverlay.style.color = '#eee';
+    diagOverlay.style.fontSize = '12px';
+    diagOverlay.style.zIndex = '10';
+    document.body.appendChild(diagOverlay);
+  }
+  const sf = config.seamFix;
+  const a2c = sf.useAlphaToCoverage !== false && alphaToCoverageSupported;
+  diagOverlay.textContent = `diag=${diagPreset} | bias=${sf.bias} repeatMin=${sf.repeatMin} alphaTest=${sf.alphaTest} mag=${sf.magFilterMode} premul=${sf.premultiplyAlpha} alphaBleed=${sf.alphaBleed} p=${sf.alphaBleedPasses} a2c=${a2c} mip=${sf.allowMipMap} aniso=${sf.anisotropy}`;
+}
+
+function setDiagPreset(name) {
+  diagPreset = name;
+  config = JSON.parse(JSON.stringify(baseConfig));
+  parseQueryOverrides();
+  switch (name) {
+    case 'raw': // disable viewer-side texture tweaks (baseline for comparison)
+      config.seamFix.enabled = false;
+      config.seamFix.premultiplyAlpha = false;
+      config.seamFix.alphaBleed = false;
+      config.seamFix.allowMipMap = false;
+      break;
+    case 'solid':
+      config.seamFix.enabled = false;
+      break;
+    case 'nearest':
+      config.seamFix.magFilterMode = 'nearest';
+      config.seamFix.premultiplyAlpha = false;
+      break;
+    case 'mipmap_on':
+      config.seamFix.magFilterMode = 'linear';
+      config.seamFix.premultiplyAlpha = false;
+      config.seamFix.allowMipMap = true;
+      break;
+    case 'premul':
+      config.seamFix.premultiplyAlpha = true;
+      break;
+    default:
+      break;
+  }
+  updateDiagOverlay();
+  reloadFromState();
+}
+
+function applyAlphaBleed(texture, opts = {}) {
+  if (!texture || !texture.image || texture._alphaBleedApplied) return texture;
+  const { radius = 2, premultiplyAlpha = false, passes = 1 } = opts;
+  const img = texture.image;
+  const hasSize = img && typeof img.width === 'number' && typeof img.height === 'number' && img.width > 0 && img.height > 0;
+  const isDrawable =
+    (typeof HTMLImageElement !== 'undefined' && img instanceof HTMLImageElement) ||
+    (typeof HTMLCanvasElement !== 'undefined' && img instanceof HTMLCanvasElement) ||
+    (typeof ImageBitmap !== 'undefined' && img instanceof ImageBitmap) ||
+    (typeof OffscreenCanvas !== 'undefined' && img instanceof OffscreenCanvas);
+  // Guard: DataTexture 等 drawImage 非対応の画像はスキップ
+  if (!hasSize || !isDrawable) {
+    console.warn('alphaBleed: skip (non-drawable image)', img);
+    return texture;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext('2d');
+  try {
+    ctx.drawImage(img, 0, 0);
+  } catch (e) {
+    console.warn('alphaBleed: drawImage failed, skip', e);
+    return texture;
+  }
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { width, height } = canvas;
+  const idx = (x, y) => (y * width + x) * 4;
+  const threshold = 8; // alpha <= 8 considered transparent
+  const doPass = () => {
+    const src = new Uint8ClampedArray(data.data);
+    let changed = false;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const i = idx(x, y);
+        const a = src[i + 3];
+        if (a > threshold) continue;
+        let count = 0;
+        let rr = 0;
+        let gg = 0;
+        let bb = 0;
+        for (let ry = -radius; ry <= radius; ry++) {
+          for (let rx = -radius; rx <= radius; rx++) {
+            const nx = x + rx;
+            const ny = y + ry;
+            if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+            const ni = idx(nx, ny);
+            const na = src[ni + 3];
+            if (na > threshold) {
+              rr += src[ni];
+              gg += src[ni + 1];
+              bb += src[ni + 2];
+              count++;
+            }
+          }
+        }
+        if (count > 0) {
+          data.data[i] = Math.round(rr / count);
+          data.data[i + 1] = Math.round(gg / count);
+          data.data[i + 2] = Math.round(bb / count);
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  };
+
+  const maxPasses = Math.max(1, passes | 0);
+  for (let p = 0; p < maxPasses; p++) {
+    const changed = doPass();
+    if (!changed) break;
+  }
+
+  ctx.putImageData(data, 0, 0);
+  texture.image = canvas;
+  if ('premultiplyAlpha' in texture) texture.premultiplyAlpha = premultiplyAlpha;
+  texture.needsUpdate = true;
+  texture._alphaBleedApplied = true;
+  return texture;
+}
 
 function setStatus(msg, isError = false) {
   statusEl.textContent = msg;
@@ -249,52 +424,85 @@ async function loadModelAndMotion(state) {
         currentModelPath = model_path;
         scene.add(currentMesh);
 
-        // Material quality tweaks (viewer-side only)
-        const maxAniso = renderer.capabilities.getMaxAnisotropy
+                // Material quality tweaks (viewer-side only)
+        const maxAnisoSupported = renderer.capabilities.getMaxAnisotropy
           ? renderer.capabilities.getMaxAnisotropy()
           : 1;
         const alphaTagRegex = /(hair|lash|透明|alpha)/i;
         const seamSensitiveRegex = /(face|eye|skin|口|目)/i;
+        const sf = { ...config.seamFix, ...(state.config?.seamFix || {}) };
+        const useNearest = sf.magFilterMode === 'nearest' || diagPreset === 'nearest';
+        const allowMip = sf.allowMipMap || diagPreset === 'mipmap_on';
+        const premul = sf.premultiplyAlpha || diagPreset === 'premul';
+        const alphaBleedEnabled = !!sf.alphaBleed;
+        const targetAniso = sf.anisotropy ?? 0;
+        config.seamFix = sf;
+        updateDiagOverlay();
+
         currentMesh.traverse((child) => {
           if (!child.isMesh) return;
+          if (diagPreset === 'solid') {
+            child.material = new THREE.MeshBasicMaterial({
+              color: 0xdddddd,
+              side: THREE.DoubleSide,
+            });
+            return;
+          }
           const materials = Array.isArray(child.material) ? child.material : [child.material];
           materials.forEach((mat) => {
             if (!mat) return;
-            const maps = ['map', 'emissiveMap', 'alphaMap', 'specularMap', 'normalMap'];
+            const maps = ['map', 'emissiveMap', 'alphaMap', 'specularMap', 'normalMap', 'bumpMap'];
             maps.forEach((k) => {
               const tex = mat[k];
               if (tex) {
-                tex.anisotropy = Math.max(tex.anisotropy || 1, maxAniso);
                 const seamSensitive = seamSensitiveRegex.test(mat.name || '');
                 const alphaLike = alphaTagRegex.test(mat.name || '') || seamSensitive;
-                if (alphaLike) {
-                  tex.wrapS = THREE.ClampToEdgeWrapping;
-                  tex.wrapT = THREE.ClampToEdgeWrapping;
-                  tex.minFilter = THREE.LinearFilter; // avoid mip seam
-                  tex.magFilter = THREE.LinearFilter;
-                  tex.generateMipmaps = false;
-                  // 軽微〜中程度のUVオフセットでセンター縫い目の色混ざりを緩和（シーム多発材のみ）
-                  const seamBias = 0.0015;
-                  tex.offset.x += seamBias;
-                  tex.offset.y += seamBias;
-                  tex.repeat.x = Math.max(0.995, tex.repeat.x || 1.0);
-                  tex.repeat.y = Math.max(0.995, tex.repeat.y || 1.0);
-                } else {
-                  tex.minFilter = THREE.LinearMipmapLinearFilter;
-                  tex.magFilter = THREE.LinearFilter;
+                if (alphaBleedEnabled && seamSensitive) {
+                  applyAlphaBleed(tex, {
+                    radius: sf.alphaBleedRadius || 3,
+                    premultiplyAlpha: premul,
+                    passes: sf.alphaBleedPasses || 1,
+                  });
                 }
                 if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
+                tex.wrapS = THREE.ClampToEdgeWrapping;
+                tex.wrapT = THREE.ClampToEdgeWrapping;
+                if (useNearest) {
+                  tex.minFilter = allowMip ? THREE.NearestMipmapNearestFilter : THREE.NearestFilter;
+                  tex.magFilter = THREE.NearestFilter;
+                } else {
+                  tex.minFilter = allowMip ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
+                  tex.magFilter = THREE.LinearFilter;
+                }
+                tex.generateMipmaps = allowMip;
+                if (premul && 'premultiplyAlpha' in tex) tex.premultiplyAlpha = true;
+                if (targetAniso > 0) {
+                  tex.anisotropy = Math.min(maxAnisoSupported, targetAniso);
+                }
+                if (sf.enabled && alphaLike) {
+                  const bias = sf.bias ?? 0.0015;
+                  tex.offset.x += bias;
+                  tex.offset.y += bias;
+                  const repMin = sf.repeatMin ?? 0.995;
+                  tex.repeat.x = Math.max(repMin, tex.repeat.x || 1.0);
+                  tex.repeat.y = Math.max(repMin, tex.repeat.y || 1.0);
+                }
+                tex.needsUpdate = true;
               }
             });
-            if (mat.transparent || alphaTagRegex.test(mat.name || '') || seamSensitiveRegex.test(mat.name || '')) {
-              mat.alphaTest = Math.max(mat.alphaTest || 0, 0.5);
-              if (alphaToCoverageSupported) mat.alphaToCoverage = true;
+            const alphaLike =
+              mat.transparent || alphaTagRegex.test(mat.name || '') || seamSensitiveRegex.test(mat.name || '');
+            if (alphaLike) {
+              mat.alphaTest = Math.max(mat.alphaTest || 0, sf.alphaTest ?? 0.5);
+              if (alphaToCoverageSupported && sf.useAlphaToCoverage !== false) {
+                mat.alphaToCoverage = true;
+              }
             }
-            mat.needsUpdate = true;
+            if (targetAniso > 0) {
+              mat.needsUpdate = true;
+            }
           });
-        });
-
-        // Center camera/controls to model bounds
+        });// Center camera/controls to model bounds
         const box = new THREE.Box3().setFromObject(currentMesh);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
@@ -341,9 +549,27 @@ function animate() {
 const clock = new THREE.Clock();
 
 function main() {
+  parseQueryOverrides();
+  setDiagPreset(config.diag || 'base');
   initThree();
+  updateDiagOverlay();
+  const diagButtons = document.querySelectorAll('#diag-controls button');
+  diagButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.diag || btn.textContent.toLowerCase();
+      setDiagPreset(target);
+    });
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '1') setDiagPreset('base');
+    if (e.key === '2') setDiagPreset('solid');
+    if (e.key === '3') setDiagPreset('nearest');
+    if (e.key === '4') setDiagPreset('mipmap_on');
+    if (e.key === '5') setDiagPreset('premul');
+  });
   reloadBtn.addEventListener('click', reloadFromState);
   reloadFromState();
 }
 
 main();
+
