@@ -25,6 +25,14 @@
       <button data-diag="premul">Premul</button>
       <button data-diag="mipmap_on">Mip</button>
     </div>
+    <div id="seamfix-controls" class="diag-group">
+      <span class="label">SeamFix:</span>
+      <label title="UV Bias">bias:<input type="number" id="sf-bias" step="0.0005" min="0" max="0.01" value="0.0015"></label>
+      <label title="Alpha Test">αTest:<input type="number" id="sf-alphatest" step="0.05" min="0" max="1" value="0.5"></label>
+      <label title="Premultiply Alpha"><input type="checkbox" id="sf-premul" checked>premul</label>
+      <label title="Anisotropy">aniso:<input type="number" id="sf-aniso" step="1" min="1" max="16" value="16"></label>
+      <button id="sf-apply">Apply</button>
+    </div>
     <button id="reload">Reload</button>
   </div>
   <canvas id="canvas"></canvas>

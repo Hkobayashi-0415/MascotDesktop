@@ -424,7 +424,7 @@ async function loadModelAndMotion(state) {
         currentModelPath = model_path;
         scene.add(currentMesh);
 
-                // Material quality tweaks (viewer-side only)
+        // Material quality tweaks (viewer-side only)
         const maxAnisoSupported = renderer.capabilities.getMaxAnisotropy
           ? renderer.capabilities.getMaxAnisotropy()
           : 1;
@@ -548,25 +548,113 @@ function animate() {
 
 const clock = new THREE.Clock();
 
-function main() {
-  parseQueryOverrides();
-  setDiagPreset(config.diag || 'base');
-  initThree();
+// LocalStorage keys
+const LS_KEY_DIAG = 'mmdviewer_diag';
+const LS_KEY_SEAMFIX = 'mmdviewer_seamfix';
+
+function loadFromLocalStorage() {
+  try {
+    const savedDiag = localStorage.getItem(LS_KEY_DIAG);
+    if (savedDiag) config.diag = savedDiag;
+    const savedSeamFix = localStorage.getItem(LS_KEY_SEAMFIX);
+    if (savedSeamFix) {
+      const parsed = JSON.parse(savedSeamFix);
+      Object.assign(config.seamFix, parsed);
+    }
+  } catch (e) {
+    console.warn('Failed to load from localStorage:', e);
+  }
+}
+
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem(LS_KEY_DIAG, diagPreset);
+    localStorage.setItem(LS_KEY_SEAMFIX, JSON.stringify({
+      bias: config.seamFix.bias,
+      alphaTest: config.seamFix.alphaTest,
+      premultiplyAlpha: config.seamFix.premultiplyAlpha,
+      anisotropy: config.seamFix.anisotropy,
+    }));
+  } catch (e) {
+    console.warn('Failed to save to localStorage:', e);
+  }
+}
+
+function updateSeamFixUI() {
+  const biasEl = document.getElementById('sf-bias');
+  const alphaTestEl = document.getElementById('sf-alphatest');
+  const premulEl = document.getElementById('sf-premul');
+  const anisoEl = document.getElementById('sf-aniso');
+  if (biasEl) biasEl.value = config.seamFix.bias;
+  if (alphaTestEl) alphaTestEl.value = config.seamFix.alphaTest;
+  if (premulEl) premulEl.checked = config.seamFix.premultiplyAlpha;
+  if (anisoEl) anisoEl.value = config.seamFix.anisotropy === 'max' ? 16 : config.seamFix.anisotropy;
+}
+
+function applySeamFixFromUI() {
+  const biasEl = document.getElementById('sf-bias');
+  const alphaTestEl = document.getElementById('sf-alphatest');
+  const premulEl = document.getElementById('sf-premul');
+  const anisoEl = document.getElementById('sf-aniso');
+  if (biasEl) config.seamFix.bias = parseFloat(biasEl.value) || 0.0015;
+  if (alphaTestEl) config.seamFix.alphaTest = parseFloat(alphaTestEl.value) || 0.5;
+  if (premulEl) config.seamFix.premultiplyAlpha = premulEl.checked;
+  if (anisoEl) config.seamFix.anisotropy = parseInt(anisoEl.value, 10) || 16;
+  saveToLocalStorage();
   updateDiagOverlay();
+  reloadFromState();
+}
+
+function updateDiagButtonHighlight() {
+  const diagButtons = document.querySelectorAll('#diag-controls button');
+  diagButtons.forEach((btn) => {
+    const target = btn.dataset.diag || btn.textContent.toLowerCase();
+    if (target === diagPreset) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
+function main() {
+  loadFromLocalStorage();
+  parseQueryOverrides();
+  initThree();
+
+  // Set initial diag preset from localStorage or query
+  const initialDiag = config.diag || 'base';
+  setDiagPreset(initialDiag);
+  updateDiagButtonHighlight();
+  updateSeamFixUI();
+  updateDiagOverlay();
+
+  // Diag preset buttons
   const diagButtons = document.querySelectorAll('#diag-controls button');
   diagButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.diag || btn.textContent.toLowerCase();
       setDiagPreset(target);
+      saveToLocalStorage();
+      updateDiagButtonHighlight();
     });
   });
+
+  // SeamFix Apply button
+  const sfApply = document.getElementById('sf-apply');
+  if (sfApply) {
+    sfApply.addEventListener('click', applySeamFixFromUI);
+  }
+
+  // Keyboard shortcuts
   window.addEventListener('keydown', (e) => {
-    if (e.key === '1') setDiagPreset('base');
-    if (e.key === '2') setDiagPreset('solid');
-    if (e.key === '3') setDiagPreset('nearest');
-    if (e.key === '4') setDiagPreset('mipmap_on');
-    if (e.key === '5') setDiagPreset('premul');
+    if (e.key === '1') { setDiagPreset('base'); updateDiagButtonHighlight(); saveToLocalStorage(); }
+    if (e.key === '2') { setDiagPreset('solid'); updateDiagButtonHighlight(); saveToLocalStorage(); }
+    if (e.key === '3') { setDiagPreset('nearest'); updateDiagButtonHighlight(); saveToLocalStorage(); }
+    if (e.key === '4') { setDiagPreset('mipmap_on'); updateDiagButtonHighlight(); saveToLocalStorage(); }
+    if (e.key === '5') { setDiagPreset('premul'); updateDiagButtonHighlight(); saveToLocalStorage(); }
   });
+
   reloadBtn.addEventListener('click', reloadFromState);
   reloadFromState();
 }

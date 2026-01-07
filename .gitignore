@@ -67,3 +67,10 @@ UserDataM/
 
 # Reference files (not in repo by design, sibling dir)
 refs/
+
+# Prevent motion file re-commit at repo root
+/*.vmd
+/*.fbx
+/Eyedart_Breath_motion_v1.1/
+/MMO用待機モーションセット/
+/天音かなた公式mmd_ver1.0/

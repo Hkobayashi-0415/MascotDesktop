@@ -13,12 +13,14 @@
 2) `powershell -ExecutionPolicy Bypass -File scripts/run.ps1 [-Mode split|single]`
    - Default `Mode` is `split` (core/avatarを別コンソールで起動)。`single`なら1コンソールでまとめて起動。
    - `/health` と `/avatar/health` OK まで待機後、既定ブラウザで `http://127.0.0.1:8770/viewer` を開きます。
-   - 非ASCIIパスは WARN のみで動作継続しますが、ASCIIパス (例: `C:\\dev\\MascotDesktop\\workspace`) を推奨。
+   - 非ASCIIパスは WARN のみで動作継続しますが、ASCIIパス (例: `C:\\dev\\MascotDesktop\\workspace`) を**強く推奨**。詳細は [`docs/PATHS.md`](docs/PATHS.md) を参照。
 
 ## Assets and motions
 
 - No PMX/VMD/texture/audio assets are committed. Place your own under `data/assets_user/` (gitignored).
 - Motion manifest template: `data/templates/motions/manifest.sample.json`. If manifest is absent, `idle.vmd` under the model directory is searched; otherwise `/avatar/load` returns `MOTION_NOT_FOUND`.
+- **Quick motion demo**: See [`docs/MOTIONS_DEMO.md`](docs/MOTIONS_DEMO.md) for a 3-minute slot-based playback tutorial.
+- **Manifest reference**: See [`docs/MANIFEST.md`](docs/MANIFEST.md) for slot resolution, error codes, and troubleshooting.
 
 ## Known visual limitation
 
