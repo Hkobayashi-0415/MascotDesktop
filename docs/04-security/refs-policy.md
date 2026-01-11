@@ -4,3 +4,10 @@
 - refs/character_chat_prototype: user-owned; code/design/schema reuse allowed. Still avoid committing secrets.
 - refs/public_files-main: reference-only. Code is readable but do not edit/copy into workspace; treat as behavioral/UI reference (no reverse engineering needed, but keep it read-only).
 - Keep refs/ outside git. Optionally run `scripts/setup/make_refs_readonly.ps1` to set +R attributes.
+
+## Revision History
+
+### v1.0 (~2025-12-30)
+- 初版作成
+- ルートレベル `docs/04-security/refs-policy.md` と workspace 版に同一内容で存在
+- 2026-01-11: workspace 版が正式版として確定

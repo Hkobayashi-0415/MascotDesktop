@@ -1,0 +1,82 @@
+{
+  "version": "0.1.0",
+  "avatar": {
+    "model_path": "data/assets_user/characters/<slug>/mmd/model.pmx"
+  },
+  "motions": {
+    "slots": {
+      "idle": {
+        "variants": [
+          {
+            "path": "../motions/idle.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 1.0,
+            "root_lock": true,
+            "crossfade_sec": 0.35,
+            "physics": false,
+            "license": {
+              "author": "",
+              "source_url": "",
+              "terms_note": ""
+            }
+          }
+        ]
+      },
+      "speaking": {
+        "variants": [
+          {
+            "path": "../motions/speaking_01.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 1.0,
+            "root_lock": true,
+            "crossfade_sec": 0.25,
+            "physics": false,
+            "license": {
+              "author": "",
+              "source_url": "",
+              "terms_note": ""
+            }
+          }
+        ]
+      },
+      "notify": {
+        "variants": [
+          {
+            "path": "../motions/notify_01.vmd",
+            "weight": 1,
+            "loop": false,
+            "time_scale": 1.0,
+            "root_lock": false,
+            "crossfade_sec": 0.25,
+            "physics": false,
+            "license": {
+              "author": "",
+              "source_url": "",
+              "terms_note": ""
+            }
+          }
+        ]
+      },
+      "sleep": {
+        "variants": [
+          {
+            "path": "../motions/sleep_01.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 0.8,
+            "root_lock": true,
+            "crossfade_sec": 0.35,
+            "physics": false,
+            "license": {
+              "author": "",
+              "source_url": "",
+              "terms_note": ""
+            }
+          }
+        ]
+      }
+    }
+  }
+}
