@@ -688,6 +688,47 @@ function main() {
 
   reloadBtn.addEventListener('click', reloadFromState);
 
+  // T2: Fetch available slots and update motion dropdown
+  async function updateMotionDropdown() {
+    const motionSelect = document.getElementById('motion-select');
+    if (!motionSelect) return;
+
+    try {
+      const res = await fetch('/avatar/slots');
+      const data = await res.json();
+
+      if (!data.ok || !data.slots) {
+        console.warn('Failed to fetch slots:', data);
+        return;
+      }
+
+      // Clear existing options
+      motionSelect.innerHTML = '';
+
+      if (data.slots.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = '(no motions)';
+        motionSelect.appendChild(opt);
+        motionSelect.disabled = true;
+        return;
+      }
+
+      // Add options from API
+      for (const slot of data.slots) {
+        const opt = document.createElement('option');
+        opt.value = slot.file;
+        opt.textContent = slot.label || slot.file;
+        opt.dataset.slot = slot.slot;
+        motionSelect.appendChild(opt);
+      }
+
+      motionSelect.disabled = data.slots.length <= 1;
+    } catch (e) {
+      console.error('Failed to update motion dropdown:', e);
+    }
+  }
+
   // Character load button
   const charSelect = document.getElementById('char-select');
   const charLoadBtn = document.getElementById('char-load');
@@ -706,6 +747,8 @@ function main() {
           setStatus(`Error: ${data.error}`, true);
         } else {
           setStatus(`Loaded: ${slug}`);
+          // T2: Update motion dropdown after loading new character
+          await updateMotionDropdown();
           reloadFromState();
         }
       } catch (e) {
@@ -759,6 +802,8 @@ function main() {
     });
   }
 
+  // T2: Initial dropdown update and state reload
+  updateMotionDropdown();
   reloadFromState();
 }
 

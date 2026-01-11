@@ -1,5 +1,40 @@
 # WORKLOG
 
+## 2026-01-12 T2: 動的モーションドロップダウン
+
+### Summary
+- GET `/avatar/slots` エンドポイントを追加（キャラクターの利用可能スロット一覧）
+- viewer.js の motion-select を動的に生成するように変更
+- index.html からハードコードされた Kanata 専用 VMD オプションを削除
+
+### Changes Made
+- `apps/avatar/poc/poc_avatar_mmd_viewer.py`: `get_available_slots()` 関数と `/avatar/slots` エンドポイント追加
+- `viewer/viewer.js`: `updateMotionDropdown()` 関数追加、キャラロード時と初期化時に呼び出し
+- `viewer/index.html`: motion-select のハードコードオプションを削除
+
+### Verification
+```powershell
+# 1. サーバー再起動
+cd C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace
+python apps/avatar/poc/poc_avatar_mmd_viewer.py --open-viewer
+
+# 2. ブラウザで /viewer を開く
+Start-Process "http://127.0.0.1:8770/viewer"
+
+# 3. API直接テスト
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/slots" -Method GET
+```
+
+### Expected Behavior
+- Kanata v1: manifest.json の idle スロット（Ten）が表示される
+- AZKi: idle.vmd が表示される
+- キャラ切替時に motion-select が自動更新される
+
+### Author/Agent
+- codex
+
+---
+
 ## 2026-01-12 T1: /avatar/load start_slot パラメータ追加
 
 ### Summary
