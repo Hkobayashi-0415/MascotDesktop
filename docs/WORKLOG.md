@@ -1,5 +1,34 @@
 # WORKLOG
 
+## 2026-01-12 T1: /avatar/load start_slot パラメータ追加
+
+### Summary
+- POST `/avatar/load` に `start_slot` オプションパラメータを追加
+- 指定時: そのスロットでモーションを解決
+- 未指定時: 従来通り `idle` スロットを使用
+- エラー時: `SLOT_NOT_FOUND` エラーコードを返す
+
+### Changes Made
+- `apps/avatar/poc/poc_avatar_mmd_viewer.py`: `/avatar/load` ハンドラを拡張
+
+### Verification
+```powershell
+# サーバー起動中に別ターミナルで実行
+# 1. 従来動作（start_slot なし → idle）
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/load" -Method POST -Body '{"model_path":"data/assets_user/characters/amane_kanata_v1/mmd/model.pmx"}' -ContentType "application/json"
+
+# 2. start_slot 指定（idle 以外のスロットがあれば）
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/load" -Method POST -Body '{"model_path":"data/assets_user/characters/amane_kanata_v1/mmd/model.pmx","start_slot":"idle"}' -ContentType "application/json"
+```
+
+### Open Issues
+- T2: viewer.js 側で start_slot を送信する実装
+
+### Author/Agent
+- codex
+
+---
+
 ## 2026-01-11 P5-0 Implementation: Character Registry
 
 ### Summary
