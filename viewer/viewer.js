@@ -502,8 +502,12 @@ async function loadModelAndMotion(state) {
                 }
                 if (sf.enabled && alphaLike) {
                   const bias = sf.bias ?? 0.0015;
-                  tex.offset.x += bias;
-                  tex.offset.y += bias;
+                  // Use absolute offset, not cumulative (+=) to avoid drift on reload
+                  if (!tex._seamBiasApplied) {
+                    tex.offset.x = bias;
+                    tex.offset.y = bias;
+                    tex._seamBiasApplied = true;
+                  }
                   const repMin = sf.repeatMin ?? 0.995;
                   tex.repeat.x = Math.max(repMin, tex.repeat.x || 1.0);
                   tex.repeat.y = Math.max(repMin, tex.repeat.y || 1.0);
@@ -718,9 +722,19 @@ function main() {
       const vmdFile = motionSelect.value;
       setStatus(`Applying ${vmdFile}...`);
       try {
-        // Get current character slug from char-select
-        const charSelect = document.getElementById('char-select');
-        const slug = charSelect ? charSelect.value : 'amane_kanata_v1';
+        // Extract slug from currently loaded model path instead of UI dropdown
+        // This ensures motion is applied to the actual loaded model, not UI selection
+        let slug = null;
+        if (currentModelPath) {
+          // Extract slug from path like "data/assets_user/characters/<slug>/mmd/model.pmx"
+          const match = currentModelPath.match(/characters\/([^\/]+)\/mmd\//);
+          slug = match ? match[1] : null;
+        }
+        if (!slug) {
+          // Fallback to UI selection if model path not available
+          const charSelect = document.getElementById('char-select');
+          slug = charSelect ? charSelect.value : 'amane_kanata_v1';
+        }
 
         // Update manifest to use selected motion
         const res = await fetch('/avatar/set_motion', {
