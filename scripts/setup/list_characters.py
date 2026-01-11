@@ -189,7 +189,7 @@ def print_human_readable(results: List[Dict]) -> None:
     for result in results:
         slug = result["slug"]
         mode = result["mode"] or "N/A"
-        valid_mark = "✓" if result["valid"] else "✗"
+        valid_mark = "[OK]" if result["valid"] else "[NG]"
         
         print(f"\n{valid_mark} {slug} [{mode}]")
         
