@@ -1,0 +1,28 @@
+# Environments / dependencies
+venv/
+**/venv/
+node_modules/
+__pycache__/
+**/__pycache__/
+
+# Builds / artifacts
+dist/
+build/
+*.log
+logs/
+secrets/
+
+# Databases / assets (user data)
+data/db/
+data/assets_user/
+**/db.sqlite3
+
+# Static build outputs
+**/staticfiles/
+
+# Configs with secrets
+**/settings.py
+
+# OS cruft
+*.DS_Store
+Thumbs.db
