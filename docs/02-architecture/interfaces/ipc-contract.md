@@ -10,6 +10,7 @@
 - ChatSendRequest/Response: テキスト送信、LLM応答（音声クリップ優先/TTSフォールバックのメタ含む）。
 - AudioPlayRequest: クリップID or カテゴリ指定、割込み許可フラグ、音量。
 - AvatarSetStateRequest: state遷移要求（idle/talk/notify/sleep/on/smile/oko 等）、avatar_mode指定可。
+- AvatarLoadModelRequest / AvatarPlayMotionRequest: Mode1 (MMD) 向けのロード/モーション再生要求。HealthCheckで viewer の生存を確認。
 - WindowEvent: drag/move/position-save/topmost-toggle/clickthrough-toggle/safe-unlock。
 - ReminderUpsertRequest: リマインド登録/更新/削除フラグ。
 - HealthCheck: service=core/memory/shell/audio/avatar/scheduler。
@@ -25,3 +26,12 @@
 ## バージョニング
 - `dto_version`: string (例 "0.1.0")。破壊的変更時にメジャー更新。
 - Transportは後日確定。エンドポイント/pipe名は `core/chat`, `core/config`, `shell/window`, `shell/avatar`, `shell/audio`, `scheduler/reminder`, `health` などを想定。
+
+## 相関 (Correlation)
+- リクエストIDはヘッダ `X-Request-Id` に載せ、Bodyの `request_id` と同一にする。存在しなければCore/Shellが生成。
+- ログは component/feature 単位で出力しつつ request_id で横断追跡可能にする。
+
+## ログ方針（抜粋）
+- payload全文は記録せずメタ情報のみ（キー一覧、サイズ、content_length）。
+- error_code がある場合はレスポンスとログに載せる（後方互換のためcodeは任意フィールド）。
+- エラーコードの一覧は `docs/02-architecture/interfaces/error-codes.md` を参照。

@@ -1,5 +1,69 @@
 # WORKLOG
 
+## 2026-01-11 (Documentation Consolidation and Rules Enhancement)
+
+### Summary
+- ドキュメント二重構造問題を解消し、workspace/docs/ を単一の Source of Truth として確立
+- ルートレベル `docs/` は legacy 化（DEPRECATED.md で明示）、ファイルは保持
+- workspace/docs/ 内の主要ドキュメント5件に改訂履歴を追加（ルート版との差分を記録）
+- documentation-rules.md に Multi-Agent 向けの包括的なルールを追加（文書乱立防止、改訂履歴フォーマット、禁止事項、判断フロー）
+- documentation-index.md に「For Agents」セクションを追加
+- 両README（ルート・workspace）に明確な導線を設置
+
+### Changes Made
+
+**Phase 1: workspace/docs/ への改訂履歴追加**
+- `docs/03-operations/logging.md`: v1.0（baseline, 8行）→ v2.0（PoC, 27行）の差分を記録
+- `docs/02-architecture/assets/asset-handling.md`: v1.0（24行）→ v2.0（49行）の拡張履歴を記録
+- `docs/04-security/refs-policy.md`: ルート版と同一、workspace版が正式版として確定
+- `docs/04-security/secrets-and-config.md`: 同上
+- `docs/05-dev/ascii-path-migration.md`: 同上
+
+**Phase 2: documentation-rules.md の強化**
+- 「Document Collision Prevention (Multi-Agent)」セクション追加
+  - 既存ファイル検索方法、重複判定基準、類似ファイル名確認
+- 「Revision History Format」セクション追加
+  - 改訂履歴の標準フォーマットを定義
+- 「Prohibited Actions (Strict)」セクション追加
+  - ルートレベル docs/ への作成・更新禁止を明記
+  - refs/ への書き込み禁止、二重管理禁止
+- 「Agent Decision Flow」セクション追加
+  - 新規作成時・更新時の判断フローを明確化
+
+**Phase 3: documentation-index.md の強化**
+- 「For Agents (MUST READ)」セクション追加
+  - documentation-rules.md への強調リンク
+  - ドキュメント改訂履歴の説明
+  - Legacy Documents Notice
+
+**Phase 4: README導線の整理**
+- **ルートレベル `README.md`**: 冒頭に legacy 警告を追加、workspace への誘導を明示
+- **workspace `README.md`**: Docs セクション冒頭にエージェント向けガイドを追加
+
+**Phase 5: DEPRECATED.md 作成**
+- ルートレベル `docs/DEPRECATED.md` を作成
+- legacy 化の明確な警告、workspace への誘導、エージェント向け注意を記載
+- なぜ保持するのか（既存参照への配慮、段階的移行）を説明
+
+### Verification
+- DEPRECATED.md の視認性確認: ✓ 明確で分かりやすい
+- README導線確認: ✓ 両版とも適切に誘導されている
+- 全ドキュメントリンク確認: ✓ 正しく機能
+- 改訂履歴確認: ✓ 5ファイルすべてに追加済み
+- AGENTS.md との整合性確認: ✓ 矛盾なし（Plan → Approve → Execute フローと整合）
+
+### Open Issues
+- なし
+
+### Next Actions
+- エージェントが新規ドキュメント作成時に documentation-rules.md を遵守することを確認
+- 必要に応じて workspace/docs/ の構造をさらに整理
+
+### Author/Agent
+- codex
+
+---
+
 ## 2025-12-31 G0 (setup)
 - git が実行環境で認識されずブランチ作成不可のため、以降は作業ディレクトリに直接反映する前提で進行する。
 - 目的: MMD Viewer/Motion MVP に向けたゲート進行の下準備。
@@ -219,3 +283,9 @@
 - `tray_host.spec` — PyInstaller spec（windowed）
 - `requirements.txt` — 依存関係定義
 - `docs/RESIDENT_MODE.md` — 常駐モードガイド
+
+## 2026-01-10 Docs (index + rules)
+- Summary: audited docs, added missing entrypoints (QUICKSTART, VIEWER_SEAMS), updated README + doc index/rules.
+- Verification: links in README and documentation index updated.
+- Open issues: legacy uppercase filenames remain for compatibility.
+- Author/Agent: codex

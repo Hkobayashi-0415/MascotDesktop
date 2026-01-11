@@ -30,7 +30,7 @@ STATE = {
     "last_error": None,
     "updated_at": None,
 }
-DEFAULT_MODEL = "data/assets_user/characters/kanata_official_v1/mmd/model.pmx"
+DEFAULT_MODEL = "data/assets_user/characters/amane_kanata_v1/mmd/model.pmx"
 # Browser auto-openはデフォルトOFF。必要なら環境変数 AVATAR_OPEN_BROWSER=1 をセット。
 DEFAULT_OPEN_BROWSER = os.environ.get("AVATAR_OPEN_BROWSER", "0") == "1"
 _UNSET = object()
@@ -503,6 +503,59 @@ class Handler(BaseHTTPRequestHandler):
                     request_id=req_id,
                     status_code=200,
                     model_path=model_path,
+                ),
+            )
+            return
+
+        if parsed.path == "/avatar/set_motion":
+            # Set motion directly by file name (for UI motion switcher)
+            slug = payload.get("slug")
+            motion_file = payload.get("motion_file")
+            if not motion_file:
+                self._set_headers(400, request_id=req_id)
+                payload_err = error(req_id, "AVATAR.SET_MOTION.MISSING_FILE", "motion_file is required", 400)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+            
+            # Build motion path
+            if slug:
+                motion_path = f"data/assets_user/characters/{slug}/mmd/{motion_file}"
+            else:
+                model_path = STATE.get("model_path")
+                if model_path:
+                    model_dir = os.path.dirname(model_path)
+                    motion_path = f"{model_dir}/{motion_file}"
+                else:
+                    motion_path = motion_file
+            
+            abs_motion = os.path.join(WS_ROOT, motion_path)
+            if not os.path.exists(abs_motion):
+                self._set_headers(404, request_id=req_id)
+                payload_err = error(req_id, "MOTION_NOT_FOUND", f"motion file not found: {motion_file}", 404)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+            
+            motion = build_motion_dict(motion_path, slot="idle")
+            update_state(motion=motion, slot="idle", error=None)
+            
+            self._set_headers(200, request_id=req_id)
+            payload_ok = success(
+                {
+                    "status": "ok",
+                    "dto_version": "0.1.0",
+                    "motion_path": motion_path,
+                    "note": "motion set; viewer will pick up on next poll",
+                },
+                req_id,
+            )
+            self.wfile.write(json.dumps(payload_ok, ensure_ascii=False).encode("utf-8"))
+            get_logger("avatar.ipc").info(
+                "avatar.set_motion",
+                extra=log_extra(
+                    "avatar.ipc",
+                    "avatar.set_motion",
+                    request_id=req_id,
+                    motion_path=motion_path,
                 ),
             )
             return
