@@ -1,5 +1,47 @@
 # WORKLOG
 
+## 2026-01-11 P5-0 Implementation: Character Registry
+
+### Summary
+- `scripts/setup/list_characters.py` を新規作成
+- ローカルキャラクター一覧を取得・モード検出・必須ファイル確認
+- `--json` オプションでJSON出力対応
+- 標準ライブラリのみ使用（新規依存なし）
+
+### Changes Made
+- **New file**: `scripts/setup/list_characters.py` (205行)
+  - `data/assets_user/characters/<slug>/` を走査
+  - モード検出: mmd / pngtuber / unknown
+  - 必須ファイル確認: `mmd/model.pmx`, `mmd/manifest.json`, `motions/*.vmd`
+  - WARN メッセージ出力: 欠落ファイルの警告
+  - Exit code: 0 (正常) / 1 (内部エラー)
+
+### Verification
+```powershell
+python scripts/setup/list_characters.py
+```
+結果:
+- 7キャラクター検出
+- Valid: 6/7
+- 1キャラクター (demo) は mode=unknown
+- 5キャラクターで motions/*.vmd が欠落（WARN）
+
+```powershell
+python scripts/setup/list_characters.py --json
+```
+結果: JSON形式で正常出力
+
+### Open Issues
+- なし
+
+### Next Actions
+- P5-1: Tray menu でキャラクター切替UI
+
+### Author/Agent
+- codex
+
+---
+
 ## 2026-01-11 (Documentation Consolidation and Rules Enhancement)
 
 ### Summary
