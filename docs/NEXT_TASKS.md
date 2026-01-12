@@ -64,9 +64,27 @@
   - 子プロセス STARTF_USESHOWWINDOW
 - ドキュメント: `docs/RESIDENT_MODE.md`
 
-## P5 — Next (候補)
+## P5 — In Progress (キャラクター管理)
+- [x] P5-0: Character Registry (read-only)
+  - `scripts/setup/list_characters.py` で slug 一覧・モード検出・必須ファイル確認
+  - `--json` オプションでJSON出力対応
+  - 標準ライブラリのみ使用、新規依存なし
+- [x] T1: `/avatar/load` に `start_slot` パラメータ追加
+  - 指定されたスロットで初期モーションを設定
+  - 未指定時は従来通り `idle` スロット
+- [x] T2: 動的モーションドロップダウン
+  - GET `/avatar/slots` エンドポイント追加
+  - viewer.js で motion-select を動的生成
+  - ハードコードされたKanata専用オプションを削除
+  - manifest.json の description フィールドを全キャラで統一
+- [ ] P5-1: Tray menu でキャラクター切替UI
+- [ ] P5-2: ホットリロード（実行中のキャラクター変更）
+- [x] T3: viewer.js から start_slot を送信
+  - キャラ別スロット選択を localStorage で保持
+  - SLOT_NOT_FOUND 時は自動リトライ
+
+## P6 — Future (候補)
 - [ ] Core統合（LLM/TTS/STT連携）
-- [ ] キャラ切替/ホットリロード
 - [ ] 状態遷移（sleep/smile等）
 - [ ] 音声クリップ/TTS連携
 - [ ] P4-3: マスコット用ウインドウ（透過・クリック透過）

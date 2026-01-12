@@ -1,5 +1,165 @@
 # WORKLOG
 
+## 2026-01-12 Kanata v1 manifest.json 複数スロット対応
+
+### Summary
+- `amane_kanata_v1/mmd/manifest.json` を更新
+- 6つのモーションスロットを定義: Ten, Koa, Marieru, Rea, Usa, idle
+
+### Changes Made
+- `data/assets_user/characters/amane_kanata_v1/mmd/manifest.json`: 複数スロット定義
+
+### Verification
+- ブラウザでハードリフレッシュ（Ctrl+Shift+R）
+- Motion ドロップダウンに5つのモーションが表示されることを確認
+- モーション切替（Apply）が正常動作
+- T3検証: キャラ切替後に選択モーションが保持される
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-12 T3: キャラ別スロット保持とstart_slot送信
+
+### Summary
+- キャラクター別のモーション選択を localStorage に保持
+- キャラ切替時に保存されたスロットを `start_slot` として送信
+- `SLOT_NOT_FOUND` エラー時は自動リトライ（デフォルトに fallback）
+
+### Changes Made
+- `viewer/viewer.js`:
+  - `lastSlotBySlug` マップと管理関数追加
+  - `loadCharacterWithSlot()` 関数追加（start_slot送信 + リトライ）
+  - モーション適用時に `setLastSlotForSlug()` 呼び出し
+
+### Verification
+```powershell
+# 1. サーバー再起動
+cd C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace
+python apps/avatar/poc/poc_avatar_mmd_viewer.py --open-viewer
+
+# 2. ブラウザで /viewer を開く
+Start-Process "http://127.0.0.1:8770/viewer"
+```
+
+### Expected Behavior
+1. Kanata v1 でモーション変更（例: Koa）
+2. AZKi に切替
+3. Kanata v1 に戻す → Koa が自動選択される
+4. 無効なスロットが保存されていた場合 → 自動でデフォルトにフォールバック
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-12 T2: 動的モーションドロップダウン
+
+### Summary
+- GET `/avatar/slots` エンドポイントを追加（キャラクターの利用可能スロット一覧）
+- viewer.js の motion-select を動的に生成するように変更
+- index.html からハードコードされた Kanata 専用 VMD オプションを削除
+
+### Changes Made
+- `apps/avatar/poc/poc_avatar_mmd_viewer.py`: `get_available_slots()` 関数と `/avatar/slots` エンドポイント追加
+- `viewer/viewer.js`: `updateMotionDropdown()` 関数追加、キャラロード時と初期化時に呼び出し
+- `viewer/index.html`: motion-select のハードコードオプションを削除
+
+### Verification
+```powershell
+# 1. サーバー再起動
+cd C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace
+python apps/avatar/poc/poc_avatar_mmd_viewer.py --open-viewer
+
+# 2. ブラウザで /viewer を開く
+Start-Process "http://127.0.0.1:8770/viewer"
+
+# 3. API直接テスト
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/slots" -Method GET
+```
+
+### Expected Behavior
+- Kanata v1: manifest.json の idle スロット（Ten）が表示される
+- AZKi: idle.vmd が表示される
+- キャラ切替時に motion-select が自動更新される
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-12 T1: /avatar/load start_slot パラメータ追加
+
+### Summary
+- POST `/avatar/load` に `start_slot` オプションパラメータを追加
+- 指定時: そのスロットでモーションを解決
+- 未指定時: 従来通り `idle` スロットを使用
+- エラー時: `SLOT_NOT_FOUND` エラーコードを返す
+
+### Changes Made
+- `apps/avatar/poc/poc_avatar_mmd_viewer.py`: `/avatar/load` ハンドラを拡張
+
+### Verification
+```powershell
+# サーバー起動中に別ターミナルで実行
+# 1. 従来動作（start_slot なし → idle）
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/load" -Method POST -Body '{"model_path":"data/assets_user/characters/amane_kanata_v1/mmd/model.pmx"}' -ContentType "application/json"
+
+# 2. start_slot 指定（idle 以外のスロットがあれば）
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/load" -Method POST -Body '{"model_path":"data/assets_user/characters/amane_kanata_v1/mmd/model.pmx","start_slot":"idle"}' -ContentType "application/json"
+```
+
+### Open Issues
+- T2: viewer.js 側で start_slot を送信する実装
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-11 P5-0 Implementation: Character Registry
+
+### Summary
+- `scripts/setup/list_characters.py` を新規作成
+- ローカルキャラクター一覧を取得・モード検出・必須ファイル確認
+- `--json` オプションでJSON出力対応
+- 標準ライブラリのみ使用（新規依存なし）
+
+### Changes Made
+- **New file**: `scripts/setup/list_characters.py` (205行)
+  - `data/assets_user/characters/<slug>/` を走査
+  - モード検出: mmd / pngtuber / unknown
+  - 必須ファイル確認: `mmd/model.pmx`, `mmd/manifest.json`, `motions/*.vmd`
+  - WARN メッセージ出力: 欠落ファイルの警告
+  - Exit code: 0 (正常) / 1 (内部エラー)
+
+### Verification
+```powershell
+python scripts/setup/list_characters.py
+```
+結果:
+- 7キャラクター検出
+- Valid: 6/7
+- 1キャラクター (demo) は mode=unknown
+- 5キャラクターで motions/*.vmd が欠落（WARN）
+
+```powershell
+python scripts/setup/list_characters.py --json
+```
+結果: JSON形式で正常出力
+
+### Open Issues
+- なし
+
+### Next Actions
+- P5-1: Tray menu でキャラクター切替UI
+
+### Author/Agent
+- codex
+
+---
+
 ## 2026-01-11 (Documentation Consolidation and Rules Enhancement)
 
 ### Summary
