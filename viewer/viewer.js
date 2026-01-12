@@ -576,6 +576,48 @@ const clock = new THREE.Clock();
 // LocalStorage keys
 const LS_KEY_DIAG = 'mmdviewer_diag';
 const LS_KEY_SEAMFIX = 'mmdviewer_seamfix';
+const LS_KEY_LAST_SLOT_BY_SLUG = 'mmdviewer_lastSlotBySlug';
+
+// T3: Per-character slot selection persistence
+let lastSlotBySlug = {};
+
+function loadLastSlotBySlug() {
+  try {
+    const saved = localStorage.getItem(LS_KEY_LAST_SLOT_BY_SLUG);
+    if (saved) {
+      lastSlotBySlug = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn('Failed to load lastSlotBySlug:', e);
+    lastSlotBySlug = {};
+  }
+}
+
+function saveLastSlotBySlug() {
+  try {
+    localStorage.setItem(LS_KEY_LAST_SLOT_BY_SLUG, JSON.stringify(lastSlotBySlug));
+  } catch (e) {
+    console.warn('Failed to save lastSlotBySlug:', e);
+  }
+}
+
+function setLastSlotForSlug(slug, slotFile) {
+  if (slug && slotFile) {
+    lastSlotBySlug[slug] = slotFile;
+    saveLastSlotBySlug();
+  }
+}
+
+function getLastSlotForSlug(slug) {
+  return lastSlotBySlug[slug] || null;
+}
+
+function clearLastSlotForSlug(slug) {
+  if (slug && lastSlotBySlug[slug]) {
+    delete lastSlotBySlug[slug];
+    saveLastSlotBySlug();
+  }
+}
 
 function loadFromLocalStorage() {
   try {
@@ -644,6 +686,7 @@ function updateDiagButtonHighlight() {
 
 function main() {
   loadFromLocalStorage();
+  loadLastSlotBySlug();  // T3: Load per-character slot selections
   parseQueryOverrides();
   initThree();
 
@@ -729,6 +772,38 @@ function main() {
     }
   }
 
+  // T3: Helper to load character with start_slot support and retry on SLOT_NOT_FOUND
+  async function loadCharacterWithSlot(slug, startSlot = null) {
+    const modelPath = `data/assets_user/characters/${slug}/mmd/model.pmx`;
+    const payload = { model_path: modelPath };
+
+    if (startSlot) {
+      payload.start_slot = startSlot;
+    }
+
+    const res = await fetch('/avatar/load', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    // T3: Handle SLOT_NOT_FOUND - clear stored slot and retry without start_slot
+    if (data.error_code === 'SLOT_NOT_FOUND' && startSlot) {
+      console.warn(`Slot '${startSlot}' not found for ${slug}, retrying with default...`);
+      clearLastSlotForSlug(slug);
+      // Retry without start_slot
+      const retryRes = await fetch('/avatar/load', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model_path: modelPath }),
+      });
+      return retryRes.json();
+    }
+
+    return data;
+  }
+
   // Character load button
   const charSelect = document.getElementById('char-select');
   const charLoadBtn = document.getElementById('char-load');
@@ -737,12 +812,10 @@ function main() {
       const slug = charSelect.value;
       setStatus(`Loading ${slug}...`);
       try {
-        const res = await fetch('/avatar/load', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model_path: `data/assets_user/characters/${slug}/mmd/model.pmx` }),
-        });
-        const data = await res.json();
+        // T3: Get previously saved slot for this character
+        const savedSlot = getLastSlotForSlug(slug);
+        const data = await loadCharacterWithSlot(slug, savedSlot);
+
         if (data.error) {
           setStatus(`Error: ${data.error}`, true);
         } else {
@@ -793,6 +866,10 @@ function main() {
           setStatus(`Error: ${data.error}`, true);
         } else {
           setStatus(`Motion: ${vmdFile}`);
+          // T3: Save the selected slot for this character
+          if (slug && vmdFile) {
+            setLastSlotForSlug(slug, vmdFile);
+          }
           // Reload to apply new motion
           setTimeout(() => reloadFromState(), 300);
         }

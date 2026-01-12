@@ -1,5 +1,39 @@
 # WORKLOG
 
+## 2026-01-12 T3: キャラ別スロット保持とstart_slot送信
+
+### Summary
+- キャラクター別のモーション選択を localStorage に保持
+- キャラ切替時に保存されたスロットを `start_slot` として送信
+- `SLOT_NOT_FOUND` エラー時は自動リトライ（デフォルトに fallback）
+
+### Changes Made
+- `viewer/viewer.js`:
+  - `lastSlotBySlug` マップと管理関数追加
+  - `loadCharacterWithSlot()` 関数追加（start_slot送信 + リトライ）
+  - モーション適用時に `setLastSlotForSlug()` 呼び出し
+
+### Verification
+```powershell
+# 1. サーバー再起動
+cd C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace
+python apps/avatar/poc/poc_avatar_mmd_viewer.py --open-viewer
+
+# 2. ブラウザで /viewer を開く
+Start-Process "http://127.0.0.1:8770/viewer"
+```
+
+### Expected Behavior
+1. Kanata v1 でモーション変更（例: Koa）
+2. AZKi に切替
+3. Kanata v1 に戻す → Koa が自動選択される
+4. 無効なスロットが保存されていた場合 → 自動でデフォルトにフォールバック
+
+### Author/Agent
+- codex
+
+---
+
 ## 2026-01-12 T2: 動的モーションドロップダウン
 
 ### Summary

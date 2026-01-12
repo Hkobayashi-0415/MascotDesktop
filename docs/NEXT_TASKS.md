@@ -79,7 +79,9 @@
   - manifest.json の description フィールドを全キャラで統一
 - [ ] P5-1: Tray menu でキャラクター切替UI
 - [ ] P5-2: ホットリロード（実行中のキャラクター変更）
-- [ ] T3: viewer.js から start_slot を送信
+- [x] T3: viewer.js から start_slot を送信
+  - キャラ別スロット選択を localStorage で保持
+  - SLOT_NOT_FOUND 時は自動リトライ
 
 ## P6 — Future (候補)
 - [ ] Core統合（LLM/TTS/STT連携）
