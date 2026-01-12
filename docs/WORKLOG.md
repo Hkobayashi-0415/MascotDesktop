@@ -1,5 +1,25 @@
 # WORKLOG
 
+## 2026-01-12 Kanata v1 manifest.json 複数スロット対応
+
+### Summary
+- `amane_kanata_v1/mmd/manifest.json` を更新
+- 6つのモーションスロットを定義: Ten, Koa, Marieru, Rea, Usa, idle
+
+### Changes Made
+- `data/assets_user/characters/amane_kanata_v1/mmd/manifest.json`: 複数スロット定義
+
+### Verification
+- ブラウザでハードリフレッシュ（Ctrl+Shift+R）
+- Motion ドロップダウンに5つのモーションが表示されることを確認
+- モーション切替（Apply）が正常動作
+- T3検証: キャラ切替後に選択モーションが保持される
+
+### Author/Agent
+- codex
+
+---
+
 ## 2026-01-12 T3: キャラ別スロット保持とstart_slot送信
 
 ### Summary
