@@ -1,9 +1,0 @@
-{
-  "dto_version": "0.1.0",
-  "request_id": "req-avatar-1",
-  "character_id": "miku",
-  "avatar_mode": "pngtuber",
-  "state": "02_smile",
-  "reason": "chat_response",
-  "duration_ms": 10000
-}

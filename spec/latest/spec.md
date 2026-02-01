@@ -4,6 +4,9 @@
 | 日付 | 内容 |
 |---|---|
 | 2025-12-26 | public_files-main を参照に追加。WindowController受入条件/AvatarRenderer(Mode3)状態遷移を反映。マッピング表を更新。 |
+| 2025-12-30 | PoCエントリを apps/*/poc に整理、ASCIIパス警告を追加。Avatar Mode1 (MMD) を別プロセスViewerで縦切りPoC開始、MMDアセット配置規約を追記。 |
+| 2025-12-30 | Topmost切替をUI操作（ボタン/右クリック）に変更。tキー無効化、idempotentな set_topmost で1操作1送信に統一。 |
+| 2025-12-30 | Topmost操作を「Pinned/Normal」の2モードに整理。UIボタン/右クリックで切替。pinnedがconfigの正に。 |
 
 ## 1. 背景・目的
 - Windowsローカル専用の常駐AIマスコット。CocoroAIはブラックボックス参照のみ。日本語パス非対応リスクを回避（ASCII前提）。
@@ -34,21 +37,22 @@
 
 ## 7. アバター仕様（3D/動画/PNGTuber）
 - Mode3(参考: public_files): 状態 01_normal/02_smile/03_oko/04_sleep/05_on、無操作15分→sleep、click→smile/oko/on、10秒でnormal復帰、直前画像除外ランダム。
-- Mode1/2も状態イベントを共有。リソース: `<character>/<state>/*`。
+- Mode1 (MMD): 別プロセスViewerでロード／状態反映を先行。モデル配置は ASCII パスの assets_user 側 (`data/assets_user/characters/<slug>/mmd/`)。初期は表示のみ、VMD再生は後続。
+- Mode2(動画ループ) と Mode3 も同じイベントセットを共有。リソース: `<character>/<state>/*`。
 - 参照: `docs/02-architecture/avatar/avatar-renderer.md`, `data/templates/assets/pngtuber_mode3/README.md`, `docs/02-architecture/assets/asset-handling.md`.
 
 ## 8. ウィンドウ仕様
-- フレームレス/透過、ドラッグ移動、位置/サイズ保存/復元。Topmost ON/OFF。クリック透過はオプション＋安全ホットキー。最小/最大サイズガード。
+- フレームレス/透過、ドラッグ移動、位置/サイズ保存/復元。Topmostは「Pinned/Normal」の2モードをUI（ボタン/右クリックメニュー）で操作し、キー依存を排除。クリック透過はオプション＋安全ホットキー。最小/最大サイズガード。ドラッグ中送信なし、リリース時1回のみconfig.set。pinnedをsource of truthとしてCore/Shellで保存・復元。
 
 ## 9. DBデータモデル案
 - characters, character_versions, character_prompts, character_voice_profiles, character_audio_clips, character_assets, tags/character_tags, memory_items, reminders, speaker_profiles, audit_logs, user_character_affinity。
 
 ## 10. コンポーネント構成
-- Core(LLM/TTS/STT/Embedding, MCP)、Memory(DB/埋め込み/リマインド/話者/監査)、Shell(UI/Audio/Avatar/Window)、Scheduler(リマインド/バックアップ/ヘルス)、AudioRenderer、AvatarRenderer。
+- Core(LLM/TTS/STT/Embedding, MCP)、Memory(DB/埋め込み/リマインド/話者/監査)、Shell(UI/Audio/Avatar/Window)、Avatar Viewer (Mode1: 別プロセス MMD Viewer PoC)、Scheduler(リマインド/バックアップ/ヘルス)、AudioRenderer、AvatarRenderer。
 - IPC/DTO: `docs/02-architecture/interfaces/ipc-contract.md`, dtoサンプル `docs/02-architecture/interfaces/dto/*.json`
 
 ## 11. データ配置/Git運用
-- Gitルート: workspace。refsは外・read-only。Git除外: venv, db.sqlite3, staticfiles, settings.py, logs, secrets, data/db, assets_user。
+- Gitルート: workspace。refsは外・read-only。Git除外: venv, db.sqlite3, staticfiles, settings.py, logs, secrets, data/db, assets_user。MMDテンプレは `data/templates/assets/mmd_mode1` に置き、実アセットは `data/assets_user` 側（ASCIIパス）に配置。
 
 ## 12. 外部連携
 - LLM(OpenAI/Gemini/ローカル)、TTS(VoiceVox/StyleBertVITS2/Aivis)、STT(amivoice)、Embedding(text-embedding-3-large等)、MCP(許可ディレクトリ/コマンド、監査)。
@@ -71,4 +75,4 @@
 
 ## 18. ロードマップ
 - Phase1: git init, Core最小(LLM/TTS)、Shell簡易UI、設定保存、ログ。
-- Phase2: キャラCRUD+版管理+DDL適用、メモリ要約/埋め込み、リマインド、AvatarRenderer Mode3実装（public_files遷移を適用）、WindowController受入条件を満たす。
+- Phase2: キャラCRUD+版管理+DDL適用、メモリ要約/埋め込み、リマインド、AvatarRenderer Mode3実装（public_files遷移を適用）、WindowController受入条件を満たす。Mode1(MMD) ViewerをShellと統合し、ロード/ステート反映のIPCを整備。
