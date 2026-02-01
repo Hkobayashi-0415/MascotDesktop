@@ -96,11 +96,32 @@ workspace/
 
 ```powershell
 cd dist\mascot_avatar
+
+# 基本起動（ブラウザ自動オープン + デフォルトモデル）
 .\mascot_avatar.exe
 
-# data/assets_user/ は dist 外部または同梱不要
-# ユーザーがアセットを配置してから起動
+# ブラウザを開かない
+.\mascot_avatar.exe --no-browser
+
+# 特定モデルを指定
+.\mascot_avatar.exe --model data/assets_user/characters/my_char/mmd/model.pmx
+
+# slugで指定（data/assets_user/characters/<slug>/mmd/model.pmx）
+.\mascot_avatar.exe --slug kanata_official_v1
+
+# ポート変更
+.\mascot_avatar.exe --port 8780
 ```
+
+### CLIオプション
+
+| オプション | デフォルト | 説明 |
+|------------|------------|------|
+| `--open-viewer` | True | ブラウザで viewer を自動オープン |
+| `--no-browser` | - | ブラウザを開かない |
+| `--model <path>` | - | PMXファイルパス（workspace相対） |
+| `--slug <slug>` | - | キャラクタースラッグ |
+| `--port <port>` | 8770 | HTTPサーバポート |
 
 ---
 
@@ -115,7 +136,20 @@ cd dist\mascot_avatar
 
 ---
 
+## ビルド失敗時の典型原因
+
+| 症状 | 原因 | 対処 |
+|------|------|------|
+| `ModuleNotFoundError: tkinter` | tkinterが除外されている | `mascot.spec` の `excludes` から `tkinter` を削除 |
+| `ModuleNotFoundError: logging.handlers` | hiddenimports不足 | `mascot.spec` の `hiddenimports` に追加 |
+| 非ASCII文字関連エラー | パスに日本語等が含まれる | ASCIIパスへ移動（docs/PATHS.md参照） |
+| pyinstaller not found | venvにインストールされていない | `pip install pyinstaller` を実行 |
+| `failed to execute script` | ランタイム依存不足 | `warn-mascot.txt` を確認 |
+
+---
+
 ## 関連ドキュメント
 - [PATHS.md](PATHS.md) — ASCIIパス移行ガイド
 - [ASSETS_PLACEMENT.md](ASSETS_PLACEMENT.md) — アセット配置ガイド
 - [README.md](../README.md) — Quick Start
+

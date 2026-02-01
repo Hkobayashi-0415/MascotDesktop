@@ -1,5 +1,12 @@
 # Cocoro Mascot Desktop (workspace)
 
+> [!IMPORTANT]
+> **このREADMEは legacy です。最新情報は [`workspace/README.md`](workspace/README.md) を参照してください。**
+> 
+> **ドキュメントは `workspace/docs/` が正式版です。**
+> - Documentation Index: [`workspace/docs/00-overview/documentation-index.md`](workspace/docs/00-overview/documentation-index.md)
+> - Documentation Rules: [`workspace/docs/00-overview/documentation-rules.md`](workspace/docs/00-overview/documentation-rules.md)
+
 - This repository is rooted at `workspace/` only. `refs/` lives alongside but is not under git.
 - Target: Windows-only, local desktop AI mascot (chat + audio + memory + notifications + media).
 - Do not place files at `<NEW_ROOT>/` except `workspace/` and `refs/`.

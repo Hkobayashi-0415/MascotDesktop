@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 const statusEl = document.getElementById('status');
 const reloadBtn = document.getElementById('reload');
@@ -72,11 +73,16 @@ function updateDiagOverlay() {
     diagOverlay.style.color = '#eee';
     diagOverlay.style.fontSize = '12px';
     diagOverlay.style.zIndex = '10';
+    diagOverlay.style.display = 'none'; // Hidden by default
+    diagOverlay.id = 'diag-overlay';
     document.body.appendChild(diagOverlay);
   }
   const sf = config.seamFix;
   const a2c = sf.useAlphaToCoverage !== false && alphaToCoverageSupported;
   diagOverlay.textContent = `diag=${diagPreset} | bias=${sf.bias} repeatMin=${sf.repeatMin} alphaTest=${sf.alphaTest} mag=${sf.magFilterMode} premul=${sf.premultiplyAlpha} alphaBleed=${sf.alphaBleed} p=${sf.alphaBleedPasses} a2c=${a2c} mip=${sf.allowMipMap} aniso=${sf.anisotropy}`;
+
+  // Only show if in debug mode
+  diagOverlay.style.display = document.body.classList.contains('debug-mode') ? 'block' : 'none';
 }
 
 function setDiagPreset(name) {
@@ -378,33 +384,34 @@ async function loadModelAndMotion(state) {
   const baseDir = model_path.split('/').slice(0, -1).join('/');
   const cleanBase = baseDir.replace(/\\/g, '/');
   const resourceBase = `/static/${cleanBase}/`;
-  const textureSibling = cleanBase.endsWith('/mmd')
-    ? `/static/${cleanBase.replace(/\/mmd$/, '/texture')}/`
-    : resourceBase;
 
   const manager = new THREE.LoadingManager();
+
+  // Register TGALoader for .tga files
+  manager.addHandler(/\.tga$/i, new TGALoader(manager));
+
+  // Cache buster timestamp
+  const cacheBuster = `?t=${Date.now()}`;
+
   manager.setURLModifier((url) => {
     if (url.startsWith('blob:') || url.startsWith('data:')) return url;
     const clean = url.replace(/^\.?\//, '');
 
-    // Case1: relative texture/* path from PMX
-    if (cleanBase.endsWith('/mmd') && clean.startsWith('texture/')) {
-      return `${textureSibling}${clean.slice('texture/'.length)}`;
+    // Simple path resolution: prepend /static/ if not already
+    let finalUrl = url;
+    if (!url.startsWith('/static/')) {
+      finalUrl = `/static/${cleanBase}/${clean}`;
     }
 
-    // Case2: resourcePath prepended (/static/.../mmd/texture/*)
-    const mmdTexturePrefix = `/static/${cleanBase}/texture/`;
-    if (cleanBase.endsWith('/mmd') && url.startsWith(mmdTexturePrefix)) {
-      const rest = url.slice(mmdTexturePrefix.length);
-      return `${textureSibling}${rest}`;
+    // Add cache buster for image files
+    if (/\.(png|jpg|jpeg|tga|bmp)$/i.test(finalUrl)) {
+      finalUrl += cacheBuster;
     }
 
-    if (!url.startsWith('/static/')) return `/static/${clean}`;
-    return url;
+    return finalUrl;
   });
 
   const loader = new MMDLoader(manager);
-  loader.setResourcePath(resourceBase);
 
   // If model is already loaded and unchanged, only swap motion
   if (currentMesh && currentModelPath === model_path) {
@@ -423,6 +430,20 @@ async function loadModelAndMotion(state) {
         currentMesh.scale.set(1, 1, 1);
         currentModelPath = model_path;
         scene.add(currentMesh);
+
+        // Reset all morph targets (表情) to 0
+        if (currentMesh.morphTargetInfluences) {
+          for (let i = 0; i < currentMesh.morphTargetInfluences.length; i++) {
+            currentMesh.morphTargetInfluences[i] = 0;
+          }
+        }
+        currentMesh.traverse((child) => {
+          if (child.morphTargetInfluences) {
+            for (let i = 0; i < child.morphTargetInfluences.length; i++) {
+              child.morphTargetInfluences[i] = 0;
+            }
+          }
+        });
 
         // Material quality tweaks (viewer-side only)
         const maxAnisoSupported = renderer.capabilities.getMaxAnisotropy
@@ -481,8 +502,12 @@ async function loadModelAndMotion(state) {
                 }
                 if (sf.enabled && alphaLike) {
                   const bias = sf.bias ?? 0.0015;
-                  tex.offset.x += bias;
-                  tex.offset.y += bias;
+                  // Use absolute offset, not cumulative (+=) to avoid drift on reload
+                  if (!tex._seamBiasApplied) {
+                    tex.offset.x = bias;
+                    tex.offset.y = bias;
+                    tex._seamBiasApplied = true;
+                  }
                   const repMin = sf.repeatMin ?? 0.995;
                   tex.repeat.x = Math.max(repMin, tex.repeat.x || 1.0);
                   tex.repeat.y = Math.max(repMin, tex.repeat.y || 1.0);
@@ -551,6 +576,48 @@ const clock = new THREE.Clock();
 // LocalStorage keys
 const LS_KEY_DIAG = 'mmdviewer_diag';
 const LS_KEY_SEAMFIX = 'mmdviewer_seamfix';
+const LS_KEY_LAST_SLOT_BY_SLUG = 'mmdviewer_lastSlotBySlug';
+
+// T3: Per-character slot selection persistence
+let lastSlotBySlug = {};
+
+function loadLastSlotBySlug() {
+  try {
+    const saved = localStorage.getItem(LS_KEY_LAST_SLOT_BY_SLUG);
+    if (saved) {
+      lastSlotBySlug = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn('Failed to load lastSlotBySlug:', e);
+    lastSlotBySlug = {};
+  }
+}
+
+function saveLastSlotBySlug() {
+  try {
+    localStorage.setItem(LS_KEY_LAST_SLOT_BY_SLUG, JSON.stringify(lastSlotBySlug));
+  } catch (e) {
+    console.warn('Failed to save lastSlotBySlug:', e);
+  }
+}
+
+function setLastSlotForSlug(slug, slotFile) {
+  if (slug && slotFile) {
+    lastSlotBySlug[slug] = slotFile;
+    saveLastSlotBySlug();
+  }
+}
+
+function getLastSlotForSlug(slug) {
+  return lastSlotBySlug[slug] || null;
+}
+
+function clearLastSlotForSlug(slug) {
+  if (slug && lastSlotBySlug[slug]) {
+    delete lastSlotBySlug[slug];
+    saveLastSlotBySlug();
+  }
+}
 
 function loadFromLocalStorage() {
   try {
@@ -619,6 +686,7 @@ function updateDiagButtonHighlight() {
 
 function main() {
   loadFromLocalStorage();
+  loadLastSlotBySlug();  // T3: Load per-character slot selections
   parseQueryOverrides();
   initThree();
 
@@ -653,9 +721,166 @@ function main() {
     if (e.key === '3') { setDiagPreset('nearest'); updateDiagButtonHighlight(); saveToLocalStorage(); }
     if (e.key === '4') { setDiagPreset('mipmap_on'); updateDiagButtonHighlight(); saveToLocalStorage(); }
     if (e.key === '5') { setDiagPreset('premul'); updateDiagButtonHighlight(); saveToLocalStorage(); }
+    // Ctrl+D to toggle debug mode
+    if (e.key === 'd' && e.ctrlKey) {
+      e.preventDefault();
+      document.body.classList.toggle('debug-mode');
+      updateDiagOverlay();
+    }
   });
 
   reloadBtn.addEventListener('click', reloadFromState);
+
+  // T2: Fetch available slots and update motion dropdown
+  async function updateMotionDropdown() {
+    const motionSelect = document.getElementById('motion-select');
+    if (!motionSelect) return;
+
+    try {
+      const res = await fetch('/avatar/slots');
+      const data = await res.json();
+
+      if (!data.ok || !data.slots) {
+        console.warn('Failed to fetch slots:', data);
+        return;
+      }
+
+      // Clear existing options
+      motionSelect.innerHTML = '';
+
+      if (data.slots.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = '(no motions)';
+        motionSelect.appendChild(opt);
+        motionSelect.disabled = true;
+        return;
+      }
+
+      // Add options from API
+      for (const slot of data.slots) {
+        const opt = document.createElement('option');
+        opt.value = slot.file;
+        opt.textContent = slot.label || slot.file;
+        opt.dataset.slot = slot.slot;
+        motionSelect.appendChild(opt);
+      }
+
+      motionSelect.disabled = data.slots.length <= 1;
+    } catch (e) {
+      console.error('Failed to update motion dropdown:', e);
+    }
+  }
+
+  // T3: Helper to load character with start_slot support and retry on SLOT_NOT_FOUND
+  async function loadCharacterWithSlot(slug, startSlot = null) {
+    const modelPath = `data/assets_user/characters/${slug}/mmd/model.pmx`;
+    const payload = { model_path: modelPath };
+
+    if (startSlot) {
+      payload.start_slot = startSlot;
+    }
+
+    const res = await fetch('/avatar/load', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    // T3: Handle SLOT_NOT_FOUND - clear stored slot and retry without start_slot
+    if (data.error_code === 'SLOT_NOT_FOUND' && startSlot) {
+      console.warn(`Slot '${startSlot}' not found for ${slug}, retrying with default...`);
+      clearLastSlotForSlug(slug);
+      // Retry without start_slot
+      const retryRes = await fetch('/avatar/load', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model_path: modelPath }),
+      });
+      return retryRes.json();
+    }
+
+    return data;
+  }
+
+  // Character load button
+  const charSelect = document.getElementById('char-select');
+  const charLoadBtn = document.getElementById('char-load');
+  if (charSelect && charLoadBtn) {
+    charLoadBtn.addEventListener('click', async () => {
+      const slug = charSelect.value;
+      setStatus(`Loading ${slug}...`);
+      try {
+        // T3: Get previously saved slot for this character
+        const savedSlot = getLastSlotForSlug(slug);
+        const data = await loadCharacterWithSlot(slug, savedSlot);
+
+        if (data.error) {
+          setStatus(`Error: ${data.error}`, true);
+        } else {
+          setStatus(`Loaded: ${slug}`);
+          // T2: Update motion dropdown after loading new character
+          await updateMotionDropdown();
+          reloadFromState();
+        }
+      } catch (e) {
+        setStatus(`Load failed: ${e.message}`, true);
+      }
+    });
+  }
+
+  // Motion select + apply
+  const motionSelect = document.getElementById('motion-select');
+  const motionApply = document.getElementById('motion-apply');
+  if (motionSelect && motionApply) {
+    motionApply.addEventListener('click', async () => {
+      const vmdFile = motionSelect.value;
+      setStatus(`Applying ${vmdFile}...`);
+      try {
+        // Extract slug from currently loaded model path instead of UI dropdown
+        // This ensures motion is applied to the actual loaded model, not UI selection
+        let slug = null;
+        if (currentModelPath) {
+          // Extract slug from path like "data/assets_user/characters/<slug>/mmd/model.pmx"
+          const match = currentModelPath.match(/characters\/([^\/]+)\/mmd\//);
+          slug = match ? match[1] : null;
+        }
+        if (!slug) {
+          // Fallback to UI selection if model path not available
+          const charSelect = document.getElementById('char-select');
+          slug = charSelect ? charSelect.value : 'amane_kanata_v1';
+        }
+
+        // Update manifest to use selected motion
+        const res = await fetch('/avatar/set_motion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug,
+            motion_file: vmdFile
+          }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          setStatus(`Error: ${data.error}`, true);
+        } else {
+          setStatus(`Motion: ${vmdFile}`);
+          // T3: Save the selected slot for this character
+          if (slug && vmdFile) {
+            setLastSlotForSlug(slug, vmdFile);
+          }
+          // Reload to apply new motion
+          setTimeout(() => reloadFromState(), 300);
+        }
+      } catch (e) {
+        setStatus(`Apply failed: ${e.message}`, true);
+      }
+    });
+  }
+
+  // T2: Initial dropdown update and state reload
+  updateMotionDropdown();
   reloadFromState();
 }
 

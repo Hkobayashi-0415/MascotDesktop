@@ -1,5 +1,7 @@
 # 仕様書（Windowsローカル専用）
 
+NOTE: 本ドキュメントは旧仕様（pre-Unity）として参照専用。新仕様は `docs/00-overview/migrations/unity-migration-spec.md` を参照。
+
 ## 改訂履歴
 | 日付 | 内容 |
 |---|---|

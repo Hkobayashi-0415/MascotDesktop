@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -8,26 +9,30 @@ html, body {
   color: #eee;
   font-family: Arial, sans-serif;
 }
+
 #canvas {
   width: 100%;
   height: 100%;
   display: block;
 }
+
 #overlay {
   position: absolute;
   top: 8px;
   left: 8px;
   z-index: 10;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
   padding: 6px 10px;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
+
 #status {
   font-size: 12px;
 }
+
 #reload {
   background: #333;
   color: #fff;
@@ -37,19 +42,23 @@ html, body {
   cursor: pointer;
   align-self: flex-start;
 }
+
 #reload:hover {
   background: #555;
 }
+
 .diag-group {
   display: flex;
   gap: 4px;
   align-items: center;
   flex-wrap: wrap;
 }
+
 .diag-group .label {
   font-size: 11px;
   opacity: 0.7;
 }
+
 .diag-group button {
   background: #222;
   color: #eee;
@@ -59,19 +68,23 @@ html, body {
   font-size: 11px;
   cursor: pointer;
 }
+
 .diag-group button:hover {
   background: #444;
 }
+
 .diag-group button.active {
   background: #4a90d9;
   border-color: #6ab0ff;
 }
+
 #seamfix-controls label {
   font-size: 10px;
   display: flex;
   align-items: center;
   gap: 2px;
 }
+
 #seamfix-controls input[type="number"] {
   width: 50px;
   background: #222;
@@ -81,13 +94,50 @@ html, body {
   padding: 1px 3px;
   font-size: 10px;
 }
+
 #seamfix-controls input[type="checkbox"] {
   margin: 0;
 }
+
 #sf-apply {
   background: #4a7;
   border-color: #5b8;
 }
+
 #sf-apply:hover {
   background: #5b9;
+}
+
+/* Hide debug controls by default - toggle with Ctrl+D */
+#diag-controls,
+#seamfix-controls {
+  display: none !important;
+}
+
+.debug-mode #diag-controls,
+.debug-mode #seamfix-controls {
+  display: flex !important;
+}
+
+/* Compact character UI */
+#char-controls select {
+  background: #222;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 11px;
+}
+
+#char-controls button,
+#motion-controls button {
+  min-width: 45px;
+}
+
+/* Hide status details in compact mode */
+#status {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

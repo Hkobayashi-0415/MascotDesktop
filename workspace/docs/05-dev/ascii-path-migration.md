@@ -14,3 +14,11 @@
 
 ## 注意
 - 実行はユーザー判断。元の環境は保持し、破壊的操作はしない。
+
+## Revision History
+
+### v1.0 (~2025-12-30)
+- 初版作成
+- ルートレベル `docs/05-dev/ascii-path-migration.md` と workspace 版に同一内容で存在
+- 2026-01-11: workspace 版が正式版として確定
+- Note: `docs/PATHS.md` が推奨ドキュメントとして追加されたが、このファイルは移行手順として保持

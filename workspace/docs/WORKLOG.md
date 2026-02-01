@@ -1,5 +1,229 @@
 # WORKLOG
 
+## 2026-01-12 Kanata v1 manifest.json 複数スロット対応
+
+### Summary
+- `amane_kanata_v1/mmd/manifest.json` を更新
+- 6つのモーションスロットを定義: Ten, Koa, Marieru, Rea, Usa, idle
+
+### Changes Made
+- `data/assets_user/characters/amane_kanata_v1/mmd/manifest.json`: 複数スロット定義
+
+### Verification
+- ブラウザでハードリフレッシュ（Ctrl+Shift+R）
+- Motion ドロップダウンに5つのモーションが表示されることを確認
+- モーション切替（Apply）が正常動作
+- T3検証: キャラ切替後に選択モーションが保持される
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-12 T3: キャラ別スロット保持とstart_slot送信
+
+### Summary
+- キャラクター別のモーション選択を localStorage に保持
+- キャラ切替時に保存されたスロットを `start_slot` として送信
+- `SLOT_NOT_FOUND` エラー時は自動リトライ（デフォルトに fallback）
+
+### Changes Made
+- `viewer/viewer.js`:
+  - `lastSlotBySlug` マップと管理関数追加
+  - `loadCharacterWithSlot()` 関数追加（start_slot送信 + リトライ）
+  - モーション適用時に `setLastSlotForSlug()` 呼び出し
+
+### Verification
+```powershell
+# 1. サーバー再起動
+cd C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace
+python apps/avatar/poc/poc_avatar_mmd_viewer.py --open-viewer
+
+# 2. ブラウザで /viewer を開く
+Start-Process "http://127.0.0.1:8770/viewer"
+```
+
+### Expected Behavior
+1. Kanata v1 でモーション変更（例: Koa）
+2. AZKi に切替
+3. Kanata v1 に戻す → Koa が自動選択される
+4. 無効なスロットが保存されていた場合 → 自動でデフォルトにフォールバック
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-12 T2: 動的モーションドロップダウン
+
+### Summary
+- GET `/avatar/slots` エンドポイントを追加（キャラクターの利用可能スロット一覧）
+- viewer.js の motion-select を動的に生成するように変更
+- index.html からハードコードされた Kanata 専用 VMD オプションを削除
+
+### Changes Made
+- `apps/avatar/poc/poc_avatar_mmd_viewer.py`: `get_available_slots()` 関数と `/avatar/slots` エンドポイント追加
+- `viewer/viewer.js`: `updateMotionDropdown()` 関数追加、キャラロード時と初期化時に呼び出し
+- `viewer/index.html`: motion-select のハードコードオプションを削除
+
+### Verification
+```powershell
+# 1. サーバー再起動
+cd C:\Users\sugar\OneDrive\デスクトップ\MascotDesktop\workspace
+python apps/avatar/poc/poc_avatar_mmd_viewer.py --open-viewer
+
+# 2. ブラウザで /viewer を開く
+Start-Process "http://127.0.0.1:8770/viewer"
+
+# 3. API直接テスト
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/slots" -Method GET
+```
+
+### Expected Behavior
+- Kanata v1: manifest.json の idle スロット（Ten）が表示される
+- AZKi: idle.vmd が表示される
+- キャラ切替時に motion-select が自動更新される
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-12 T1: /avatar/load start_slot パラメータ追加
+
+### Summary
+- POST `/avatar/load` に `start_slot` オプションパラメータを追加
+- 指定時: そのスロットでモーションを解決
+- 未指定時: 従来通り `idle` スロットを使用
+- エラー時: `SLOT_NOT_FOUND` エラーコードを返す
+
+### Changes Made
+- `apps/avatar/poc/poc_avatar_mmd_viewer.py`: `/avatar/load` ハンドラを拡張
+
+### Verification
+```powershell
+# サーバー起動中に別ターミナルで実行
+# 1. 従来動作（start_slot なし → idle）
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/load" -Method POST -Body '{"model_path":"data/assets_user/characters/amane_kanata_v1/mmd/model.pmx"}' -ContentType "application/json"
+
+# 2. start_slot 指定（idle 以外のスロットがあれば）
+Invoke-RestMethod -Uri "http://127.0.0.1:8770/avatar/load" -Method POST -Body '{"model_path":"data/assets_user/characters/amane_kanata_v1/mmd/model.pmx","start_slot":"idle"}' -ContentType "application/json"
+```
+
+### Open Issues
+- T2: viewer.js 側で start_slot を送信する実装
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-11 P5-0 Implementation: Character Registry
+
+### Summary
+- `scripts/setup/list_characters.py` を新規作成
+- ローカルキャラクター一覧を取得・モード検出・必須ファイル確認
+- `--json` オプションでJSON出力対応
+- 標準ライブラリのみ使用（新規依存なし）
+
+### Changes Made
+- **New file**: `scripts/setup/list_characters.py` (205行)
+  - `data/assets_user/characters/<slug>/` を走査
+  - モード検出: mmd / pngtuber / unknown
+  - 必須ファイル確認: `mmd/model.pmx`, `mmd/manifest.json`, `motions/*.vmd`
+  - WARN メッセージ出力: 欠落ファイルの警告
+  - Exit code: 0 (正常) / 1 (内部エラー)
+
+### Verification
+```powershell
+python scripts/setup/list_characters.py
+```
+結果:
+- 7キャラクター検出
+- Valid: 6/7
+- 1キャラクター (demo) は mode=unknown
+- 5キャラクターで motions/*.vmd が欠落（WARN）
+
+```powershell
+python scripts/setup/list_characters.py --json
+```
+結果: JSON形式で正常出力
+
+### Open Issues
+- なし
+
+### Next Actions
+- P5-1: Tray menu でキャラクター切替UI
+
+### Author/Agent
+- codex
+
+---
+
+## 2026-01-11 (Documentation Consolidation and Rules Enhancement)
+
+### Summary
+- ドキュメント二重構造問題を解消し、workspace/docs/ を単一の Source of Truth として確立
+- ルートレベル `docs/` は legacy 化（DEPRECATED.md で明示）、ファイルは保持
+- workspace/docs/ 内の主要ドキュメント5件に改訂履歴を追加（ルート版との差分を記録）
+- documentation-rules.md に Multi-Agent 向けの包括的なルールを追加（文書乱立防止、改訂履歴フォーマット、禁止事項、判断フロー）
+- documentation-index.md に「For Agents」セクションを追加
+- 両README（ルート・workspace）に明確な導線を設置
+
+### Changes Made
+
+**Phase 1: workspace/docs/ への改訂履歴追加**
+- `docs/03-operations/logging.md`: v1.0（baseline, 8行）→ v2.0（PoC, 27行）の差分を記録
+- `docs/02-architecture/assets/asset-handling.md`: v1.0（24行）→ v2.0（49行）の拡張履歴を記録
+- `docs/04-security/refs-policy.md`: ルート版と同一、workspace版が正式版として確定
+- `docs/04-security/secrets-and-config.md`: 同上
+- `docs/05-dev/ascii-path-migration.md`: 同上
+
+**Phase 2: documentation-rules.md の強化**
+- 「Document Collision Prevention (Multi-Agent)」セクション追加
+  - 既存ファイル検索方法、重複判定基準、類似ファイル名確認
+- 「Revision History Format」セクション追加
+  - 改訂履歴の標準フォーマットを定義
+- 「Prohibited Actions (Strict)」セクション追加
+  - ルートレベル docs/ への作成・更新禁止を明記
+  - refs/ への書き込み禁止、二重管理禁止
+- 「Agent Decision Flow」セクション追加
+  - 新規作成時・更新時の判断フローを明確化
+
+**Phase 3: documentation-index.md の強化**
+- 「For Agents (MUST READ)」セクション追加
+  - documentation-rules.md への強調リンク
+  - ドキュメント改訂履歴の説明
+  - Legacy Documents Notice
+
+**Phase 4: README導線の整理**
+- **ルートレベル `README.md`**: 冒頭に legacy 警告を追加、workspace への誘導を明示
+- **workspace `README.md`**: Docs セクション冒頭にエージェント向けガイドを追加
+
+**Phase 5: DEPRECATED.md 作成**
+- ルートレベル `docs/DEPRECATED.md` を作成
+- legacy 化の明確な警告、workspace への誘導、エージェント向け注意を記載
+- なぜ保持するのか（既存参照への配慮、段階的移行）を説明
+
+### Verification
+- DEPRECATED.md の視認性確認: ✓ 明確で分かりやすい
+- README導線確認: ✓ 両版とも適切に誘導されている
+- 全ドキュメントリンク確認: ✓ 正しく機能
+- 改訂履歴確認: ✓ 5ファイルすべてに追加済み
+- AGENTS.md との整合性確認: ✓ 矛盾なし（Plan → Approve → Execute フローと整合）
+
+### Open Issues
+- なし
+
+### Next Actions
+- エージェントが新規ドキュメント作成時に documentation-rules.md を遵守することを確認
+- 必要に応じて workspace/docs/ の構造をさらに整理
+
+### Author/Agent
+- codex
+
+---
+
 ## 2025-12-31 G0 (setup)
 - git が実行環境で認識されずブランチ作成不可のため、以降は作業ディレクトリに直接反映する前提で進行する。
 - 目的: MMD Viewer/Motion MVP に向けたゲート進行の下準備。
@@ -146,3 +370,82 @@
 - P2-1: ASCIIパス移行ガイド（PATHS.md）完了
 - P2-2: Packaging調査（package.ps1 + mascot.spec）完了、exe起動確認済み
 - P2-3: Repo-root cleanup（退避スクリプト + .gitignore更新）完了、git rm待ち
+
+## 2026-01-08 P3 Implementation
+### P3-0: Repo Root 最終クリーンアップ
+- repo-rootの全アセット（5アイテム）を `refs/assets_inbox/` へ移動
+  - きゅーぴっど。モーションデータ.vmd/fbx
+  - Eyedart_Breath_motion_v1.1/
+  - MMO用待機モーションセット/
+  - 天音かなた公式mmd_ver1.0/
+- README規約「NEW_ROOTにはworkspaceとrefsのみ」と実体が一致
+
+### P3-1: Packaging UX 改善（Avatar exe）
+- `poc_avatar_mmd_viewer.py` にCLIオプション追加:
+  - `--open-viewer` (デフォルトTrue): ブラウザ自動オープン
+  - `--no-browser`: ブラウザを開かない
+  - `--model <path>`: PMXファイルパス指定
+  - `--slug <slug>`: キャラクタースラッグ指定
+  - `--port <port>`: HTTPサーバポート指定
+- アセット未配置時のガイド表示（docs/ASSETS_PLACEMENT.md誘導）
+- `mascot.spec` に argparse, webbrowser を hiddenimports 追加
+
+### P3-2: 統合ランチャーの器
+- `apps/shell/launcher.py` 新規作成
+  - 将来Core+Avatar統合起動のための構造
+  - 現時点ではAvatar単体起動
+  - 停止時の子プロセス確実終了（CTRL_BREAK_EVENT）
+  - logs/へのログ集約
+
+### ドキュメント更新
+- `docs/PACKAGING.md`: CLIオプション、ビルド失敗時典型原因を追記
+
+## 2026-01-08 P3 Verification ✅
+### ビルド検証
+- `package.ps1` 実行成功（OneDrive競合で一度リトライ）
+- `dist/mascot_avatar/mascot_avatar.exe` 生成
+- exe起動成功、ブラウザ自動オープン確認
+- 非ASCIIパス警告表示（動作継続）
+
+### DoD チェック結果
+| 項目 | 結果 |
+|------|------|
+| P3-0: README規約と実体一致 | ✅ |
+| P3-1: exe起動でブラウザ自動オープン | ✅ |
+| P3-1: アセット未配置時ガイド表示 | ✅ |
+| P3-2: launcher経由で起動・停止確実 | ✅ |
+
+## 2026-01-08 P3 Complete ✅
+- ブランチ: `feature/p3-packaging-ux`
+- 次フェーズ候補（P4）: Core統合、キャラ切替、状態遷移、音声連携
+
+## 2026-01-08 P4 Implementation: 常駐体験の実現
+### P4-0: トレイ常駐ホスト
+- `apps/shell/tray_host.py` 新規作成
+  - pystray でトレイアイコン
+  - pywebview で WebView2 ベース Viewer 埋め込み（枠なし）
+  - 単一インスタンス制御（lockファイル）
+  - 子プロセス確実終了（CTRL_BREAK_EVENT）
+
+### P4-1: Viewer埋め込み
+- `poc_avatar_mmd_viewer.py` 修正:
+  - `--open-viewer` デフォルトを False に変更
+  - `--headless` モード追加（Tkinter UI なし、HTTP サーバのみ）
+- pywebview で viewer URL を内部ロード
+
+### P4-2: コンソール窓を出さない
+- `tray_host.spec` 新規作成（console=False）
+- `mascot.spec` も console=False に変更
+- 子プロセス起動時 STARTF_USESHOWWINDOW で非表示
+
+### 新規ファイル
+- `apps/shell/tray_host.py` — トレイ常駐ホスト
+- `tray_host.spec` — PyInstaller spec（windowed）
+- `requirements.txt` — 依存関係定義
+- `docs/RESIDENT_MODE.md` — 常駐モードガイド
+
+## 2026-01-10 Docs (index + rules)
+- Summary: audited docs, added missing entrypoints (QUICKSTART, VIEWER_SEAMS), updated README + doc index/rules.
+- Verification: links in README and documentation index updated.
+- Open issues: legacy uppercase filenames remain for compatibility.
+- Author/Agent: codex

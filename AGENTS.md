@@ -8,6 +8,13 @@
   - `git remote -v`
   - `git status`
 
+### External Toolboxes (Allowed, With Limits)
+- 開発支援として、以下の外部リポジトリ/ノートを参照してよい（skills/テンプレ/手順/経験の検索用途）。
+  - `D:\dev\00_repository_templates`（skills・テンプレ・補助ツール）
+  - `D:\Obsidian\Programming`（実装時の経験値DB。参考資料）
+- ただし、このリポジトリの仕様・実装判断の「根拠」は `MascotDesktop` 内の記述で完結させる（外部参照だけに依存しない）。
+- 外部参照を行った場合は、worklog に `External-Refs` として識別可能な形（ノートID/パス/タイトル等）で記録する。
+
 ## 1) Workflow Gate: Plan → Approve → Execute (理由・根拠必須)
 ### 1.1 Plan（必ず最初）
 コマンド実行・ファイル編集の前に、必ず PLAN を提示する（理由と根拠を含む）：
@@ -51,5 +58,6 @@
 - 機密情報・トークン・個人情報はログ出力しない。
 
 ## 6) Work history (追加要件)
-- 詳細な作業履歴を `docs/worklog/` に残す（経験値ライブラリ化のため）。
-- 記録項目：変更内容、実行コマンド、テスト結果、判断理由、次アクション。
+- 作業履歴は `docs/worklog/` に残す（このリポジトリ内で再現・検証できる状態にするため）。
+- `docs/worklog/` に残す必須項目：変更内容、実行コマンド、テスト結果、判断理由（要点）、次アクション、ロールバック方針、`Used-Skills`、`External-Refs`。
+- 詳細手順・長文の経験談・補足は `D:\Obsidian\Programming` に蓄積してよい（ただし参照情報として扱い、worklog には識別子を残す）。

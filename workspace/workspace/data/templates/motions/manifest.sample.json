@@ -1,0 +1,82 @@
+{
+  "version": "0.1.0",
+  "avatar": {
+    "model_path": "data/assets_user/characters/sample_character/mmd/model.pmx"
+  },
+  "motions": {
+    "slots": {
+      "idle": {
+        "variants": [
+          {
+            "path": "data/assets_user/characters/sample_character/motions/idle.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 0.9,
+            "root_lock": true,
+            "crossfade_sec": 0.35,
+            "physics": false,
+            "license": {
+              "author": "author name",
+              "source_url": "https://example.com/idle_motion",
+              "terms_note": "for personal/local use"
+            }
+          }
+        ]
+      },
+      "speaking": {
+        "variants": [
+          {
+            "path": "data/assets_user/characters/sample_character/motions/speaking.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 1.0,
+            "root_lock": true,
+            "crossfade_sec": 0.35,
+            "physics": false,
+            "license": {
+              "author": "author name",
+              "source_url": "https://example.com/speaking_motion",
+              "terms_note": "for personal/local use"
+            }
+          }
+        ]
+      },
+      "notify": {
+        "variants": [
+          {
+            "path": "data/assets_user/characters/sample_character/motions/notify.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 1.0,
+            "root_lock": true,
+            "crossfade_sec": 0.35,
+            "physics": false,
+            "license": {
+              "author": "author name",
+              "source_url": "https://example.com/notify_motion",
+              "terms_note": "for personal/local use"
+            }
+          }
+        ]
+      },
+      "sleep": {
+        "variants": [
+          {
+            "path": "data/assets_user/characters/sample_character/motions/sleep.vmd",
+            "weight": 1,
+            "loop": true,
+            "time_scale": 0.7,
+            "root_lock": true,
+            "crossfade_sec": 0.5,
+            "physics": false,
+            "license": {
+              "author": "author name",
+              "source_url": "https://example.com/sleep_motion",
+              "terms_note": "for personal/local use"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

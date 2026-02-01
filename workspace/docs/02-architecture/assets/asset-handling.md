@@ -46,3 +46,16 @@
 - Mode3テンプレ: `data/templates/assets/pngtuber_mode3/README.md`
 - Placeholders: `data/templates/assets/placeholders/README.md`
 - AvatarRenderer: `docs/02-architecture/avatar/avatar-renderer.md`
+
+## Revision History
+
+### v2.0 (2025-12-30~)
+- 表示モード（`image_fit_mode`: contain/cover）の詳細を追加
+- 置き場所の推奨構成を詳細化（characters/<slug>/... 構造）
+- ログとフォールバック仕様を追加（placeholder使用時のINFOログ）
+- 探索優先順位を明記（assets_user → templates → フォールバック）
+- 旧バージョン（v1.0）は基本方針のみ（24行）
+
+### v1.0 (~2025-12-30)
+- 基本方針のみ定義（ルートレベル `docs/02-architecture/assets/asset-handling.md` に存在）
+- 管理方針、許可拡張子、サイズ制約、パス解決の概要のみ

@@ -26,6 +26,7 @@ datas = [
 
 # Hidden imports (modules loaded dynamically)
 hiddenimports = [
+    'argparse',
     'http.server',
     'json',
     'logging',
@@ -37,6 +38,7 @@ hiddenimports = [
     'urllib.parse',
     'uuid',
     'tkinter',
+    'webbrowser',
 ]
 
 a = Analysis(
@@ -73,7 +75,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,  # Server needs console output
+    console=False,  # Windowed mode - no console
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

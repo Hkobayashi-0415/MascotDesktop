@@ -30,7 +30,7 @@ STATE = {
     "last_error": None,
     "updated_at": None,
 }
-DEFAULT_MODEL = "data/assets_user/characters/kanata_official_v1/mmd/model.pmx"
+DEFAULT_MODEL = "data/assets_user/characters/amane_kanata_v1/mmd/model.pmx"
 # Browser auto-openはデフォルトOFF。必要なら環境変数 AVATAR_OPEN_BROWSER=1 をセット。
 DEFAULT_OPEN_BROWSER = os.environ.get("AVATAR_OPEN_BROWSER", "0") == "1"
 _UNSET = object()
@@ -134,6 +134,59 @@ def resolve_motion_from_slot(slot: str, model_path: str):
     if manifest_err:
         return None, "MANIFEST_NOT_FOUND"
     return None, "MOTION_NOT_FOUND"
+
+
+def get_available_slots(model_path: str):
+    """
+    T2: Get available motion slots for a character.
+    Returns list of slot info dicts: [{slot, file, label, category}]
+    Falls back to implicit idle slot if manifest missing but idle.vmd exists.
+    """
+    if not model_path:
+        return [], "MODEL_PATH_REQUIRED"
+    
+    manifest, manifest_path, manifest_err = load_manifest(model_path)
+    slots = []
+    
+    if manifest and "motions" in manifest and "slots" in manifest["motions"]:
+        manifest_slots = manifest["motions"]["slots"]
+        for slot_name, slot_info in manifest_slots.items():
+            variants = slot_info.get("variants", [])
+            if variants:
+                # Use first variant's path as the primary file
+                primary = variants[0]
+                slots.append({
+                    "slot": slot_name,
+                    "file": primary.get("path", ""),
+                    "label": slot_info.get("description", slot_name),
+                    "category": slot_info.get("category", "default"),
+                    "variant_count": len(variants),
+                })
+    else:
+        # Fallback: check for idle.vmd
+        model_dir = (Path(WS_ROOT) / model_path).parent
+        idle_vmd = model_dir / "idle.vmd"
+        if idle_vmd.exists():
+            slots.append({
+                "slot": "idle",
+                "file": "idle.vmd",
+                "label": "Idle",
+                "category": "default",
+                "variant_count": 1,
+            })
+        else:
+            # Try to find any .vmd file
+            vmd_files = list(model_dir.glob("*.vmd"))
+            for vmd in vmd_files[:5]:  # Limit to 5 fallback options
+                slots.append({
+                    "slot": "idle",  # All fallback to idle slot
+                    "file": vmd.name,
+                    "label": vmd.stem,
+                    "category": "fallback",
+                    "variant_count": 1,
+                })
+    
+    return slots, None
 
 
 def update_state(model_path=_UNSET, motion_path=_UNSET, motion=_UNSET, slot=_UNSET, error=_UNSET):
@@ -300,6 +353,37 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(204)
             self.end_headers()
             return
+        # T2: GET /avatar/slots - return available motion slots for a character
+        if parsed.path == "/avatar/slots":
+            from urllib.parse import parse_qs
+            query = parse_qs(parsed.query)
+            model_path = query.get("model_path", [None])[0]
+            
+            # If no model_path specified, use currently loaded model
+            if not model_path:
+                model_path = STATE.get("model_path") or CURRENT_MODEL_PATH
+            
+            if not model_path:
+                self._set_headers(400, request_id=req_id)
+                payload_err = error(req_id, "AVATAR.SLOTS.NO_MODEL", "model_path required or load a model first", 400)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+            
+            slots, slots_err = get_available_slots(model_path)
+            
+            self._set_headers(200, request_id=req_id)
+            body = success({
+                "status": "ok",
+                "dto_version": "0.1.0",
+                "model_path": model_path,
+                "slots": slots,
+            }, req_id)
+            self.wfile.write(json.dumps(body, ensure_ascii=False).encode("utf-8"))
+            get_logger("avatar.ipc").info(
+                "avatar.slots",
+                extra=log_extra("avatar.ipc", "avatar.slots", request_id=req_id, model_path=model_path, slot_count=len(slots)),
+            )
+            return
         if parsed.path == "/avatar/current_model":
             if CURRENT_MODEL_PATH:
                 model_url = f"/static/{CURRENT_MODEL_PATH.replace('\\\\','/')}"
@@ -456,32 +540,64 @@ class Handler(BaseHTTPRequestHandler):
                 )
                 return
 
+            # T1: Support optional start_slot parameter
+            # If provided, use that slot instead of "idle" for initial motion
+            start_slot = payload.get("start_slot", "idle")
+            
             motion = None
+            motion_err = None
             if payload.get("default_motion_path"):
-                motion = build_motion_dict(payload["default_motion_path"], slot="idle")
+                motion = build_motion_dict(payload["default_motion_path"], slot=start_slot)
             else:
-                motion, motion_err = resolve_motion_from_slot("idle", model_path)
+                motion, motion_err = resolve_motion_from_slot(start_slot, model_path)
+            
             if not motion:
-                self._set_headers(404, request_id=req_id)
-                payload_err = error(
-                    req_id,
-                    motion_err or "MOTION_NOT_FOUND",
-                    "idle motion not found (manifest missing and idle.vmd absent)",
-                    404,
-                )
-                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
-                update_state(model_path=model_path, motion=None, slot=None, error=payload_err["error_code"])
-                get_logger("avatar.ipc").warning(
-                    "avatar.load.motion_missing",
-                    extra=log_extra(
-                        "avatar.ipc",
+                # If start_slot was explicitly specified and failed, return error
+                if payload.get("start_slot"):
+                    self._set_headers(404, request_id=req_id)
+                    payload_err = error(
+                        req_id,
+                        motion_err or "SLOT_NOT_FOUND",
+                        f"motion not found for slot '{start_slot}'",
+                        404,
+                    )
+                    self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                    # Still load model, just without motion
+                    update_state(model_path=model_path, motion=None, slot=None, error=payload_err["error_code"])
+                    get_logger("avatar.ipc").warning(
+                        "avatar.load.slot_missing",
+                        extra=log_extra(
+                            "avatar.ipc",
+                            "avatar.load.slot_missing",
+                            request_id=req_id,
+                            model_path=model_path,
+                            start_slot=start_slot,
+                            error_code="SLOT_NOT_FOUND",
+                        ),
+                    )
+                    return
+                else:
+                    # Original behavior: idle slot required
+                    self._set_headers(404, request_id=req_id)
+                    payload_err = error(
+                        req_id,
+                        motion_err or "MOTION_NOT_FOUND",
+                        "idle motion not found (manifest missing and idle.vmd absent)",
+                        404,
+                    )
+                    self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                    update_state(model_path=model_path, motion=None, slot=None, error=payload_err["error_code"])
+                    get_logger("avatar.ipc").warning(
                         "avatar.load.motion_missing",
-                        request_id=req_id,
-                        model_path=model_path,
-                        error_code="MOTION_NOT_FOUND",
-                    ),
-                )
-                return
+                        extra=log_extra(
+                            "avatar.ipc",
+                            "avatar.load.motion_missing",
+                            request_id=req_id,
+                            model_path=model_path,
+                            error_code="MOTION_NOT_FOUND",
+                        ),
+                    )
+                    return
             update_state(model_path=model_path, motion=motion, slot=motion.get("slot") if motion else None, error=None)
             self._set_headers(200, request_id=req_id)
             payload_ok = success(
@@ -490,6 +606,7 @@ class Handler(BaseHTTPRequestHandler):
                     "dto_version": payload.get("dto_version", "0.1.0"),
                     "loaded_model": model_path,
                     "default_motion": motion.get("motion_path") if motion else None,
+                    "start_slot": start_slot,
                     "note": "Viewer will attempt to load model via /viewer page.",
                 },
                 req_id,
@@ -503,6 +620,60 @@ class Handler(BaseHTTPRequestHandler):
                     request_id=req_id,
                     status_code=200,
                     model_path=model_path,
+                    start_slot=start_slot,
+                ),
+            )
+            return
+
+        if parsed.path == "/avatar/set_motion":
+            # Set motion directly by file name (for UI motion switcher)
+            slug = payload.get("slug")
+            motion_file = payload.get("motion_file")
+            if not motion_file:
+                self._set_headers(400, request_id=req_id)
+                payload_err = error(req_id, "AVATAR.SET_MOTION.MISSING_FILE", "motion_file is required", 400)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+            
+            # Build motion path
+            if slug:
+                motion_path = f"data/assets_user/characters/{slug}/mmd/{motion_file}"
+            else:
+                model_path = STATE.get("model_path")
+                if model_path:
+                    model_dir = os.path.dirname(model_path)
+                    motion_path = f"{model_dir}/{motion_file}"
+                else:
+                    motion_path = motion_file
+            
+            abs_motion = os.path.join(WS_ROOT, motion_path)
+            if not os.path.exists(abs_motion):
+                self._set_headers(404, request_id=req_id)
+                payload_err = error(req_id, "MOTION_NOT_FOUND", f"motion file not found: {motion_file}", 404)
+                self.wfile.write(json.dumps(payload_err, ensure_ascii=False).encode("utf-8"))
+                return
+            
+            motion = build_motion_dict(motion_path, slot="idle")
+            update_state(motion=motion, slot="idle", error=None)
+            
+            self._set_headers(200, request_id=req_id)
+            payload_ok = success(
+                {
+                    "status": "ok",
+                    "dto_version": "0.1.0",
+                    "motion_path": motion_path,
+                    "note": "motion set; viewer will pick up on next poll",
+                },
+                req_id,
+            )
+            self.wfile.write(json.dumps(payload_ok, ensure_ascii=False).encode("utf-8"))
+            get_logger("avatar.ipc").info(
+                "avatar.set_motion",
+                extra=log_extra(
+                    "avatar.ipc",
+                    "avatar.set_motion",
+                    request_id=req_id,
+                    motion_path=motion_path,
                 ),
             )
             return
@@ -536,41 +707,113 @@ def run_server(host="127.0.0.1", port=8770):
 
 
 def main():
-    server = run_server()
-    # auto-load default model if exists
-    if os.path.exists(os.path.join(WS_ROOT, DEFAULT_MODEL)):
-        motion, motion_err = resolve_motion_from_slot("idle", DEFAULT_MODEL)
+    import argparse
+    parser = argparse.ArgumentParser(description="MascotDesktop Avatar Viewer (MMD PoC)")
+    parser.add_argument("--open-viewer", dest="open_viewer", action="store_true", default=False,
+                        help="Open viewer in browser on startup (default: False)")
+    parser.add_argument("--no-browser", dest="open_viewer", action="store_false",
+                        help="Do not open browser on startup")
+    parser.add_argument("--headless", action="store_true", default=False,
+                        help="Run in headless mode (no Tkinter UI, HTTP server only)")
+    parser.add_argument("--model", type=str, default=None,
+                        help="Path to PMX model file (relative to workspace root)")
+    parser.add_argument("--slug", type=str, default=None,
+                        help="Character slug to load from data/assets_user/characters/<slug>/mmd/model.pmx")
+    parser.add_argument("--port", type=int, default=8770,
+                        help="HTTP server port (default: 8770)")
+    args = parser.parse_args()
+
+    server = run_server(port=args.port)
+    
+    # Determine model path
+    model_path = None
+    if args.model:
+        model_path = args.model
+    elif args.slug:
+        model_path = f"data/assets_user/characters/{args.slug}/mmd/model.pmx"
+    else:
+        model_path = DEFAULT_MODEL
+
+    # Try to load model
+    abs_model = os.path.join(WS_ROOT, model_path)
+    if os.path.exists(abs_model):
+        motion, motion_err = resolve_motion_from_slot("idle", model_path)
         update_state(
-            model_path=DEFAULT_MODEL,
+            model_path=model_path,
             motion=motion,
             slot=motion.get("slot") if motion else None,
             error=None if motion else motion_err,
         )
         get_logger("avatar.ipc").info(
-            "avatar.load.default",
+            "avatar.load.auto",
             extra=log_extra(
                 "avatar.ipc",
-                "avatar.load.default",
-                request_id="auto-default",
-                model_path=DEFAULT_MODEL,
+                "avatar.load.auto",
+                request_id="auto-load",
+                model_path=model_path,
                 motion_path=motion.get("motion_path") if motion else None,
             ),
         )
     else:
+        # Asset not found - show guidance
+        guide_msg = f"""
+========================================
+  Asset Not Found: {model_path}
+========================================
+Please place your PMX model at:
+  {abs_model}
+
+See docs/ASSETS_PLACEMENT.md for details.
+========================================
+"""
+        print(guide_msg)
         get_logger("avatar.ipc").warning(
-            "avatar.load.default_missing",
+            "avatar.load.asset_missing",
             extra=log_extra(
                 "avatar.ipc",
-                "avatar.load.default_missing",
-                request_id="auto-default",
-                model_path=DEFAULT_MODEL,
+                "avatar.load.asset_missing",
+                request_id="auto-load",
+                model_path=model_path,
+                guide="docs/ASSETS_PLACEMENT.md",
             ),
         )
-    if DEFAULT_OPEN_BROWSER:
+        update_state(model_path=None, motion=None, slot=None, error="ASSET_NOT_FOUND")
+
+    # Open browser if requested
+    if args.open_viewer:
         try:
-            webbrowser.open("http://127.0.0.1:8770/viewer")
-        except Exception:
+            viewer_url = f"http://127.0.0.1:{args.port}/viewer"
+            webbrowser.open(viewer_url)
+            get_logger("avatar.ipc").info(
+                "avatar.viewer.browser_opened",
+                extra=log_extra("avatar.ipc", "avatar.viewer.browser_opened", request_id="auto-open", url=viewer_url),
+            )
+        except Exception as e:
+            get_logger("avatar.ipc").warning(
+                "avatar.viewer.browser_open_failed",
+                extra=log_extra("avatar.ipc", "avatar.viewer.browser_open_failed", request_id="auto-open", error=str(e)),
+            )
+
+    # Headless mode: just run HTTP server, no UI
+    if args.headless:
+        get_logger("avatar.ipc").info(
+            "avatar.headless.running",
+            extra=log_extra("avatar.ipc", "avatar.headless.running", request_id="headless", port=args.port),
+        )
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
             pass
+        finally:
+            server.shutdown()
+            server.server_close()
+            get_logger("avatar.health").info(
+                "avatar.viewer.stop", extra=log_extra("avatar.health", "avatar.viewer.stop", request_id=ensure_request_id())
+            )
+        return
+
+    # Normal mode with Tkinter UI
     ui = ViewerUI()
     try:
         ui.run()
@@ -584,3 +827,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
