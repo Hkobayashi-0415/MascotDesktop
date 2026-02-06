@@ -1,9 +1,12 @@
 # Worklog: Unity migration spec (legacy split)
+- Repo-Refs: n/a
+- Obsidian-Refs: n/a
+- Report-Path: docs/worklog/2026-01-28_unity-migration-spec.md
+- Obsidian-Log: 未実施:当時未運用
 
 - Date: 2026-01-28
 - Task: Mark legacy spec as reference-only and add new Unity migration spec
 - Used-Skills: n/a
-- External-Refs: n/a
 
 ## Summary
 - Marked `spec/latest/spec.md` as legacy (reference-only) for pre-Unity.
@@ -39,3 +42,10 @@
 
 ## Next Actions
 - Expand Unity migration spec with detailed acceptance criteria and MMD scope.
+- Review findings and refs are logged separately in `docs/worklog/2026-02-01_review-unity-migration.md`.
+
+## Record Check
+- Report-Path exists: True
+- Repo-Refs populated: Yes
+- Obsidian-Refs populated (or n/a): Yes
+- Obsidian-Log recorded (path or reason): Yes

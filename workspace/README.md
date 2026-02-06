@@ -32,6 +32,11 @@
 - Viewer seams: [`docs/VIEWER_SEAMS.md`](docs/VIEWER_SEAMS.md)
 - Worklog / backlog: [`docs/WORKLOG.md`](docs/WORKLOG.md), [`docs/NEXT_TASKS.md`](docs/NEXT_TASKS.md)
 
+## Worklog (Procedure)
+
+- Worklog procedure: `docs/worklog/README.md`
+- Agent rules (source of truth): `../AGENTS.md`
+
 ## Assets and motions
 
 - No PMX/VMD/texture/audio assets are committed. Place your own under `data/assets_user/` (gitignored).

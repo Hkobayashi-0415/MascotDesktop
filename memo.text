@@ -1,0 +1,186 @@
+Unity移行のレビューと難易度評価
+進行中のタスクはありません
+
+
+この開発リポジトリの実装内容を下記の視点でレビューしてください
+・HTML、Python主体から参考リポジトリCocoroAIのようにUnityでの実装に切り替える場合の難易度
+・切り替えの具体的なプランの概要を難易度別に
+・メリットデメリットの提示
+・既存のレポートがプログラミングフォルダにあれば参照して参考にしてください 
+・現時点での課題
+
+
+
+理解できましたか？
+
+理解しました。code-review スキルを使って進めます（レビュー依頼のため）。
+
+以下、実行前のPLANです。承認後にコマンド実行・ファイル閲覧を開始します。
+
+PLAN
+
+目的: 現行実装（HTML/Python中心）を把握し、Unity移行の難易度評価・段階別プラン概要・メリデメ・課題をレビュー観点で提示
+スコープ: リポジトリ内の仕様/実装/ドキュメント/既存レポートの調査とレビュー出力
+非スコープ: 実装変更、依存追加、Unityコード作成、ビルド/実行
+現状の根拠: ユーザー提示のコンテキスト（d:\dev\MascotDesktop、開いているタブ一覧、AGENTS.md）、追加根拠は承認後に取得
+変更対象ファイル: なし（レビューのみ）。ただし docs/worklog/ に作業記録を新規作成予定
+変更内容の要約: レビュー結果の記録を docs/worklog/ に追加
+実行予定コマンド（目的）:
+git rev-parse --show-toplevel（リポジトリ同定）
+git remote -v（同定補助）
+git status（状態確認）
+rg --files / rg -n（HTML/Python/Unity/CocoroAI参照や既存レポートの探索）
+必要に応じて Get-ChildItem（D:\Obsidian\Programming のレポート確認）
+テスト計画: レビューのみのため原則テスト対象外。docs/worklog/ 追加のみであればテスト省略の理由を記録
+ロールバック手順: 追加した docs/worklog/ のファイル削除
+リスク・代替案: 仕様根拠が不足する場合は「不明/要確認」と明記し、推測は避ける。外部参照が必要なら記録の上で限定的に使用
+承認キーワード: APPROVE / GO / 実行 / 進めて のいずれかをください。
+
+実行
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+編集済み
+2026-02-04_unity-migration-review.md
+## Record Check
+- Report-Path exists: <TBD>
+- Report-Path exists: True
+- Repo-Refs populated: Yes
+- Obsidian-Refs populated (or n/a): Yes
+- Obsidian-Log recorded: <TBD>
+- Obsidian-Log recorded: Yes
+
+
+Review Findings
+
+High: Config schema defines topmost while Core/Shell persist and use pinned, which will break Unity config compatibility unless reconciled. config-schema.md (line 13) poc_core_http.py (line 26) poc_shell.py (line 113)
+High: MMD viewer relies on three.js MMDLoader plus seam-fix/alpha-bleed tuning; Unity must re‑implement and re‑validate these material behaviors to avoid regressions. viewer.js (line 3) viewer.js (line 26) VIEWER_SEAMS.md (line 6)
+High: Target is single-window Unity (UI+Avatar+minimal core) but runtime is multi-process with HTTP IPC; migration requires IPC/lifecycle redesign. run-poc.md (line 11) spec.md (line 42) unity-migration-spec.md (line 8)
+Medium: Avatar viewer Python UI is explicitly a placeholder; real render is browser-based, so Unity acceptance criteria for MMD are not stabilized yet. poc_avatar_mmd_viewer.py (line 210) dev-status.md (line 10)
+Medium: Spec references an IPC contract doc that is missing in workspace, leaving Unity integration contracts unclear. spec.md (line 54)
+Medium: Non-ASCII path risk remains; Unity asset loading/packaging will inherit instability unless ASCII enforcement is part of migration. dev-status.md (line 9)
+Migration Difficulty
+Overall: viewer-only Unity replacement is low‑medium; Unity UI + minimal core is medium‑high; full Unity consolidation is high. Current stack is Python core/shell + web viewer (PACKAGING.md (line 23) PACKAGING.md (line 47) PACKAGING.md (line 49)) while the migration spec targets single-window Unity UI+MMD+minimal core (unity-migration-spec.md (line 6) unity-migration-spec.md (line 37)). CocoroAI refs show UnityPlayer.dll under CocoroShell, suggesting Unity is used for the shell but the overall stack remains multi-process (UnityPlayer.dll UnityPlayer.dll).
+
+Tiered Plan (by difficulty)
+
+Prerequisites (all tiers): Align topmost vs pinned, define IPC contract in workspace, and preserve request_id logging semantics. config-schema.md (line 13) spec.md (line 54) logging.md (line 4)
+Low (Viewer-only): Replace the web MMD viewer with a Unity avatar viewer process; keep Core/Shell and HTTP IPC; implement /avatar/load + slots + motion playback; load assets from data/assets_user. run-poc.md (line 11) viewer.js (line 740) poc_avatar_mmd_viewer.py (line 288)
+Medium (Unity UI + minimal core): Implement single-window shell (pinned/drag/fit/config), integrate Unity MMD viewer, and keep Core/Memory external while bridging request_id logging. unity-migration-spec.md (line 22) logging.md (line 4)
+High (Unity dominant): Consolidate UI+Avatar+config/logging in Unity and deprecate Python shell + web viewer; stage Core/Memory migration only if scope expands beyond non-goals. unity-migration-spec.md (line 14)
+Pros
+
+Single-window UX and unified UI/Avatar control in Unity. unity-migration-spec.md (line 8)
+Stronger 3D pipeline control, better chances to stabilize MMD rendering. viewer.js (line 3) VIEWER_SEAMS.md (line 6)
+Reduced dependency on browser/CDN for rendering. index.html (line 11)
+Centralized config and UI events in the Unity minimal core. unity-migration-spec.md (line 22)
+Cons
+
+Re-implementing MMD loader + seam-fix + motion slots is high-cost and regression-prone. viewer.js (line 3) viewer.js (line 740)
+IPC/logging and config compatibility must be preserved or redesigned. logging.md (line 4) config-schema.md (line 13)
+Build/packaging shifts from PyInstaller to Unity tooling. PACKAGING.md (line 23)
+Scope creep risk versus non-goals (Memory/Embedding/DB not in Unity). unity-migration-spec.md (line 14)
+Current Issues (summary)
+
+topmost vs pinned mismatch across schema and implementation.
+MMD seam-fix and motion-slot behavior tightly coupled to three.js viewer.
+Multi-process IPC vs single-window Unity target is unresolved.
+IPC contract doc missing in workspace; migration mapping is underspecified.
+Existing Reports Consulted
+
+2026-02-01_review-unity-migration.md
+2026-02-02_review-unity-migration-followup.md
+MascotDesktop_phaseNA_log_260201.md (procedural notes)
+MascotDesktop_phaseNA_log_260204_0149.md (procedural notes)
+Open Questions / Assumptions
+
+Which migration tier is the intended target: viewer-only, UI+minimal core, or full Unity?
+Should HTTP/JSON IPC remain, or do we need a new transport (named pipe, etc.)?
+What are the minimum MMD acceptance criteria (idle only vs full motion/slots)?
+Do we standardize on pinned or topmost in the config schema before Unity work?
+Changes and Tests
+
+Added 2026-02-04_unity-migration-review.md
+Added MascotDesktop_phaseNA_log_260204_0205.md
+Test: 2026-02-04_unity-migration-review.md
+Test: MascotDesktop_phaseNA_log_260204_0205.md
+Next Steps
+
+Choose a migration tier (viewer-only / UI+minimal core / full Unity).
+Decide the config key standard (pinned vs topmost) and update schema + code accordingly.
+Define the IPC contract (document it in workspace) before Unity implementation.
+1 個のファイルが変更されました
+元に戻す
+
+レビューする
+docs/worklog/2026-02-04_unity-migration-review.md
+
+
