@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.0624687">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.062469" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1037" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.053208" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="19532" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1038" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.052311" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1039" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.051737" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1040" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.051149" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1008" name="AvatarStateControllerTests" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.049505" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1010" name="ApplyState_UsesIdle_WhenUnknownState" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests.ApplyState_UsesIdle_WhenUnknownState" methodname="ApplyState_UsesIdle_WhenUnknownState" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" seed="860043709" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.025183" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:15:55.7534952+00:00","level":"INFO","component":"avatar","event_name":"avatar.state.transitioned","request_id":"req-state-002","error_code":"","message":"avatar state changed to mystery_state","path":"idle","source_tier":"state_machine","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:15:55.7574904+00:00","level":"INFO","component":"avatar","event_name":"avatar.motion.slot_played","request_id":"req-state-002","error_code":"","message":"motion slot played","path":"idle","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1009" name="ApplyState_UsesMappedSlot_ForHappy" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests.ApplyState_UsesMappedSlot_ForHappy" methodname="ApplyState_UsesMappedSlot_ForHappy" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" seed="287779026" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.002856" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:15:55.7736102+00:00","level":"INFO","component":"avatar","event_name":"avatar.state.transitioned","request_id":"req-state-001","error_code":"","message":"avatar state changed to happy","path":"happy","source_tier":"state_machine","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:15:55.7748019+00:00","level":"INFO","component":"avatar","event_name":"avatar.motion.slot_played","request_id":"req-state-001","error_code":"","message":"motion slot played","path":"happy","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1011" name="CoreEvent_UpdatesStateController" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests.CoreEvent_UpdatesStateController" methodname="CoreEvent_UpdatesStateController" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" seed="1596165435" result="Passed" start-time="2026-02-08 16:15:55Z" end-time="2026-02-08 16:15:55Z" duration="0.006803" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:15:55.7773058+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-state-003","error_code":"","message":"avatar state updated","path":"sleepy","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:15:55.7813917+00:00","level":"INFO","component":"avatar","event_name":"avatar.state.transitioned","request_id":"req-state-003","error_code":"","message":"avatar state changed to sleepy","path":"sleepy","source_tier":"state_machine","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:15:55.7823662+00:00","level":"INFO","component":"avatar","event_name":"avatar.motion.slot_played","request_id":"req-state-003","error_code":"","message":"motion slot played","path":"sleepy","source_tier":"state_machine","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\avatar-state-20260209_011548.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

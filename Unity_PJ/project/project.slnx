@@ -1,0 +1,6 @@
+﻿<Solution>
+  <Project Path="LibMMD.csproj" />
+  <Project Path="MascotDesktop.Tests.EditMode.csproj" />
+  <Project Path="MascotDesktop.Runtime.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+</Solution>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.0492912">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.049291" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1015" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.038540" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="78956" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1016" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.037514" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1017" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.036977" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1018" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.033798" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1008" name="ModelFormatRouterTests" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.032497" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1009" name="Classify_ReturnsImage_ForPng" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsImage_ForPng" methodname="Classify_ReturnsImage_ForPng" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="527148796" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.014843" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1011" name="Classify_ReturnsPmx_ForPmx" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsPmx_ForPmx" methodname="Classify_ReturnsPmx_ForPmx" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="986438992" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.000209" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="Classify_ReturnsUnsupported_ForUnknown" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsUnsupported_ForUnknown" methodname="Classify_ReturnsUnsupported_ForUnknown" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="591063970" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.000143" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="Classify_ReturnsVrm_ForVrm" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsVrm_ForVrm" methodname="Classify_ReturnsVrm_ForVrm" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="1554024839" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.000147" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1013" name="UnsupportedExtensionErrorCode_ReturnsMissing_ForNoExtension" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.UnsupportedExtensionErrorCode_ReturnsMissing_ForNoExtension" methodname="UnsupportedExtensionErrorCode_ReturnsMissing_ForNoExtension" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="1546711318" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.000324" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="UnsupportedExtensionErrorCode_ReturnsUnsupported_ForUnknownExtension" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.UnsupportedExtensionErrorCode_ReturnsUnsupported_ForUnknownExtension" methodname="UnsupportedExtensionErrorCode_ReturnsUnsupported_ForUnknownExtension" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="1711834263" result="Passed" start-time="2026-02-08 06:25:40Z" end-time="2026-02-08 06:25:40Z" duration="0.000104" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-modelrouter.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

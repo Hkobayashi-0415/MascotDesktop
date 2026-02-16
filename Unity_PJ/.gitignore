@@ -1,0 +1,38 @@
+# Unity_PJ gitignore
+
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+
+# IDE and generated project files
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+
+# Local runtime data
+project/Logs/
+project/UserSettings/
+
+# Local assets (do not commit binaries)
+data/assets_user/**
+!data/assets_user/.gitkeep
+!data/assets_user/characters/
+!data/assets_user/characters/.gitkeep
+
+# Keep templates tracked
+data/templates/**

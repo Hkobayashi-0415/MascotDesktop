@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="30" result="Failed(Child)" total="30" passed="27" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.1470761">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="30" result="Failed" site="Child" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.147076" total="30" passed="27" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1037" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="30" result="Failed" site="Child" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.138452" total="30" passed="27" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="81568" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1038" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="30" result="Failed" site="Child" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.137636" total="30" passed="27" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1039" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="30" result="Failed" site="Child" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.137109" total="30" passed="27" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1040" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="30" result="Failed" site="Child" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.136543" total="30" passed="27" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="AssetPathResolverTests" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.078733" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1007" name="ResolveRelative_AddsWarningCode_ForNonAsciiSegment" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_AddsWarningCode_ForNonAsciiSegment" methodname="ResolveRelative_AddsWarningCode_ForNonAsciiSegment" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="563751907" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.034583" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9281711+00:00","level":"WARN","component":"assets","event_name":"assets.path.non_ascii","request_id":"req-test-006","error_code":"ASSET.PATH.NON_ASCII_WARN","message":"non-ascii path segment detected","path":"characters/ナース/state.png","source_tier":"","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:41.9311772+00:00","level":"INFO","component":"assets","event_name":"assets.path.resolved","request_id":"req-test-006","error_code":"","message":"resolved from canonical assets root","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_3c4e1b874145410ca60953b1ee63d586\\canonical\\characters\\ナース\\state.png","source_tier":"assets_user","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1003" name="ResolveRelative_FallsBackToStreamingAssets" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_FallsBackToStreamingAssets" methodname="ResolveRelative_FallsBackToStreamingAssets" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="492285807" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.005695" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9558879+00:00","level":"INFO","component":"assets","event_name":"assets.path.resolved","request_id":"req-test-002","error_code":"","message":"resolved from streaming assets root","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_80a1c1fc35cb4c43a589ad090bea851a\\streaming\\characters\\fallback\\stream.png","source_tier":"streaming_assets","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1004" name="ResolveRelative_RejectsAbsolutePath" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_RejectsAbsolutePath" methodname="ResolveRelative_RejectsAbsolutePath" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="949926852" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.005984" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9616959+00:00","level":"ERROR","component":"assets","event_name":"assets.path.resolve_failed","request_id":"req-test-003","error_code":"ASSET.PATH.ABSOLUTE_FORBIDDEN","message":"absolute path is forbidden","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_8b256f978848416689a54a764ddcf864\\canonical\\characters/demo/state.png","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1006" name="ResolveRelative_RejectsLegacyLikePath_WhenForbidden" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_RejectsLegacyLikePath_WhenForbidden" methodname="ResolveRelative_RejectsLegacyLikePath_WhenForbidden" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="108276376" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.006239" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9684899+00:00","level":"ERROR","component":"assets","event_name":"assets.path.resolve_failed","request_id":"req-test-005","error_code":"ASSET.PATH.LEGACY_FORBIDDEN","message":"legacy path is forbidden in this mode","path":"workspace/data/assets_user/characters/a.png","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1005" name="ResolveRelative_RejectsTraversal" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_RejectsTraversal" methodname="ResolveRelative_RejectsTraversal" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="272383224" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.005600" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9746744+00:00","level":"ERROR","component":"assets","event_name":"assets.path.resolve_failed","request_id":"req-test-004","error_code":"ASSET.PATH.TRAVERSAL_FORBIDDEN","message":"path traversal is forbidden","path":"../secrets/token.txt","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1002" name="ResolveRelative_ResolvesFromCanonical" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_ResolvesFromCanonical" methodname="ResolveRelative_ResolvesFromCanonical" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="883252665" result="Passed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.006427" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9802751+00:00","level":"INFO","component":"assets","event_name":"assets.path.resolved","request_id":"req-test-001","error_code":"","message":"resolved from canonical assets root","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_c655167d1a6943d38c965879a6c7ee7b\\canonical\\characters\\demo\\state.png","source_tier":"assets_user","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1008" name="AvatarStateControllerTests" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.021242" total="3" passed="0" failed="3" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1010" name="ApplyState_UsesIdle_WhenUnknownState" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests.ApplyState_UsesIdle_WhenUnknownState" methodname="ApplyState_UsesIdle_WhenUnknownState" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" seed="192209964" result="Failed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:41Z" duration="0.011347" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at MascotDesktop.Tests.EditMode.AvatarStateControllerTests.ApplyState_UsesIdle_WhenUnknownState () [0x00015] in D:\dev\MascotDesktop\Unity_PJ\project\Assets\Tests\EditMode\AvatarStateControllerTests.cs:50
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9896829+00:00","level":"INFO","component":"avatar","event_name":"avatar.state.transitioned","request_id":"req-state-002","error_code":"","message":"avatar state changed to mystery_state","path":"idle","source_tier":"state_machine","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:41.9907474+00:00","level":"ERROR","component":"avatar","event_name":"avatar.motion.slot_play_failed","request_id":"req-state-002","error_code":"AVATAR.MOTION.SLOT_NOT_FOUND","message":"slot not found: idle","path":"","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1009" name="ApplyState_UsesMappedSlot_ForHappy" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests.ApplyState_UsesMappedSlot_ForHappy" methodname="ApplyState_UsesMappedSlot_ForHappy" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" seed="426837559" result="Failed" start-time="2026-02-08 16:06:41Z" end-time="2026-02-08 16:06:42Z" duration="0.003063" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at MascotDesktop.Tests.EditMode.AvatarStateControllerTests.ApplyState_UsesMappedSlot_ForHappy () [0x00015] in D:\dev\MascotDesktop\Unity_PJ\project\Assets\Tests\EditMode\AvatarStateControllerTests.cs:40
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:41.9985936+00:00","level":"INFO","component":"avatar","event_name":"avatar.state.transitioned","request_id":"req-state-001","error_code":"","message":"avatar state changed to happy","path":"happy","source_tier":"state_machine","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:41.9996317+00:00","level":"ERROR","component":"avatar","event_name":"avatar.motion.slot_play_failed","request_id":"req-state-001","error_code":"AVATAR.MOTION.SLOT_NOT_FOUND","message":"slot not found: happy","path":"","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1011" name="CoreEvent_UpdatesStateController" fullname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests.CoreEvent_UpdatesStateController" methodname="CoreEvent_UpdatesStateController" classname="MascotDesktop.Tests.EditMode.AvatarStateControllerTests" runstate="Runnable" seed="453245973" result="Failed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.005474" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected string length 6 but was 4. Strings differ at index 0.
+  Expected: "sleepy"
+  But was:  "idle"
+  -----------^
+]]></message>
+                  <stack-trace><![CDATA[at MascotDesktop.Tests.EditMode.AvatarStateControllerTests.CoreEvent_UpdatesStateController () [0x0002f] in D:\dev\MascotDesktop\Unity_PJ\project\Assets\Tests\EditMode\AvatarStateControllerTests.cs:61
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0012047+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-state-003","error_code":"","message":"avatar state updated","path":"sleepy","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:42.0032842+00:00","level":"INFO","component":"avatar","event_name":"avatar.state.transitioned","request_id":"req-state-003","error_code":"","message":"avatar state changed to sleepy","path":"sleepy","source_tier":"state_machine","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:42.0043196+00:00","level":"ERROR","component":"avatar","event_name":"avatar.motion.slot_play_failed","request_id":"req-state-003","error_code":"AVATAR.MOTION.SLOT_NOT_FOUND","message":"slot not found: sleepy","path":"","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1012" name="CoreOrchestratorTests" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.008376" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1013" name="ApplyAvatarState_NormalizesToIdle_WhenEmpty" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests.ApplyAvatarState_NormalizesToIdle_WhenEmpty" methodname="ApplyAvatarState_NormalizesToIdle_WhenEmpty" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests" runstate="Runnable" seed="1644410237" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001483" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0079709+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-core-001","error_code":"","message":"avatar state updated","path":"idle","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1015" name="ScheduleReminder_TriggersWhenDue" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests.ScheduleReminder_TriggersWhenDue" methodname="ScheduleReminder_TriggersWhenDue" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests" runstate="Runnable" seed="477855714" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.003492" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0108607+00:00","level":"INFO","component":"core","event_name":"core.reminder.scheduled","request_id":"req-core-003","error_code":"","message":"reminder scheduled for 2026-02-08T16:06:42.0098246+00:00","path":"","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:42.0108607+00:00","level":"INFO","component":"core","event_name":"core.reminder.triggered","request_id":"req-core-003","error_code":"","message":"ping","path":"","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1014" name="SendChat_RaisesStateChanged_ForHappyMessage" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests.SendChat_RaisesStateChanged_ForHappyMessage" methodname="SendChat_RaisesStateChanged_ForHappyMessage" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTests" runstate="Runnable" seed="462102224" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.002269" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0123969+00:00","level":"INFO","component":"core","event_name":"core.chat.received","request_id":"req-core-002","error_code":"","message":"I am happy today","path":"","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T16:06:42.0139391+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-core-002","error_code":"","message":"avatar state updated","path":"happy","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1016" name="ModelFormatRouterTests" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.003442" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1017" name="Classify_ReturnsImage_ForPng" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsImage_ForPng" methodname="Classify_ReturnsImage_ForPng" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="660194802" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001484" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="Classify_ReturnsPmx_ForPmx" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsPmx_ForPmx" methodname="Classify_ReturnsPmx_ForPmx" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="1865149678" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000139" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1020" name="Classify_ReturnsUnsupported_ForUnknown" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsUnsupported_ForUnknown" methodname="Classify_ReturnsUnsupported_ForUnknown" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="207311448" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000116" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="Classify_ReturnsVrm_ForVrm" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.Classify_ReturnsVrm_ForVrm" methodname="Classify_ReturnsVrm_ForVrm" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="1255229739" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000109" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1021" name="UnsupportedExtensionErrorCode_ReturnsMissing_ForNoExtension" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.UnsupportedExtensionErrorCode_ReturnsMissing_ForNoExtension" methodname="UnsupportedExtensionErrorCode_ReturnsMissing_ForNoExtension" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="1916336678" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000162" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1022" name="UnsupportedExtensionErrorCode_ReturnsUnsupported_ForUnknownExtension" fullname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests.UnsupportedExtensionErrorCode_ReturnsUnsupported_ForUnknownExtension" methodname="UnsupportedExtensionErrorCode_ReturnsUnsupported_ForUnknownExtension" classname="MascotDesktop.Tests.EditMode.ModelFormatRouterTests" runstate="Runnable" seed="954593478" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000109" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1023" name="MotionSlotPlayerTests" fullname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests" classname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.006825" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1026" name="PlaySlot_ReturnsFailure_WhenSlotEmpty" fullname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests.PlaySlot_ReturnsFailure_WhenSlotEmpty" methodname="PlaySlot_ReturnsFailure_WhenSlotEmpty" classname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests" runstate="Runnable" seed="1518328231" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.002086" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0250090+00:00","level":"ERROR","component":"avatar","event_name":"avatar.motion.slot_play_failed","request_id":"req-motion-003","error_code":"AVATAR.MOTION.SLOT_EMPTY","message":"requested slot is empty","path":"","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1025" name="PlaySlot_UsesFallback_WhenUnknownSlot" fullname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests.PlaySlot_UsesFallback_WhenUnknownSlot" methodname="PlaySlot_UsesFallback_WhenUnknownSlot" classname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests" runstate="Runnable" seed="817140147" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001232" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0268302+00:00","level":"WARN","component":"avatar","event_name":"avatar.motion.slot_fallback_used","request_id":"req-motion-002","error_code":"AVATAR.MOTION.SLOT_FALLBACK","message":"fallback slot used: idle","path":"unknown_slot","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1024" name="PlaySlot_UsesRequestedSlot_WhenExists" fullname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests.PlaySlot_UsesRequestedSlot_WhenExists" methodname="PlaySlot_UsesRequestedSlot_WhenExists" classname="MascotDesktop.Tests.EditMode.MotionSlotPlayerTests" runstate="Runnable" seed="1330495345" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001128" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0278668+00:00","level":"INFO","component":"avatar","event_name":"avatar.motion.slot_played","request_id":"req-motion-001","error_code":"","message":"motion slot played","path":"idle","source_tier":"state_machine","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1027" name="RuntimeLogTests" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.012910" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1031" name="Error_AssignsDefaultErrorCode_WhenMissing" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Error_AssignsDefaultErrorCode_WhenMissing" methodname="Error_AssignsDefaultErrorCode_WhenMissing" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="2058520662" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001067" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0319774+00:00","level":"ERROR","component":"tests","event_name":"tests.runtime.error_missing_code","request_id":"req-test-error","error_code":"RUNTIME.ERROR.UNSPECIFIED","message":"","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1034" name="Error_IncludesExceptionInfo" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Error_IncludesExceptionInfo" methodname="Error_IncludesExceptionInfo" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="1834001138" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001323" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0335287+00:00","level":"ERROR","component":"test","event_name":"test.exception","request_id":"req-test-ex","error_code":"TEST.EX.CODE","message":"with exception","path":"","source_tier":"","exception_type":"System.InvalidOperationException","exception_message":"Test exception message"}
+]]></output>
+              </test-case>
+              <test-case id="1032" name="Info_NormalizesOptionalFieldsToEmptyString" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Info_NormalizesOptionalFieldsToEmptyString" methodname="Info_NormalizesOptionalFieldsToEmptyString" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="772759276" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001007" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0342085+00:00","level":"INFO","component":"tests","event_name":"tests.runtime.info_defaults","request_id":"req-test-info","error_code":"","message":"","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1033" name="Info_OutputsLogWithInfoLevel" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Info_OutputsLogWithInfoLevel" methodname="Info_OutputsLogWithInfoLevel" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="987901676" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000965" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0352450+00:00","level":"INFO","component":"test","event_name":"test.event","request_id":"req-test-info-level","error_code":"","message":"test message","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1029" name="NewRequestId_GeneratesUniqueIds" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.NewRequestId_GeneratesUniqueIds" methodname="NewRequestId_GeneratesUniqueIds" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="47866852" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001621" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="NewRequestId_HasExpectedFormat" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.NewRequestId_HasExpectedFormat" methodname="NewRequestId_HasExpectedFormat" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="1846752176" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000348" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="Warn_AssignsDefaultErrorCode_WhenMissing" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Warn_AssignsDefaultErrorCode_WhenMissing" methodname="Warn_AssignsDefaultErrorCode_WhenMissing" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="958776485" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001098" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0386065+00:00","level":"WARN","component":"tests","event_name":"tests.runtime.warn_missing_code","request_id":"req-test-warn","error_code":"RUNTIME.WARN.UNSPECIFIED","message":"","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1035" name="Write_FillsDefaultComponent_WhenEmpty" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Write_FillsDefaultComponent_WhenEmpty" methodname="Write_FillsDefaultComponent_WhenEmpty" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="582525462" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.001009" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0401466+00:00","level":"INFO","component":"runtime","event_name":"test.event","request_id":"req-test-default-component","error_code":"","message":"message","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1036" name="Write_FillsDefaultEventName_WhenEmpty" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Write_FillsDefaultEventName_WhenEmpty" methodname="Write_FillsDefaultEventName_WhenEmpty" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="221096297" result="Passed" start-time="2026-02-08 16:06:42Z" end-time="2026-02-08 16:06:42Z" duration="0.000958" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T16:06:42.0406907+00:00","level":"INFO","component":"test","event_name":"runtime.event","request_id":"req-test-default-event","error_code":"","message":"message","path":"","source_tier":"","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-phase3-20260209_010636.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

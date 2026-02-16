@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.0976587">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.097659" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1015" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.088448" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="81760" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1016" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.087776" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1017" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.087367" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1018" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.086938" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="AssetPathResolverTests" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.085744" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1007" name="ResolveRelative_AddsWarningCode_ForNonAsciiSegment" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_AddsWarningCode_ForNonAsciiSegment" methodname="ResolveRelative_AddsWarningCode_ForNonAsciiSegment" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="1049714082" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.035547" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T10:21:49.1087647+00:00","level":"WARN","component":"assets","event_name":"assets.path.non_ascii","request_id":"req-test-006","error_code":"ASSET.PATH.NON_ASCII_WARN","message":"non-ascii path segment detected","path":"characters/ナース/state.png","source_tier":"","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-08T10:21:49.1132502+00:00","level":"INFO","component":"assets","event_name":"assets.path.resolved","request_id":"req-test-006","error_code":"","message":"resolved from canonical assets root","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_1ffb804eb5ba43199e50bb63508ad6bf\\canonical\\characters\\ナース\\state.png","source_tier":"assets_user","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1003" name="ResolveRelative_FallsBackToStreamingAssets" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_FallsBackToStreamingAssets" methodname="ResolveRelative_FallsBackToStreamingAssets" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="720403022" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.005931" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T10:21:49.1393530+00:00","level":"INFO","component":"assets","event_name":"assets.path.resolved","request_id":"req-test-002","error_code":"","message":"resolved from streaming assets root","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_2537f9c67e584edc98eba65e4fa1c196\\streaming\\characters\\fallback\\stream.png","source_tier":"streaming_assets","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1004" name="ResolveRelative_RejectsAbsolutePath" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_RejectsAbsolutePath" methodname="ResolveRelative_RejectsAbsolutePath" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="190827326" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.007112" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T10:21:49.1460472+00:00","level":"ERROR","component":"assets","event_name":"assets.path.resolve_failed","request_id":"req-test-003","error_code":"ASSET.PATH.ABSOLUTE_FORBIDDEN","message":"absolute path is forbidden","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_093f4676f160496fb5be0dec5bc9fe07\\canonical\\characters/demo/state.png","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1006" name="ResolveRelative_RejectsLegacyLikePath_WhenForbidden" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_RejectsLegacyLikePath_WhenForbidden" methodname="ResolveRelative_RejectsLegacyLikePath_WhenForbidden" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="919297372" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.005692" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T10:21:49.1521763+00:00","level":"ERROR","component":"assets","event_name":"assets.path.resolve_failed","request_id":"req-test-005","error_code":"ASSET.PATH.LEGACY_FORBIDDEN","message":"legacy path is forbidden in this mode","path":"workspace/data/assets_user/characters/a.png","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1005" name="ResolveRelative_RejectsTraversal" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_RejectsTraversal" methodname="ResolveRelative_RejectsTraversal" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="52339069" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.005455" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T10:21:49.1576917+00:00","level":"ERROR","component":"assets","event_name":"assets.path.resolve_failed","request_id":"req-test-004","error_code":"ASSET.PATH.TRAVERSAL_FORBIDDEN","message":"path traversal is forbidden","path":"../secrets/token.txt","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1002" name="ResolveRelative_ResolvesFromCanonical" fullname="MascotDesktop.Tests.EditMode.AssetPathResolverTests.ResolveRelative_ResolvesFromCanonical" methodname="ResolveRelative_ResolvesFromCanonical" classname="MascotDesktop.Tests.EditMode.AssetPathResolverTests" runstate="Runnable" seed="945201207" result="Passed" start-time="2026-02-08 10:21:49Z" end-time="2026-02-08 10:21:49Z" duration="0.010421" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-08T10:21:49.1642237+00:00","level":"INFO","component":"assets","event_name":"assets.path.resolved","request_id":"req-test-001","error_code":"","message":"resolved from canonical assets root","path":"C:\\Users\\sugar\\AppData\\Local\\Temp\\MascotDesktop_AssetPathResolverTests_58ee447e338248388f7ad106d534af8f\\canonical\\characters\\demo\\state.png","source_tier":"assets_user","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-assetpath-20260208_192142.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

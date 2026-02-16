@@ -1,0 +1,352 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using MascotDesktop.Runtime.Avatar;
+using NUnit.Framework;
+using UnityEngine;
+
+namespace MascotDesktop.Tests.EditMode
+{
+    public sealed class SimpleModelBootstrapTests
+    {
+        [Test]
+        public void BuildModelCandidatesFromRelativePaths_IncludesModelFormatsOnly()
+        {
+            var paths = new[]
+            {
+                "characters/demo/mmd/avatar.pmx",
+                "characters/demo/mmd/avatar_legacy.pmd",
+                "characters/demo/tex/facetoon.bmp",
+                "characters/demo/tex/readme.txt"
+            };
+
+            var candidates = SimpleModelBootstrap.BuildModelCandidatesFromRelativePaths(paths);
+
+            Assert.That(candidates, Does.Contain("characters/demo/mmd/avatar.pmx"));
+            Assert.That(candidates, Does.Contain("characters/demo/mmd/avatar_legacy.pmd"));
+            Assert.That(candidates, Does.Not.Contain("characters/demo/tex/facetoon.bmp"));
+        }
+
+        [Test]
+        public void BuildModelCandidatesFromRelativePaths_ReturnsSortedDistinctList()
+        {
+            var paths = new[]
+            {
+                "characters/demo/mmd/Zeta.vrm",
+                "characters/demo/mmd/avatar.pmx",
+                "characters/demo/mmd/avatar.pmx",
+                "characters/demo/mmd/Alpha.pmd",
+                "characters/demo/images/face_main.png"
+            };
+
+            var candidates = SimpleModelBootstrap.BuildModelCandidatesFromRelativePaths(paths);
+
+            Assert.That(candidates, Is.EqualTo(new[]
+            {
+                "characters/demo/mmd/Alpha.pmd",
+                "characters/demo/mmd/avatar.pmx",
+                "characters/demo/mmd/Zeta.vrm"
+            }));
+        }
+
+        [Test]
+        public void BuildImageCandidatesFromRelativePaths_LimitsImagesPerGroupToFour()
+        {
+            var paths = new[]
+            {
+                "characters/demo/images/face_main.png",
+                "characters/demo/images/body_main.png",
+                "characters/demo/images/hair_main.png",
+                "characters/demo/images/main_albedo.png",
+                "characters/demo/images/tex_extra.png",
+                "characters/demo/images/zzz_other.png"
+            };
+
+            var candidates = SimpleModelBootstrap.BuildImageCandidatesFromRelativePaths(paths);
+            var selectedImages = candidates.Where(p => p.StartsWith("characters/demo/", System.StringComparison.OrdinalIgnoreCase)).ToArray();
+
+            Assert.That(selectedImages.Length, Is.EqualTo(4));
+            Assert.That(selectedImages, Does.Contain("characters/demo/images/face_main.png"));
+            Assert.That(selectedImages, Does.Contain("characters/demo/images/body_main.png"));
+            Assert.That(selectedImages, Does.Contain("characters/demo/images/hair_main.png"));
+            Assert.That(selectedImages, Does.Contain("characters/demo/images/main_albedo.png"));
+            Assert.That(selectedImages, Does.Not.Contain("characters/demo/images/tex_extra.png"));
+        }
+
+        [Test]
+        public void ComputeImagePlaneScale_FitsLandscapeIntoFallbackBounds()
+        {
+            var fallback = new Vector3(1.6f, 2.2f, 1f);
+
+            var scale = SimpleModelBootstrap.ComputeImagePlaneScale(1600, 900, fallback);
+
+            Assert.That(scale.x, Is.EqualTo(1.6f).Within(0.0001f));
+            Assert.That(scale.y, Is.EqualTo(0.9f).Within(0.0001f));
+            Assert.That(scale.z, Is.EqualTo(1f).Within(0.0001f));
+        }
+
+        [Test]
+        public void ComputeImagePlaneScale_FitsPortraitIntoFallbackBounds()
+        {
+            var fallback = new Vector3(1.6f, 2.2f, 1f);
+
+            var scale = SimpleModelBootstrap.ComputeImagePlaneScale(900, 1600, fallback);
+
+            Assert.That(scale.x, Is.EqualTo(1.2375f).Within(0.0001f));
+            Assert.That(scale.y, Is.EqualTo(2.2f).Within(0.0001f));
+            Assert.That(scale.z, Is.EqualTo(1f).Within(0.0001f));
+        }
+
+        [Test]
+        public void ComputeImagePlaneScale_ReturnsFallback_WhenTextureSizeInvalid()
+        {
+            var fallback = new Vector3(1.6f, 2.2f, 1f);
+
+            var scale = SimpleModelBootstrap.ComputeImagePlaneScale(0, 1600, fallback);
+
+            Assert.That(scale, Is.EqualTo(fallback));
+        }
+
+        [Test]
+        public void ComputeModelScaleFactor_ClampsToConfiguredRange()
+        {
+            var tooSmall = SimpleModelBootstrap.ComputeModelScaleFactor(500f, 2.4f, 0.05f, 12f);
+            var tooLarge = SimpleModelBootstrap.ComputeModelScaleFactor(0.001f, 2.4f, 0.05f, 12f);
+
+            Assert.That(tooSmall, Is.EqualTo(0.05f).Within(0.0001f));
+            Assert.That(tooLarge, Is.EqualTo(12f).Within(0.0001f));
+        }
+
+        [Test]
+        public void ComputeCameraFitScale_ReturnsOne_WhenModelAlreadyFits()
+        {
+            var scale = SimpleModelBootstrap.ComputeCameraFitScale(
+                modelHalfWidth: 0.5f,
+                modelHalfHeight: 0.8f,
+                cameraDistance: 8.5f,
+                cameraFieldOfView: 24f,
+                cameraAspect: 16f / 9f,
+                padding: 0.88f);
+
+            Assert.That(scale, Is.EqualTo(1f).Within(0.0001f));
+        }
+
+        [Test]
+        public void ComputeCameraFitScale_ReturnsLessThanOne_WhenModelExceedsView()
+        {
+            var scale = SimpleModelBootstrap.ComputeCameraFitScale(
+                modelHalfWidth: 10f,
+                modelHalfHeight: 10f,
+                cameraDistance: 8.5f,
+                cameraFieldOfView: 24f,
+                cameraAspect: 16f / 9f,
+                padding: 0.88f);
+
+            Assert.That(scale, Is.LessThan(1f));
+            Assert.That(scale, Is.GreaterThanOrEqualTo(0.05f));
+        }
+
+        [Test]
+        public void DiagnosticsHelpers_SkipRootPlaceholderSkinnedRenderer()
+        {
+            var modelRoot = new GameObject("ModelRoot");
+            var rootRenderer = modelRoot.AddComponent<SkinnedMeshRenderer>();
+            var child = new GameObject("Child");
+            child.transform.SetParent(modelRoot.transform, false);
+            var childRenderer = child.AddComponent<SkinnedMeshRenderer>();
+
+            try
+            {
+                Assert.That(InvokeShouldSkipRendererForDiagnostics(rootRenderer, modelRoot), Is.True);
+                Assert.That(InvokeShouldSkipRendererForDiagnostics(childRenderer, modelRoot), Is.False);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(child);
+                UnityEngine.Object.DestroyImmediate(modelRoot);
+            }
+        }
+
+        [Test]
+        public void DiagnosticsHelpers_SkipsMaterialsWithoutMainTexAndStatusTag()
+        {
+            var colorShader = Shader.Find("Unlit/Color");
+            Assert.That(colorShader, Is.Not.Null, "Unlit/Color shader is required for this test.");
+
+            var textureShader = Shader.Find("Unlit/Texture") ?? Shader.Find("Standard");
+            Assert.That(textureShader, Is.Not.Null, "Texture-capable shader is required for this test.");
+
+            var colorOnlyMaterial = new Material(colorShader);
+            var texturedMaterial = new Material(textureShader);
+            try
+            {
+                Assert.That(InvokeShouldInspectMainTextureMaterial(colorOnlyMaterial, string.Empty), Is.False);
+                Assert.That(InvokeShouldInspectMainTextureMaterial(colorOnlyMaterial, "missing_resolve"), Is.True);
+                Assert.That(InvokeShouldInspectMainTextureMaterial(texturedMaterial, string.Empty), Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(colorOnlyMaterial);
+                UnityEngine.Object.DestroyImmediate(texturedMaterial);
+            }
+        }
+
+        [Test]
+        public void TextureLoaderScore_PrefersModelNearbyCandidate()
+        {
+            const string modelBaseDir = @"D:\assets\characters\nurse\model";
+            const string requestedPath = @"texture\body.png";
+            const string nearbyCandidate = @"D:\assets\characters\nurse\texture\body.png";
+            const string farCandidate = @"D:\assets\characters\other\texture\body.png";
+
+            var nearbyScore = InvokeTextureLoaderScore(nearbyCandidate, modelBaseDir, requestedPath);
+            var farScore = InvokeTextureLoaderScore(farCandidate, modelBaseDir, requestedPath);
+
+            Assert.That(nearbyScore, Is.LessThan(farScore));
+        }
+
+        [Test]
+        public void TextureLoaderScore_PrefersTextureFolderWhenDistanceMatches()
+        {
+            const string modelBaseDir = @"D:\assets\characters\nurse\model";
+            const string requestedPath = @"textures\body.png";
+            const string texturesCandidate = @"D:\assets\characters\nurse\textures\body.png";
+            const string miscCandidate = @"D:\assets\characters\nurse\misc\body.png";
+
+            var texturesScore = InvokeTextureLoaderScore(texturesCandidate, modelBaseDir, requestedPath);
+            var miscScore = InvokeTextureLoaderScore(miscCandidate, modelBaseDir, requestedPath);
+
+            Assert.That(texturesScore, Is.LessThan(miscScore));
+        }
+
+        [Test]
+        public void DiagnosticsHelpers_IsTextureFilePath_DetectsKnownExtensions()
+        {
+            Assert.That(InvokeIsTextureFilePath(@"D:\a\b\c.png"), Is.True);
+            Assert.That(InvokeIsTextureFilePath(@"D:\a\b\c.sph"), Is.True);
+            Assert.That(InvokeIsTextureFilePath(@"D:\a\b\c.txt"), Is.False);
+            Assert.That(InvokeIsTextureFilePath(string.Empty), Is.False);
+        }
+
+        [Test]
+        public void MaterialLoaderTransparencyHeuristic_IgnoresSparseAlphaNoise()
+        {
+            var mostlyOpaque = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 100).ToArray();
+            mostlyOpaque[0] = new Color(1f, 1f, 1f, 0.90f);
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(mostlyOpaque), Is.False);
+
+            var mostlyTransparent = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 100).ToArray();
+            for (var i = 0; i < 20; i++)
+            {
+                mostlyTransparent[i] = new Color(1f, 1f, 1f, 0.40f);
+            }
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(mostlyTransparent), Is.True);
+        }
+
+        [Test]
+        public void MaterialLoaderTransparencyHeuristic_UsesSemiTransparentRatioThreshold()
+        {
+            var belowThreshold = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 100).ToArray();
+            for (var i = 0; i < 9; i++)
+            {
+                belowThreshold[i] = new Color(1f, 1f, 1f, 0.59f);
+            }
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(belowThreshold), Is.False);
+
+            var atThreshold = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 100).ToArray();
+            for (var i = 0; i < 10; i++)
+            {
+                atThreshold[i] = new Color(1f, 1f, 1f, 0.59f);
+            }
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(atThreshold), Is.True);
+        }
+
+        [Test]
+        public void MaterialLoaderTransparencyHeuristic_UsesStrongTransparentRatioThreshold()
+        {
+            var belowStrongThreshold = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 1000).ToArray();
+            for (var i = 0; i < 31; i++)
+            {
+                belowStrongThreshold[i] = new Color(1f, 1f, 1f, 0.10f);
+            }
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(belowStrongThreshold), Is.False);
+
+            var atStrongThreshold = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 1000).ToArray();
+            for (var i = 0; i < 32; i++)
+            {
+                atStrongThreshold[i] = new Color(1f, 1f, 1f, 0.10f);
+            }
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(atStrongThreshold), Is.True);
+        }
+
+        [Test]
+        public void MaterialLoaderTransparencyHeuristic_DoesNotTriggerOnLargeTextureSparseStrongAlpha()
+        {
+            var largeSparseStrong = Enumerable.Repeat(new Color(1f, 1f, 1f, 1f), 10000).ToArray();
+            for (var i = 0; i < 40; i++)
+            {
+                largeSparseStrong[i] = new Color(1f, 1f, 1f, 0.05f);
+            }
+
+            Assert.That(InvokeMaterialLoaderIsTransparentByPixels(largeSparseStrong), Is.False);
+        }
+
+        private static bool InvokeShouldSkipRendererForDiagnostics(Renderer renderer, GameObject modelRoot)
+        {
+            var method = typeof(SimpleModelBootstrap).GetMethod(
+                "ShouldSkipRendererForMissingMainTextureDiagnostics",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null, new object[] { renderer, modelRoot });
+        }
+
+        private static bool InvokeShouldInspectMainTextureMaterial(Material material, string textureStatus)
+        {
+            var method = typeof(SimpleModelBootstrap).GetMethod(
+                "ShouldInspectMainTextureMaterial",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null, new object[] { material, textureStatus });
+        }
+
+        private static int InvokeTextureLoaderScore(string candidatePath, string modelBaseDir, string requestedPath)
+        {
+            var textureLoaderType = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Select(assembly => assembly.GetType("LibMMD.Unity3D.TextureLoader", false))
+                .FirstOrDefault(type => type != null);
+            Assert.That(textureLoaderType, Is.Not.Null, "LibMMD.Unity3D.TextureLoader type not found.");
+
+            var method = textureLoaderType.GetMethod(
+                "ScoreTexturePathForRequest",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+
+            return (int)method.Invoke(null, new object[] { candidatePath, modelBaseDir, requestedPath });
+        }
+
+        private static bool InvokeIsTextureFilePath(string path)
+        {
+            var method = typeof(SimpleModelBootstrap).GetMethod(
+                "IsTextureFilePath",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            return (bool)method.Invoke(null, new object[] { path });
+        }
+
+        private static bool InvokeMaterialLoaderIsTransparentByPixels(Color[] pixels)
+        {
+            var materialLoaderType = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Select(assembly => assembly.GetType("LibMMD.Unity3D.MaterialLoader", false))
+                .FirstOrDefault(type => type != null);
+            Assert.That(materialLoaderType, Is.Not.Null, "LibMMD.Unity3D.MaterialLoader type not found.");
+
+            var method = materialLoaderType.GetMethod(
+                "IsTextureTransparentByPixels",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null, "IsTextureTransparentByPixels not found.");
+            return (bool)method.Invoke(null, new object[] { pixels });
+        }
+    }
+}
