@@ -548,3 +548,83 @@
 2. 判定
 - 線が消える: edge contribution 主因
 - 線が残る: edge/specular/outline 以外（mesh seam or texture uv/normal 寄与）へ切替
+
+## Follow-up Update (2026-02-16 09:06 UTC) - Option 2 Finalization (Conditional Edge Cap)
+- User runtime result (request_id=`req-1094e2a70f3e4dff90a2593c97265f5e`):
+  - 中央線は消失。
+  - `toonMissingMats=0`, `toonMissingSpecMats=0` を維持。
+- User decision:
+  - Option 2 を採用（`loaded_fallback_white` 条件時のみ edge cap=0）。
+
+### Additional Changes
+1. `Unity_PJ/project/Assets/LibMmd/Unity3D/MaterialLoader.cs`
+- 変更前（Step F暫定）:
+  - 無条件で `_MascotEdgeContributionCap = 0f`
+- 変更後（Option 2）:
+  - toon解決後に条件適用:
+    - `edgeContributionCap = (toonTextureStatus == loaded_fallback_white) ? 0f : 1f`
+    - `material.SetFloat("_MascotEdgeContributionCap", edgeContributionCap)`
+- 目的:
+  - 中央線抑制を fallback toon 条件時に限定し、通常モデルへの副作用を抑える。
+
+### Additional Commands
+- `Get-Content MaterialLoader.cs`（変更ブロック確認）
+- `Select-String MaterialLoader.cs "_MascotEdgeContributionCap|MainTextureStatusLoadedFallbackWhite.Equals(toonTextureStatus)|SetOverrideTag(ToonTextureStatusTag"`
+- `./tools/run_unity_tests.ps1`
+
+### Additional Verification
+1. Static checks
+- 無条件 `_MascotEdgeContributionCap=0f` は削除済み。
+- toon status 確定後に `0f/1f` を設定する条件分岐を確認。
+- Step A toon fallback は維持。
+
+2. EditMode run
+- Command: `./tools/run_unity_tests.ps1`
+- Result: 実行失敗（Unity起動不可）
+- Error: `Unity.exe ... 指定されたモジュールが見つかりません`
+
+### Rollback (for this follow-up)
+1. Option 2 を戻して暫定Step Fへ
+- 条件分岐を削除し、無条件 `_MascotEdgeContributionCap=0f` を復元。
+2. Option 2 を完全撤回
+- `_MascotEdgeContributionCap` への設定ブロックを全削除し、shader既定値に任せる。
+
+### Next Action Request (Runtime)
+1. Option 2 状態で再観測を1回実施
+- 画面観測: 中央線の有無
+- ログ: `avatar.model.material_diagnostics`（`samples`）
+2. 期待判定
+- 線なし維持: Option 2 を恒久採用候補
+- 再発: 条件拡張（toonStatus + shader/transparentReason）へ
+
+## Follow-up Update (2026-02-16 10:50 UTC) - Option 2 Runtime Confirmation
+- User runtime confirmation:
+  - 問題なし（中央線再発なし）。
+- Runtime diagnostics:
+  - request_id=`req-e664f8957f63403e8d096391f43cde16`
+  - `transparentMats=4`
+  - `toonMissingMats=0`
+  - `toonMissingSpecMats=0`
+  - samples: `toonStatus=loaded_fallback_white` を維持。
+
+### Conclusion
+- Option 2（`loaded_fallback_white` 条件時のみ `_MascotEdgeContributionCap=0`）は、
+  - 中央線抑制
+  - 欠損再発抑制（Step A）
+  の両立を確認。
+- 本件はこの条件付き対策を恒久候補として採用可能。
+
+### Additional Verification
+1. Runtime (user environment)
+- Result: Pass
+- Evidence: `req-e664f8957f63403e8d096391f43cde16`
+
+### Rollback (current stable point)
+1. Option 2を戻す場合
+- `MaterialLoader.cs` の `_MascotEdgeContributionCap` 条件設定ブロックを削除。
+2. 中央線再発時の即時回避
+- 無条件 `_MascotEdgeContributionCap=0f`（Step F暫定）へ戻す。
+
+### Status
+- Phase status: done (investigation + mitigation validated)
+- Remaining optional work: commit / release note / regression test case 追加

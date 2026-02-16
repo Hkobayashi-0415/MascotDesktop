@@ -102,10 +102,6 @@ namespace LibMMD.Unity3D
 			material.SetColor("_AmbColor", mmdMaterial.AmbientColor);
 			material.SetColor("_SpecularColor", mmdMaterial.SpecularColor);
 			material.SetFloat("_Shininess", mmdMaterial.Shiness);
-			if (material.HasProperty("_MascotEdgeContributionCap"))
-			{
-				material.SetFloat("_MascotEdgeContributionCap", 0f);
-			}
 			material.SetFloat("_OutlineWidth", mmdMaterial.EdgeSize);
 			material.SetColor("_OutlineColor", mmdMaterial.EdgeColor);
 			var mainTextureStatus = ResolveMainTextureStatus(mmdMaterial, mainTexture);
@@ -215,6 +211,11 @@ namespace LibMMD.Unity3D
 			{
 				toonTexture = Texture2D.whiteTexture;
 				toonTextureStatus = MainTextureStatusLoadedFallbackWhite;
+			}
+			if (material.HasProperty("_MascotEdgeContributionCap"))
+			{
+				var edgeContributionCap = MainTextureStatusLoadedFallbackWhite.Equals(toonTextureStatus) ? 0f : 1f;
+				material.SetFloat("_MascotEdgeContributionCap", edgeContributionCap);
 			}
 			material.SetOverrideTag(ToonTextureStatusTag, toonTextureStatus);
 			if (toonTexture != null)
