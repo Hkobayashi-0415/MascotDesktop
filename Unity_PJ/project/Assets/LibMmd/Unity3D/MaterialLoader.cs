@@ -102,6 +102,10 @@ namespace LibMMD.Unity3D
 			material.SetColor("_AmbColor", mmdMaterial.AmbientColor);
 			material.SetColor("_SpecularColor", mmdMaterial.SpecularColor);
 			material.SetFloat("_Shininess", mmdMaterial.Shiness);
+			if (material.HasProperty("_MascotEdgeContributionCap"))
+			{
+				material.SetFloat("_MascotEdgeContributionCap", 0f);
+			}
 			material.SetFloat("_OutlineWidth", mmdMaterial.EdgeSize);
 			material.SetColor("_OutlineColor", mmdMaterial.EdgeColor);
 			var mainTextureStatus = ResolveMainTextureStatus(mmdMaterial, mainTexture);
@@ -207,6 +211,11 @@ namespace LibMMD.Unity3D
 			var toonTexture = _textureLoader.LoadTexture(mmdMaterial.Toon);
 			var toonRequestedPath = mmdMaterial.Toon != null ? mmdMaterial.Toon.TexturePath : string.Empty;
 			var toonTextureStatus = ResolveTextureStatus(toonRequestedPath, toonTexture);
+			if (toonTexture == null && ShouldUseWhiteFallbackToonTexture(toonTextureStatus))
+			{
+				toonTexture = Texture2D.whiteTexture;
+				toonTextureStatus = MainTextureStatusLoadedFallbackWhite;
+			}
 			material.SetOverrideTag(ToonTextureStatusTag, toonTextureStatus);
 			if (toonTexture != null)
 			{
@@ -307,6 +316,11 @@ namespace LibMMD.Unity3D
 			}
 
 			return MainTextureStatusMissingResolve;
+		}
+
+		private static bool ShouldUseWhiteFallbackToonTexture(string toonTextureStatus)
+		{
+			return MainTextureStatusMissingSpec.Equals(toonTextureStatus);
 		}
 
 		private static bool ShouldUseWhiteFallbackMainTexture(MmdMaterial mmdMaterial, string _transparentReason)
