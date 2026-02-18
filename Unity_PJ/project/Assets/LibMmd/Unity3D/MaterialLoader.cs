@@ -326,40 +326,13 @@ namespace LibMMD.Unity3D
 
 		private static bool ShouldUseWhiteFallbackMainTexture(MmdMaterial mmdMaterial, string _transparentReason)
 		{
-			if (mmdMaterial == null)
-			{
-				return false;
-			}
-			return ShouldUseShadowWhiteFallback(mmdMaterial);
-		}
-
-		private static bool ShouldUseShadowWhiteFallback(MmdMaterial mmdMaterial)
-		{
-			if (mmdMaterial == null)
-			{
-				return false;
-			}
-
-			var materialName = mmdMaterial.Name ?? string.Empty;
-			var hasShadowKeyword = materialName.IndexOf("shadow", StringComparison.OrdinalIgnoreCase) >= 0;
-			if (!hasShadowKeyword)
-			{
-				return false;
-			}
-
-			// Untextured low-alpha shadow meshes are optional overlays in some PMX assets.
-			// Using white texture keeps shading stable while preserving diffuse alpha.
-			return mmdMaterial.DiffuseColor.a <= 0.25f;
+			// Apply the same policy for every model when main texture is unspecified.
+			return mmdMaterial != null;
 		}
 
 		private static string ResolveWhiteFallbackMainTextureReason(MmdMaterial mmdMaterial)
 		{
-			if (ShouldUseShadowWhiteFallback(mmdMaterial))
-			{
-				return "optional_shadow_spec_missing";
-			}
-
-			return "unknown";
+			return mmdMaterial == null ? "unknown" : "uniform_missing_spec";
 		}
 
 		private void RefreshShaderKeywords(MmdMaterial mmdMaterial, MmdUnityConfig config, UnityEngine.Material material)

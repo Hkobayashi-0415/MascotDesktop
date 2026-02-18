@@ -449,7 +449,7 @@ namespace MascotDesktop.Tests.EditMode
         }
 
         [Test]
-        public void MaterialLoaderWhiteFallback_DoesNotUseOpaqueMissingSpecFallback()
+        public void MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForOpaqueMaterial()
         {
             var material = new MmdMaterial
             {
@@ -459,11 +459,11 @@ namespace MascotDesktop.Tests.EditMode
 
             var useFallback = InvokeMaterialLoaderShouldUseWhiteFallbackMainTexture(material, "opaque");
 
-            Assert.That(useFallback, Is.False);
+            Assert.That(useFallback, Is.True);
         }
 
         [Test]
-        public void MaterialLoaderWhiteFallback_DoesNotUseOpaqueFallbackForTransparentMaterial()
+        public void MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForTransparentMaterial()
         {
             var material = new MmdMaterial
             {
@@ -473,11 +473,11 @@ namespace MascotDesktop.Tests.EditMode
 
             var useFallback = InvokeMaterialLoaderShouldUseWhiteFallbackMainTexture(material, "diffuse_alpha");
 
-            Assert.That(useFallback, Is.False);
+            Assert.That(useFallback, Is.True);
         }
 
         [Test]
-        public void MaterialLoaderWhiteFallback_KeepsShadowFallbackForLowAlphaShadowMesh()
+        public void MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForShadowMaterial()
         {
             var material = new MmdMaterial
             {
@@ -488,6 +488,13 @@ namespace MascotDesktop.Tests.EditMode
             var useFallback = InvokeMaterialLoaderShouldUseWhiteFallbackMainTexture(material, "diffuse_alpha");
 
             Assert.That(useFallback, Is.True);
+        }
+
+        [Test]
+        public void MaterialLoaderWhiteFallback_DoesNotUseFallbackWhenMaterialIsNull()
+        {
+            var useFallback = InvokeMaterialLoaderShouldUseWhiteFallbackMainTexture(null, "opaque");
+            Assert.That(useFallback, Is.False);
         }
 
         private static bool InvokeShouldSkipRendererForDiagnostics(Renderer renderer, GameObject modelRoot)

@@ -311,7 +311,13 @@ namespace LibMMD.Unity3D
         {
             var partMeshes = PartMeshes;
             LoadMaterials();
-            var modelRootTransform = new GameObject("Model").transform;
+            if (_boneRootGameObject == null)
+            {
+                _boneRootGameObject = new GameObject("Model");
+                _boneRootGameObject.transform.SetParent(transform, false);
+            }
+
+            var modelRootTransform = _boneRootGameObject.transform;
             for (var i = 0; i < partMeshes.Count; i++)
             {
                 var part = newMeshPart("Part" + i);
