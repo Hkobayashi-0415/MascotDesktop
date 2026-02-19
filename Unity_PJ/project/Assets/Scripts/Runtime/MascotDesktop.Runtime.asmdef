@@ -2,7 +2,8 @@
   "name": "MascotDesktop.Runtime",
   "rootNamespace": "MascotDesktop",
   "references": [
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "LibMMD"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

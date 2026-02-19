@@ -423,29 +423,17 @@ namespace MascotDesktop.Tests.EditMode
         }
 
         [Test]
-        public void MaterialLoaderShaderCaps_UsesStrongerSpecularClampForHighShininess()
+        public void MaterialLoaderToonFallback_UsesWhiteFallbackForMissingSpec()
         {
-            var highShininess = new MmdMaterial { Shiness = 50f };
-            var lowShininess = new MmdMaterial { Shiness = 5f };
-
-            var highCap = InvokeMaterialLoaderSpecularContributionCap(highShininess);
-            var lowCap = InvokeMaterialLoaderSpecularContributionCap(lowShininess);
-
-            Assert.That(highCap, Is.EqualTo(0.32f).Within(0.0001f));
-            Assert.That(lowCap, Is.EqualTo(0.45f).Within(0.0001f));
+            var useFallback = InvokeMaterialLoaderShouldUseWhiteFallbackToonTexture("missing_spec");
+            Assert.That(useFallback, Is.True);
         }
 
         [Test]
-        public void MaterialLoaderShaderCaps_UsesStrongerEdgeClampWhenEdgeAlphaIsLow()
+        public void MaterialLoaderToonFallback_DoesNotUseWhiteFallbackForMissingResolve()
         {
-            var lowEdgeAlpha = new MmdMaterial { EdgeColor = new Color(0f, 0f, 0f, 0.7f) };
-            var opaqueEdge = new MmdMaterial { EdgeColor = new Color(0f, 0f, 0f, 1f) };
-
-            var lowAlphaCap = InvokeMaterialLoaderEdgeContributionCap(lowEdgeAlpha);
-            var opaqueCap = InvokeMaterialLoaderEdgeContributionCap(opaqueEdge);
-
-            Assert.That(lowAlphaCap, Is.EqualTo(0.55f).Within(0.0001f));
-            Assert.That(opaqueCap, Is.EqualTo(0.75f).Within(0.0001f));
+            var useFallback = InvokeMaterialLoaderShouldUseWhiteFallbackToonTexture("missing_resolve");
+            Assert.That(useFallback, Is.False);
         }
 
         [Test]
@@ -658,7 +646,7 @@ namespace MascotDesktop.Tests.EditMode
             });
         }
 
-        private static float InvokeMaterialLoaderSpecularContributionCap(MmdMaterial material)
+        private static bool InvokeMaterialLoaderShouldUseWhiteFallbackToonTexture(string toonTextureStatus)
         {
             var materialLoaderType = AppDomain.CurrentDomain
                 .GetAssemblies()
@@ -667,25 +655,10 @@ namespace MascotDesktop.Tests.EditMode
             Assert.That(materialLoaderType, Is.Not.Null, "LibMMD.Unity3D.MaterialLoader type not found.");
 
             var method = materialLoaderType.GetMethod(
-                "ResolveSpecularContributionCap",
+                "ShouldUseWhiteFallbackToonTexture",
                 BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null, "ResolveSpecularContributionCap not found.");
-            return (float)method.Invoke(null, new object[] { material });
-        }
-
-        private static float InvokeMaterialLoaderEdgeContributionCap(MmdMaterial material)
-        {
-            var materialLoaderType = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .Select(assembly => assembly.GetType("LibMMD.Unity3D.MaterialLoader", false))
-                .FirstOrDefault(type => type != null);
-            Assert.That(materialLoaderType, Is.Not.Null, "LibMMD.Unity3D.MaterialLoader type not found.");
-
-            var method = materialLoaderType.GetMethod(
-                "ResolveEdgeContributionCap",
-                BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null, "ResolveEdgeContributionCap not found.");
-            return (float)method.Invoke(null, new object[] { material });
+            Assert.That(method, Is.Not.Null, "ShouldUseWhiteFallbackToonTexture not found.");
+            return (bool)method.Invoke(null, new object[] { toonTextureStatus });
         }
     }
 }

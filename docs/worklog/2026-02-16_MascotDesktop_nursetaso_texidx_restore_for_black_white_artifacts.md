@@ -2866,3 +2866,136 @@
 - Obsidian-Log recorded: `True`
 - Execution-Tool / Agent / Model recorded: `True`
 - Tags recorded: `True`
+
+## Follow-up Update (2026-02-19 02:05 JST) - Runtime error handling + logging refactor implementation
+- Trigger:
+  - user requested one-shot implementation for error-handling hardening and logging hardening.
+- Approval:
+  - `実行`
+
+### Scope
+1. Unified loader failure DTO (error_code/message + exception/stage/cause/path/source_tier).
+2. request_id propagation from `SimpleModelBootstrap` to `ReflectionModelLoaders` and stage structured logs.
+3. PMX reflection fallback hardening (whitelist + cache).
+4. RuntimeLog backend refactor (async buffer + rotation/retention + min level/filter).
+5. Observable silent catches.
+6. Add EditMode tests for failure classification/request_id/log policy.
+
+### Changes
+1. `Unity_PJ/project/Assets/Scripts/Runtime/Avatar/ReflectionModelLoaders.cs`
+- Added `RuntimeErrorDetail` and extended `ModelLoadAttemptResult` / `ImageLoadAttemptResult` with `Error`.
+- Added request-scoped signatures:
+  - `TryLoadImageTexture(string absolutePath, string requestId = null, string sourceTier = null)`
+  - `TryLoadVrm(string absolutePath, string requestId = null, string sourceTier = null)`
+  - `TryLoadPmx(string absolutePath, string requestId = null, string sourceTier = null)`
+- Added structured stage logs (`avatar.loader.stage.begin/end/fail`).
+- Replaced broad PMX fallback invoke with whitelist-based candidate discovery.
+- Added reflection caches (`Type` / `MethodInfo`) and fallback-type/method cache.
+
+2. `Unity_PJ/project/Assets/Scripts/Runtime/Avatar/SimpleModelBootstrap.cs`
+- Propagated `requestId/sourceTier` to loader calls.
+- On loader failure, consumes `RuntimeErrorDetail` and logs exception_type/exception_message.
+- Added `BuildLoaderFailureMessage(...)` to preserve stage/cause context.
+- Replaced silent catch blocks in model path diagnostics with WARN logs:
+  - `AVATAR.MODEL.PATH_SCAN_TOPLEVEL_FAILED`
+  - `AVATAR.MODEL.PATH_SCAN_NESTED_FAILED`
+
+3. `Unity_PJ/project/Assets/Scripts/Runtime/Diagnostics/RuntimeLog.cs`
+- Replaced sync `AppendAllText` lock path with async buffered writer thread.
+- Added rotation by date+size (`<prefix>-yyyyMMdd-XX.jsonl`) and retention limit.
+- Added runtime log policy env controls:
+  - min level, include/exclude component/event, max file bytes, max files, flush interval, batch size, queue size, file prefix.
+- Added APIs for deterministic tests/diagnostics:
+  - `SnapshotRecentEntries(...)`, `ClearRecentEntries()`, `Flush(...)`
+- Added optional exception payload fields in `Warn` / `Error` call surface.
+
+4. `Unity_PJ/project/Assets/LibMmd/Unity3D/TextureLoader.cs`
+- Replaced previously silent catches with `Debug.LogWarningFormat(...)` for:
+  - invalid path candidate build
+  - candidate normalization failure
+  - recursive scan failure
+
+5. Added test file:
+- `Unity_PJ/project/Assets/Tests/EditMode/RuntimeErrorHandlingAndLoggingTests.cs`
+- Tests added:
+  - failure classification (`file not found` / `decode fail` / `invoke fail` / `null root`)
+  - request_id propagation across `avatar.loader.stage.*`
+  - RuntimeLog policy (`min level`/`filter`/`rotation`/`retention`)
+
+### Commands (executed)
+- `Get-Content .git/HEAD`
+- `Get-Content .git/config`
+- `Get-Content docs/reports/2026-02-19_runtime_error_handling_logging_refactor_proposal.md`
+- `Select-String ... docs/worklog/2026-02-16_MascotDesktop_nursetaso_texidx_restore_for_black_white_artifacts.md`
+- `Select-String ... Unity_PJ/project/Assets/...` (target code scan)
+- `./tools/run_unity_tests.ps1 -TestPlatform EditMode -TestFilter "MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests"`
+- `Set-Content D:/Obsidian/Programming/MascotDesktop_phaseNA_log_260219_0205.md`
+- `Add-Content docs/worklog/2026-02-16_MascotDesktop_nursetaso_texidx_restore_for_black_white_artifacts.md`
+
+### Tests
+1. Unity EditMode filtered run (required command)
+- Result:
+  - Unity process launch failed at `tools/run_unity_tests.ps1:69`
+  - `指定されたモジュールが見つかりません。`
+- Artifact target:
+  - `Unity_PJ/artifacts/test-results/editmode-20260219_014623.log` (missing)
+  - `Unity_PJ/artifacts/test-results/editmode-20260219_014623.xml` (missing)
+
+### Decision Rationale
+1. Keep compatibility while strengthening diagnosis
+- Existing `ErrorCode/Message` left intact and `RuntimeErrorDetail` added in parallel.
+
+2. Make failure root-cause traceable per request
+- Stage logs added with `request_id` for begin/end/fail timeline correlation.
+
+3. Reduce reflection-side effects
+- Fallback invocation constrained by whitelist and method signature validation.
+
+4. Keep runtime responsive under heavy logging
+- File IO moved off caller thread; queue + batch + rotation + retention added.
+
+### Next Action
+1. Repair local Unity runtime dependency and rerun EditMode tests.
+2. Validate runtime trace behavior (`avatar.loader.stage.*`) and rotated log files on real run.
+
+### Rollback Policy
+1. Revert only these files if needed:
+- `Unity_PJ/project/Assets/Scripts/Runtime/Avatar/ReflectionModelLoaders.cs`
+- `Unity_PJ/project/Assets/Scripts/Runtime/Avatar/SimpleModelBootstrap.cs`
+- `Unity_PJ/project/Assets/Scripts/Runtime/Diagnostics/RuntimeLog.cs`
+- `Unity_PJ/project/Assets/LibMmd/Unity3D/TextureLoader.cs`
+- `Unity_PJ/project/Assets/Tests/EditMode/RuntimeErrorHandlingAndLoggingTests.cs`
+2. Keep rollback unit minimal (file-level), then rerun the same test command.
+
+### Record Metadata
+- Report-Path: `docs/worklog/2026-02-16_MascotDesktop_nursetaso_texidx_restore_for_black_white_artifacts.md`
+- Execution-Tool: `codex`
+- Execution-Agent: `codex`
+- Execution-Model: `gpt-5`
+- Used-Skills:
+  - `worklog-update`
+- Repo-Refs:
+  - `docs/reports/2026-02-19_runtime_error_handling_logging_refactor_proposal.md`
+  - `docs/worklog/2026-02-16_MascotDesktop_nursetaso_texidx_restore_for_black_white_artifacts.md`
+  - `Unity_PJ/project/Assets/Scripts/Runtime/Avatar/SimpleModelBootstrap.cs`
+  - `Unity_PJ/project/Assets/Scripts/Runtime/Avatar/ReflectionModelLoaders.cs`
+  - `Unity_PJ/project/Assets/Scripts/Runtime/Diagnostics/RuntimeLog.cs`
+  - `Unity_PJ/project/Assets/LibMmd/Unity3D/MmdGameObject.cs`
+  - `Unity_PJ/project/Assets/LibMmd/Unity3D/TextureLoader.cs`
+  - `Unity_PJ/project/Assets/Tests/EditMode/SimpleModelBootstrapTests.cs`
+  - `Unity_PJ/project/Assets/Tests/EditMode/RuntimeErrorHandlingAndLoggingTests.cs`
+  - `tools/run_unity_tests.ps1`
+- Obsidian-Refs:
+  - `D:/dev/00_repository_templates/ai_playbook/skills/worklog-update/SKILL.md`
+  - `D:/Obsidian/Programming/MascotDesktop_obsidian_log_template.md`
+- Obsidian-Log:
+  - `D:/Obsidian/Programming/MascotDesktop_phaseNA_log_260219_0205.md`
+- Tags: `[agent/codex, model/gpt-5, tool/codex, refactor, error-handling, logging, runtime-log, tests]`
+
+### Record Check
+- Report-Path exists: `True`
+- Repo-Refs present: `True`
+- Obsidian-Refs present: `True`
+- Obsidian-Log recorded: `True`
+- Execution-Tool / Agent / Model recorded: `True`
+- Tags recorded: `True`
