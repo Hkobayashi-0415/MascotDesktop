@@ -240,9 +240,13 @@ namespace LibMMD.Unity3D
                 var directPath = Path.GetFullPath(Path.Combine(baseDir, path));
                 candidates.Add(new KeyValuePair<string, string>("model_relative", directPath));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Ignore invalid path combinations
+                Debug.LogWarningFormat(
+                    "[TextureLoader] resolve candidate build failed: request={0}, base={1}, reason={2}",
+                    path,
+                    baseDir,
+                    ex.Message);
             }
 
             if (!string.IsNullOrEmpty(fileName))
@@ -295,9 +299,14 @@ namespace LibMMD.Unity3D
                 {
                     candidate = Path.GetFullPath(rawCandidate);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     candidate = rawCandidate;
+                    Debug.LogWarningFormat(
+                        "[TextureLoader] resolve candidate normalize failed: raw={0}, strategy={1}, reason={2}",
+                        rawCandidate,
+                        strategy,
+                        ex.Message);
                 }
                 if (!seen.Add(candidate))
                 {
@@ -429,8 +438,13 @@ namespace LibMMD.Unity3D
 
                 return selectedPath;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Debug.LogWarningFormat(
+                    "[TextureLoader] recursive texture scan failed: root={0}, file={1}, reason={2}",
+                    rootDir,
+                    fileName,
+                    ex.Message);
                 return null;
             }
         }

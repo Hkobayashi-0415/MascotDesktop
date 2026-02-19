@@ -463,11 +463,12 @@ namespace MascotDesktop.Runtime.Avatar
         {
             try
             {
-                var loadResult = ReflectionModelLoaders.TryLoadImageTexture(absolutePath);
+                var loadResult = ReflectionModelLoaders.TryLoadImageTexture(absolutePath, requestId, sourceTier);
                 if (!loadResult.Success || loadResult.Texture == null)
                 {
-                    errorCode = loadResult.ErrorCode ?? "ASSET.READ.DECODE_FAILED";
-                    message = loadResult.Message ?? "failed to decode image bytes";
+                    var detail = loadResult.Error;
+                    errorCode = detail?.ErrorCode ?? loadResult.ErrorCode ?? "ASSET.READ.DECODE_FAILED";
+                    message = BuildLoaderFailureMessage(loadResult.Message ?? "failed to decode image bytes", detail);
                     RuntimeLog.Error(
                         "avatar",
                         "avatar.model.texture_decode_failed",
@@ -475,7 +476,10 @@ namespace MascotDesktop.Runtime.Avatar
                         errorCode,
                         message,
                         absolutePath,
-                        sourceTier);
+                        sourceTier,
+                        ex: null,
+                        exceptionType: detail?.ExceptionType,
+                        exceptionMessage: detail?.ExceptionMessage);
                     return false;
                 }
 
@@ -550,11 +554,12 @@ namespace MascotDesktop.Runtime.Avatar
 
         private bool TryDisplayVrm(string absolutePath, string requestId, string sourceTier, out string errorCode, out string message)
         {
-            var result = ReflectionModelLoaders.TryLoadVrm(absolutePath);
+            var result = ReflectionModelLoaders.TryLoadVrm(absolutePath, requestId, sourceTier);
             if (!result.Success || result.Root == null)
             {
-                errorCode = result.ErrorCode ?? "AVATAR.VRM.LOAD_FAILED";
-                message = result.Message ?? "vrm load failed";
+                var detail = result.Error;
+                errorCode = detail?.ErrorCode ?? result.ErrorCode ?? "AVATAR.VRM.LOAD_FAILED";
+                message = BuildLoaderFailureMessage(result.Message ?? "vrm load failed", detail);
                 RuntimeLog.Error(
                     "avatar",
                     "avatar.model.vrm_load_failed",
@@ -562,7 +567,10 @@ namespace MascotDesktop.Runtime.Avatar
                     errorCode,
                     message,
                     absolutePath,
-                    sourceTier);
+                    sourceTier,
+                    ex: null,
+                    exceptionType: detail?.ExceptionType,
+                    exceptionMessage: detail?.ExceptionMessage);
                 return false;
             }
 
@@ -586,11 +594,12 @@ namespace MascotDesktop.Runtime.Avatar
         private bool TryDisplayPmx(string absolutePath, string requestId, string sourceTier, out string errorCode, out string message)
         {
             LogModelPathStructureDiagnostics(absolutePath, requestId, sourceTier);
-            var result = ReflectionModelLoaders.TryLoadPmx(absolutePath);
+            var result = ReflectionModelLoaders.TryLoadPmx(absolutePath, requestId, sourceTier);
             if (!result.Success || result.Root == null)
             {
-                errorCode = result.ErrorCode ?? "AVATAR.PMX.LOAD_FAILED";
-                message = result.Message ?? "pmx load failed";
+                var detail = result.Error;
+                errorCode = detail?.ErrorCode ?? result.ErrorCode ?? "AVATAR.PMX.LOAD_FAILED";
+                message = BuildLoaderFailureMessage(result.Message ?? "pmx load failed", detail);
                 RuntimeLog.Error(
                     "avatar",
                     "avatar.model.pmx_load_failed",
@@ -598,7 +607,10 @@ namespace MascotDesktop.Runtime.Avatar
                     errorCode,
                     message,
                     absolutePath,
-                    sourceTier);
+                    sourceTier,
+                    ex: null,
+                    exceptionType: detail?.ExceptionType,
+                    exceptionMessage: detail?.ExceptionMessage);
                 return false;
             }
 
@@ -617,6 +629,26 @@ namespace MascotDesktop.Runtime.Avatar
             errorCode = null;
             message = null;
             return true;
+        }
+
+        private static string BuildLoaderFailureMessage(string fallbackMessage, RuntimeErrorDetail detail)
+        {
+            if (detail == null)
+            {
+                return fallbackMessage ?? string.Empty;
+            }
+
+            var baseMessage = string.IsNullOrWhiteSpace(detail.Message)
+                ? (fallbackMessage ?? string.Empty)
+                : detail.Message;
+            var stage = string.IsNullOrWhiteSpace(detail.Stage) ? "unknown" : detail.Stage;
+            var cause = string.IsNullOrWhiteSpace(detail.Cause) ? "unknown" : detail.Cause;
+            if (string.IsNullOrWhiteSpace(detail.ExceptionType) && string.IsNullOrWhiteSpace(detail.ExceptionMessage))
+            {
+                return $"{baseMessage} (stage={stage}, cause={cause})";
+            }
+
+            return $"{baseMessage} (stage={stage}, cause={cause}, exception={detail.ExceptionType}: {detail.ExceptionMessage})";
         }
 
         private static void NormalizeLoadedModelRenderState(GameObject modelRoot)
@@ -940,9 +972,18 @@ namespace MascotDesktop.Runtime.Avatar
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 topLevelTextureFiles = -1;
+                RuntimeLog.Warn(
+                    "avatar",
+                    "avatar.model.path_structure_scan_failed",
+                    requestId,
+                    "AVATAR.MODEL.PATH_SCAN_TOPLEVEL_FAILED",
+                    "failed to enumerate top-level texture files",
+                    absolutePath,
+                    sourceTier,
+                    ex);
             }
 
             try
@@ -955,9 +996,18 @@ namespace MascotDesktop.Runtime.Avatar
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 nestedTextureFiles = -1;
+                RuntimeLog.Warn(
+                    "avatar",
+                    "avatar.model.path_structure_scan_failed",
+                    requestId,
+                    "AVATAR.MODEL.PATH_SCAN_NESTED_FAILED",
+                    "failed to enumerate nested texture files",
+                    absolutePath,
+                    sourceTier,
+                    ex);
             }
 
             RuntimeLog.Info(
