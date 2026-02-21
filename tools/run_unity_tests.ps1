@@ -8,7 +8,8 @@ param(
     [string]$ResultsDir,
     [switch]$NoGraphics,
     [switch]$BatchMode,
-    [switch]$Quit
+    [switch]$Quit,
+    [switch]$RequireArtifacts
 )
 
 if (-not $ProjectPath) {
@@ -66,5 +67,59 @@ if ($Quit) { $args += "-quit" }
 
 Write-Host "[run_unity_tests] UnityPath=$UnityPath"
 Write-Host "[run_unity_tests] Args=$($args -join ' ')"
-& $UnityPath @args
-exit $LASTEXITCODE
+
+$launched = $false
+$exitCode = 1
+
+# Primary: Unity.exe (or explicitly configured path) で起動を試みる
+try {
+    & $UnityPath @args
+    $exitCode = $LASTEXITCODE
+    $launched = $true
+} catch {
+    $errMsg = $_.ToString()
+    Write-Warning "[run_unity_tests] Primary launch failed: $errMsg"
+    # 起動前失敗（指定されたモジュールが見つかりません など）の場合は Unity.com へフォールバック
+}
+
+# Fallback: 起動前失敗時のみ Unity.com を試みる
+if (-not $launched) {
+    $comFallback = $UnityComPath
+    if (-not $comFallback) {
+        $comFallback = "C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.com"
+    }
+
+    if (-not (Test-Path $comFallback)) {
+        Write-Error "[run_unity_tests] Fallback Unity.com not found: $comFallback"
+        exit 1
+    }
+
+    Write-Host "[run_unity_tests] Fallback to Unity.com: $comFallback"
+    try {
+        & $comFallback @args
+        $exitCode = $LASTEXITCODE
+        $launched = $true
+    } catch {
+        Write-Error "[run_unity_tests] Fallback launch also failed: $_"
+        exit 1
+    }
+}
+
+if ($RequireArtifacts) {
+    $missingArtifacts = @()
+    if (-not (Test-Path $results)) {
+        $missingArtifacts += $results
+    }
+    if (-not (Test-Path $log)) {
+        $missingArtifacts += $log
+    }
+
+    if ($missingArtifacts.Count -gt 0) {
+        Write-Error "[run_unity_tests] Required artifacts were not generated. ExitCode=$exitCode Missing=$($missingArtifacts -join ', ')"
+        exit 1
+    }
+
+    Write-Host "[run_unity_tests] Artifact check passed. xml=$results log=$log"
+}
+
+exit $exitCode

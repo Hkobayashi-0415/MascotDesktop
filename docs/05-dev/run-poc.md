@@ -1,6 +1,15 @@
-# Phase1 PoC 実行手順 (Windows, ローカル)
+# Legacy PoC 実行手順 (Reference Only)
 
-## 前提
+- Status: legacy-reference
+- Last Updated: 2026-02-20
+- Scope: 旧PoC（`workspace` 前提）の参照用手順。Unity現行運用の主導線ではない。
+
+## Unity現行導線
+- まず `docs/05-dev/QUICKSTART.md` を参照する。
+- 画面確認は `docs/05-dev/unity-runtime-manual-check.md` を参照する。
+- キャラクター切替運用は `docs/05-dev/unity-character-switch-operations.md` を参照する。
+
+## 旧PoC手順を使う場合の前提
 - Gitルート: `workspace/`
 - 依存: Python 3.10+ (標準ライブラリのみ使用)
 - 画像テンプレ: `data/templates/assets/pngtuber_mode3/states/01_normal.png` （未存在なら自動生成される）

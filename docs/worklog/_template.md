@@ -23,6 +23,9 @@
 ## Rationale (Key Points)
 
 ## Rollback
+- Obsidianログは削除しない。
+- ロールバック理由（何を・なぜ戻したか）を明記する。
+- Obsidianログには `Rolled back` / `Superseded` 注記を追記して履歴を残す。
 
 ## Record Check
 - Report-Path exists: <True/False>

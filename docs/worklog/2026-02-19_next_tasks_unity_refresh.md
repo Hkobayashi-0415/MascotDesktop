@@ -57,7 +57,8 @@
 ## ロールバック方針
 - `docs/NEXT_TASKS.md` を更新前内容へ戻す
 - `docs/worklog/2026-02-19_next_tasks_unity_refresh.md` を削除
-- `D:/Obsidian/Programming/MascotDesktop_phaseNA_log_260219_2206.md` を削除
+- Obsidianログは削除しない（履歴保持）。
+- ロールバック実施時は理由（何を・なぜ戻したか）を `docs/worklog/` に追記し、`D:/Obsidian/Programming/MascotDesktop_phaseNA_log_260219_2206.md` に `Rolled back` または `Superseded` 注記を追加する。
 
 ## Record Check
 - Report-Path exists: True

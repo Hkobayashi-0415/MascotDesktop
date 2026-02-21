@@ -1,16 +1,120 @@
-# Dev Status (2025-12-30)
+# Dev Status (2026-02-21)
+
+## 現状サマリー（Unity移行後）
+- `U0`/`U1`/`U2` は完了（移行基盤、Runtime基盤、エラーハンドリング/ログ強化）。
+- `U3-T1`/`U3-T2` は完了（環境差異復旧手順、結果収集テンプレを `docs/05-dev` に整備）。
+- `U4-T1` は完了（`NEXT_TASKS` と本ファイルの同期更新）。
+- `U4-T3` は完了（キャラクター切替導線の標準運用手順を追加）。
+- `U4-T4` は完了（`docs/05-dev` の主導線を Unity前提へ統一し、legacy手順を分離）。
+- `U5-T1` は完了（Core統合方針、IPC契約、段階移行受入条件を文書化）。
+- `U5-T2` は完了（Runtime HUD の health/chat/config bridge 導線追加とテスト通過を確認）。
+- `U5-T3` は完了（`LoopbackHttpClientTests` 5/5 Pass、`LogAssert.Expect` 追加で失敗2件を解消）。
+- `U5-T4 Phase A` は完了（chat経路の外部Core優先化・fallback維持・request_id/error_code/retryable 可観測性確保）。
+- `U5-T4 Phase B` は完了（`/v1/tts/play` 連結、TTS統合テスト 3/3 Pass を確認）。
+- `U5-T4 Phase C` は完了（STT統合テスト 4/4 Pass、回帰3スイートも通過）。
+- `U5-T4` は完了（Phase A/B/C のartifact確認完了）。
+- `U6` は完了（回帰品質ゲート運用）。`-RequireArtifacts` 実装と未生成検知確認に加え、運用手順/記録テンプレートを `docs/05-dev/u6-regression-gate-operations.md` に標準化。
+- リリース完了計画を開始（旧P0-P6参照で Gate 定義を `docs/05-dev/release-completion-plan.md` に作成）。
 
 ## 現状OK
-- Core/Shell PoC: HTTP (health/config/chat) + フレームレス/ドラッグ/Topmost/位置保存は稼働
-- ログ基盤: JSONL, component/feature単位, request_id相関あり
-- DTO/IPC: 基本セット（config/chat/health）あり、error_code方式で統一
+- 品質ゲート対象テストは直近の通過実績あり:
+  - `RuntimeErrorHandlingAndLoggingTests`: 7/7 Passed
+  - `SimpleModelBootstrapTests`: 34/34 Passed
+  - 直近手動実行（2026-02-20）:
+    - `editmode-20260220_000605.xml`（RuntimeErrorHandlingAndLoggingTests）
+    - `editmode-20260220_001245.xml`（SimpleModelBootstrapTests）
+    - `editmode-20260220_104153.xml`（RuntimeErrorHandlingAndLoggingTests, 7/7）
+    - `editmode-20260220_150020.xml`（SimpleModelBootstrapTests, 34/34）
+  - U5-T2 bridge テスト（2026-02-20 10:29）:
+    - `editmode-20260220_102912.xml`（LoopbackHttpClientTests: 1 Passed, 2 Failed）
+  - U5-T3 契約テスト再実行（2026-02-21 01:38）:
+    - `editmode-20260221_013844.xml`（LoopbackHttpClientTests: 5/5 Passed）
+  - U5-T4 Phase A 事前確認（2026-02-21 15:09-15:28）:
+    - `editmode-20260221_150919.xml`（LoopbackHttpClientTests: 5/5 Passed）
+    - `editmode-20260221_151713.xml`（RuntimeErrorHandlingAndLoggingTests: 7/7 Passed）
+    - `editmode-20260221_152801.xml`（SimpleModelBootstrapTests: 34/34 Passed）
+  - U5-T4 Phase A 新規テスト（2026-02-21 15:39）:
+    - `editmode-20260221_153948.xml`（CoreOrchestratorLlmIntegrationTests: 3/3 Passed）
+- U5-T4 Phase A 回帰確認（2026-02-21 15:42）:
+  - `editmode-20260221_154251.xml`（LoopbackHttpClientTests: 5/5 Passed）
+ - U5-T4 Phase B 検証追補（2026-02-21 17:58-18:17）:
+   - `editmode-20260221_175856.xml`（CoreOrchestratorTtsIntegrationTests: 3/3 Passed）
+   - `editmode-20260221_181200.xml`（CoreOrchestratorLlmIntegrationTests: 5/5 Passed）
+   - `editmode-20260221_181704.xml`（LoopbackHttpClientTests: 5/5 Passed）
+ - U5-T4 Phase C 検証追補（2026-02-21 19:50-20:05）:
+   - `editmode-20260221_195019.xml`（CoreOrchestratorSttIntegrationTests: 4/4 Passed）
+   - `editmode-20260221_195037.xml`（CoreOrchestratorTtsIntegrationTests: 3/3 Passed）
+   - `editmode-20260221_195406.xml`（CoreOrchestratorLlmIntegrationTests: 5/5 Passed）
+   - `editmode-20260221_200517.xml`（LoopbackHttpClientTests: 5/5 Passed）
+ - U6-T1 `-RequireArtifacts` 検証追補（2026-02-21 21:32-21:34）:
+   - `editmode-20260221_213239.xml`（CoreOrchestratorSttIntegrationTests: missing / exit 1 検知）
+   - `editmode-20260221_213407.xml`（CoreOrchestratorTtsIntegrationTests: missing / exit 1 検知）
+   - `editmode-20260221_213441.xml`（CoreOrchestratorLlmIntegrationTests: missing / exit 1 検知）
+   - `editmode-20260221_213446.xml`（LoopbackHttpClientTests: missing / exit 1 検知）
+ - RLS-T2 最終バッチ回帰（2026-02-21 22:23-22:29）:
+   - `editmode-20260221_222310.xml`（CoreOrchestratorSttIntegrationTests: missing / exit 1 検知）
+   - `editmode-20260221_222441.xml`（CoreOrchestratorTtsIntegrationTests: missing / exit 1 検知）
+   - `editmode-20260221_222831.xml`（CoreOrchestratorLlmIntegrationTests: missing / exit 1 検知）
+   - `editmode-20260221_222910.xml`（LoopbackHttpClientTests: missing / exit 1 検知）
+  - 根拠: `docs/worklog/2026-02-19_test_run_debug.md`, `docs/worklog/2026-02-19_manual_test_exec.md`, `docs/worklog/2026-02-20_u5_t2_minimal_core_bridge.md`, `docs/worklog/2026-02-21_u5_t3_logassert_fix.md`, `docs/worklog/2026-02-21_u5_t4_phase_a_llm_impl.md`, `docs/worklog/2026-02-21_u5_t4_phase_b_tts_impl.md`, `docs/worklog/2026-02-21_u5_t4_phase_c_stt_integration.md`
+- Unity実行環境: UNITY_COM（`Unity.com`）で回避できるケースはあるが、同一エラーの再発事例が継続している。
+- Unityテスト運用ドキュメントを標準化済み:
+  - 復旧手順: `docs/05-dev/unity-test-environment-recovery.md`
+  - 結果収集テンプレ: `docs/05-dev/unity-test-result-collection-template.md`
+- Unity運用導線（U4）:
+  - キャラクター切替手順: `docs/05-dev/unity-character-switch-operations.md`
+- U5基準ドキュメントを整備:
+  - 統合計画: `docs/05-dev/u5-core-integration-plan.md`
+  - 運用手順: `docs/05-dev/u5-llm-tts-stt-operations.md`
+  - IPC契約: `docs/02-architecture/interfaces/ipc-contract.md`
+- U6/Release 基準ドキュメントを整備:
+  - 回帰品質ゲート運用: `docs/05-dev/u6-regression-gate-operations.md`
+  - リリース完了計画: `docs/05-dev/release-completion-plan.md`
+- U5-T2 実装差分:
+  - HUD bridge 導線: `Unity_PJ/project/Assets/Scripts/Runtime/UI/RuntimeDebugHud.cs`
+  - bridge挙動テスト: `Unity_PJ/project/Assets/Tests/EditMode/LoopbackHttpClientTests.cs`
+- U5-T3 実装差分:
+  - 契約反映: `Unity_PJ/project/Assets/Scripts/Runtime/Ipc/LoopbackHttpClient.cs`
+  - 契約テスト追加: `Unity_PJ/project/Assets/Tests/EditMode/LoopbackHttpClientTests.cs`
+- U5-T4 Phase A 実装差分:
+  - Core拡張: `Unity_PJ/project/Assets/Scripts/Runtime/Core/CoreOrchestrator.cs`（`SendChatWithBridgeResult` 追加）
+  - HUD修正: `Unity_PJ/project/Assets/Scripts/Runtime/UI/RuntimeDebugHud.cs`（bridge成功/失敗/unavailable分岐）
+  - Phase Aテスト: `Unity_PJ/project/Assets/Tests/EditMode/CoreOrchestratorLlmIntegrationTests.cs`（3/3 Passed）
+- U5-T4 Phase B 実装差分:
+  - Core拡張: `Unity_PJ/project/Assets/Scripts/Runtime/Core/CoreOrchestrator.cs`（`SendTtsWithBridgeResult` 追加）
+  - HUD修正: `Unity_PJ/project/Assets/Scripts/Runtime/UI/RuntimeDebugHud.cs`（chat導線から `/v1/tts/play` 連結）
+  - Phase Bテスト: `Unity_PJ/project/Assets/Tests/EditMode/CoreOrchestratorTtsIntegrationTests.cs`（新規）
+- U6-T1 実装差分:
+  - テスト実行ガード: `tools/run_unity_tests.ps1`（`-RequireArtifacts` 追加、xml/log 未生成時を fail 判定）
+- U6-T2 実装差分:
+  - 回帰運用標準: `docs/05-dev/u6-regression-gate-operations.md`（実行手順/判定ルール/記録テンプレート）
+- リリース計画差分:
+  - 旧P0-P6対応のゲート定義: `docs/05-dev/release-completion-plan.md`
 
 ## 現状NG / リスク
-- 開発パスが OneDrive + 日本語パスで、ASCII前提と矛盾（Tk/pywebview/三次元表示で不安定化リスク）
-- Avatar Mode1 (MMD) 未着手 → 最優先の縦切りが必要
-- PoCエントリが apps/* 配下に散在していた（今回 apps/*/poc へ整理済み）
+- Unity実行環境差異により、テスト起動前に `指定されたモジュールが見つかりません` が発生する場合がある。
+  - `tools/run_unity_tests.ps1` は Unity.exe 失敗時に Unity.com フォールバックを実装済みだが、この環境では Unity.com 側も同エラーで起動失敗する場合がある。
+- 上記起動前失敗時は `Unity_PJ/artifacts/test-results` に xml/log artifact が生成されない。
+- `tools/run_unity_tests.ps1` は `-RequireArtifacts` で判定を補強したが、起動前失敗時は依然として環境復旧が必要。
+- Unity実行環境差異の再発リスクは継続監視が必要（過去に `editmode-20260220_094003.*` / `094011.*` / `152126.*` 未生成事象あり）。
+- 2026-02-20 15:57 の U5-T3 検証実行でも起動エラーが再発し、`editmode-20260220_155717.*` / `editmode-20260220_155723.*` は未生成。
+- 2026-02-21 12:39 の再実行でも 3 スイートすべて起動前失敗（`指定されたモジュールが見つかりません`）。`editmode-20260221_123901.*` / `123903.*` / `123905.*` は未生成。
+- 2026-02-21 17:45 の Phase B 検証実行でも 3 スイートすべて起動前失敗（Unity.exe / Unity.com とも `指定されたモジュールが見つかりません`）。`editmode-20260221_174541.*` / `174543.*` / `174545.*` は未生成。
+- 2026-02-21 19:39-19:40 の Phase C 検証実行でも 4 スイートすべて起動前失敗（Unity.exe / Unity.com とも `指定されたモジュールが見つかりません`）。`editmode-20260221_193956.*` / `194017.*` / `194025.*` / `194027.*` は未生成。
+- 同日 19:50 以降の再実行では 4 スイート全て通過し、artifact 生成を確認（`editmode-20260221_195019.xml` / `195037.xml` / `195406.xml` / `200517.xml`）。
+- 2026-02-21 21:24 の U6-T1 回帰実行（STT/TTS/LLM/Loopback）でも 4 スイートすべて起動前失敗（Unity.exe / Unity.com とも `指定されたモジュールが見つかりません`）。`editmode-20260221_212416.*` / `212425.*` は未生成。
+- 2026-02-21 21:32-21:34 の U6-T1 追補検証でも起動前失敗自体は継続したが、`-RequireArtifacts` が artifact 未生成を全4スイートで `exit 1` として検知した（`213239` / `213407` / `213441` / `213446`）。
+- 2026-02-21 22:23-22:29 の RLS-T2 最終バッチ回帰でも 4 スイートすべて起動前失敗が継続し、`-RequireArtifacts` が artifact 未生成を全件 `exit 1` として検知した（`222310` / `222441` / `222831` / `222910`）。
 
-## 次の縦切り前提（MMD PoC）
-- ASCIIパス側にコピーして実行（例: C:\dev\MascotDesktop\workspace）
-- MMDアセットは data/templates/assets/mmd_mode1 を参照し、実体は data/assets_user/ 以下に配置（Git除外）
-- Avatar Viewer は別プロセスで立ち上げ、Coreからの簡易IPC（AvatarLoad/SetState）を受ける形で最小表示を優先
+## 標準運用（Unityテスト）
+- 起動導線（Unity First）: `docs/05-dev/QUICKSTART.md`
+- 実行前/失敗時の復旧: `docs/05-dev/unity-test-environment-recovery.md`
+- 実行結果の記録形式: `docs/05-dev/unity-test-result-collection-template.md`
+- 4スイート回帰実行時は `tools/run_unity_tests.ps1 -RequireArtifacts` を使用し、artifact未生成をfailとして扱う。
+- キャラクター切替運用: `docs/05-dev/unity-character-switch-operations.md`
+- Runtime画面確認: `docs/05-dev/unity-runtime-manual-check.md`
+- 進捗とタスク状態: `docs/NEXT_TASKS.md`
+
+## 次アクション
+- Unity起動前失敗の復旧後に、RLS-T2 最終バッチ回帰（STT/TTS/LLM/Loopback）を `-RequireArtifacts` 付きで再実行し、artifact採取を完了する。
+- `docs/05-dev/release-completion-plan.md` の Gate R1-R4 を順に判定し、リリース完了可否を `NEXT_TASKS` / `dev-status` に同期する。

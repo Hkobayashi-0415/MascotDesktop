@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.0946955">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="81" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.094696" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1092" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="81" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.085248" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="24340" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1093" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="81" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.083722" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1094" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="81" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.082525" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1095" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="81" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.081442" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1012" name="CoreOrchestratorLlmIntegrationTests" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.075381" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1014" name="SendChatWithBridgeResult_BridgeFailed_FallsBackToLocalRule" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests.SendChatWithBridgeResult_BridgeFailed_FallsBackToLocalRule" methodname="SendChatWithBridgeResult_BridgeFailed_FallsBackToLocalRule" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests" runstate="Runnable" seed="1697170421" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.024013" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-21T06:39:58.3472608+00:00","level":"WARN","component":"core","event_name":"core.chat.bridge_fallback","request_id":"req-llm-fallback-002","error_code":"IPC.HTTP.REQUEST_FAILED","message":"bridge chat failed (retryable=True); fallback to local rule","path":"core","source_tier":"","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-21T06:39:58.3498759+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-llm-fallback-002","error_code":"","message":"avatar state updated","path":"happy","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1013" name="SendChatWithBridgeResult_BridgeSuccess_AppliesStateDerivedFromText" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests.SendChatWithBridgeResult_BridgeSuccess_AppliesStateDerivedFromText" methodname="SendChatWithBridgeResult_BridgeSuccess_AppliesStateDerivedFromText" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests" runstate="Runnable" seed="1481522658" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.001958" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-21T06:39:58.3663847+00:00","level":"INFO","component":"core","event_name":"core.chat.bridge_success","request_id":"req-llm-success-001","error_code":"","message":"bridge chat succeeded; applying state from text","path":"I am happy","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-21T06:39:58.3674495+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-llm-success-001","error_code":"","message":"avatar state updated","path":"happy","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1015" name="SendChatWithBridgeResult_RecordsRequestIdErrorCodeRetryable_ViaRuntimeLog" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests.SendChatWithBridgeResult_RecordsRequestIdErrorCodeRetryable_ViaRuntimeLog" methodname="SendChatWithBridgeResult_RecordsRequestIdErrorCodeRetryable_ViaRuntimeLog" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorLlmIntegrationTests" runstate="Runnable" seed="1696188721" result="Passed" start-time="2026-02-21 06:39:58Z" end-time="2026-02-21 06:39:58Z" duration="0.034303" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-21T06:39:58.3696393+00:00","level":"WARN","component":"core","event_name":"core.chat.bridge_fallback","request_id":"req-llm-log-003","error_code":"CORE.TIMEOUT","message":"bridge chat failed (retryable=True); fallback to local rule","path":"core","source_tier":"","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-21T06:39:58.3696393+00:00","level":"INFO","component":"core","event_name":"core.avatar.state_applied","request_id":"req-llm-log-003","error_code":"","message":"avatar state updated","path":"idle","source_tier":"core","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260221_153948.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

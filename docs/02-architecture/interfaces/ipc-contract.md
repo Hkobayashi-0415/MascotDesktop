@@ -1,37 +1,99 @@
-# IPC Contract (PoC draft)
+# IPC Contract (Unity Boundary, U5 Baseline)
 
-## 方針
-- ローカル専用。Transportは未確定（HTTP localhost or named pipe）。DTOはJSON前提、`dto_version`で将来のProtobuf移行を吸収。
-- すべてのリクエストに `request_id`、`timestamp`, `actor` (user/local) を付与。
-- エラー形式: `{ dto_version, request_id, status: "error", code, message, details? }`。監査対象イベントでは必ずログ発火。
-- PoC最小セットと将来拡張を分離。
+- Status: active
+- Last Updated: 2026-02-20
+- Scope: Unity Runtime と optional companion/Core 間の loopback HTTP 契約
 
-## PoC最小セット (Phase1/2)
-- ChatSendRequest/Response: テキスト送信、LLM応答（音声クリップ優先/TTSフォールバックのメタ含む）。
-- AudioPlayRequest: クリップID or カテゴリ指定、割込み許可フラグ、音量。
-- AvatarSetStateRequest: state遷移要求（idle/talk/notify/sleep/on/smile/oko 等）、avatar_mode指定可。
-- AvatarLoadModelRequest / AvatarPlayMotionRequest: Mode1 (MMD) 向けのロード/モーション再生要求。HealthCheckで viewer の生存を確認。
-- WindowEvent: drag/move/position-save/topmost-toggle/clickthrough-toggle/safe-unlock。
-- ReminderUpsertRequest: リマインド登録/更新/削除フラグ。
-- HealthCheck: service=core/memory/shell/audio/avatar/scheduler。
-- ConfigGet/Set: スカラー設定（Topmost, clickthrough, screenshot exclusion, thresholds 等）。
+## 根拠
+- `Unity_PJ/spec/latest/spec.md` (`UR-007`, `UR-008`, `UR-009`, `UR-011`)
+- `Unity_PJ/docs/02-architecture/runtime-boundary-and-ipc.md`
+- `Unity_PJ/project/Assets/Scripts/Runtime/Ipc/LoopbackHttpClient.cs`
+- `Unity_PJ/project/Assets/Scripts/Runtime/Config/RuntimeConfig.cs`
 
-## 将来拡張
-- Streamingチャット（分割トークン）、ツール/MCP呼び出し、メモリ検索API、キャラCRUD/公開、プロンプトバージョン操作、インポート/エクスポート。
-- STTイベント (wakeword detected, partial transcript)、話者認識結果。
+## 1. 境界方針（固定事項）
+- Transport は loopback HTTP (`127.0.0.1`) + JSON DTO を採用する。
+- `request_id` は HTTP ヘッダ (`X-Request-Id`) と Body の双方で必須とする。
+- エラー応答は `error_code` / `message` / `retryable` / `request_id` を安定フィールドとして扱う。
+- payload 本文はログに保存せず、メタ情報（キー、サイズ、処理時間、ステータス）を記録する。
 
-## 監査ログ発火点
-- キャラ/プロンプトの変更、インポート/エクスポート、設定変更(Topmost/透過/鍵含む)、リマインドCRUD、オーディオ再生要求、ウィンドウ制御要求。
+## 2. 共通 DTO 契約
 
-## バージョニング
-- `dto_version`: string (例 "0.1.0")。破壊的変更時にメジャー更新。
-- Transportは後日確定。エンドポイント/pipe名は `core/chat`, `core/config`, `shell/window`, `shell/avatar`, `shell/audio`, `scheduler/reminder`, `health` などを想定。
+### 2.1 Request Envelope
+```json
+{
+  "dto_version": "1.0.0",
+  "request_id": "req-20260220-0001",
+  "timestamp_utc": "2026-02-20T00:00:00Z",
+  "actor": "runtime",
+  "payload": {}
+}
+```
 
-## 相関 (Correlation)
-- リクエストIDはヘッダ `X-Request-Id` に載せ、Bodyの `request_id` と同一にする。存在しなければCore/Shellが生成。
-- ログは component/feature 単位で出力しつつ request_id で横断追跡可能にする。
+### 2.2 Response Envelope (Success)
+```json
+{
+  "dto_version": "1.0.0",
+  "request_id": "req-20260220-0001",
+  "status": "ok",
+  "payload": {}
+}
+```
 
-## ログ方針（抜粋）
-- payload全文は記録せずメタ情報のみ（キー一覧、サイズ、content_length）。
-- error_code がある場合はレスポンスとログに載せる（後方互換のためcodeは任意フィールド）。
-- エラーコードの一覧は `docs/02-architecture/interfaces/error-codes.md` を参照。
+### 2.3 Response Envelope (Error)
+```json
+{
+  "dto_version": "1.0.0",
+  "request_id": "req-20260220-0001",
+  "status": "error",
+  "error_code": "CORE.TIMEOUT",
+  "message": "upstream timeout",
+  "retryable": true
+}
+```
+
+## 3. Endpoint Namespace（U5最小セット）
+- `POST /health`
+- `POST /v1/chat/send`
+- `POST /v1/config/get`
+- `POST /v1/config/set`
+
+## 4. U5拡張予約エンドポイント
+- `POST /v1/avatar/state`
+- `POST /v1/avatar/motion`
+- `POST /v1/tts/play`
+- `POST /v1/stt/event`
+
+## 5. 相関と検証ルール
+- 送信時: `X-Request-Id` と body `request_id` は同一値であること。
+- 受信時: レスポンスの `request_id` が送信 `request_id` と一致しない場合は契約違反として扱う。
+- 再試行時: idempotent な要求は同一 `request_id` で再送し、重複適用を避ける。
+
+## 6. エラー契約と現行Unityクライアント挙動
+
+### 6.1 サーバー側必須エラー項目
+- `status: "error"`
+- `error_code`
+- `message`
+- `retryable`
+- `request_id`
+
+### 6.2 Unity側の最低保証（現時点）
+- loopback bridge disabled: `IPC.HTTP.DISABLED`
+- non-success status: `IPC.HTTP.NON_SUCCESS`
+- transport/timeout/exception: `IPC.HTTP.REQUEST_FAILED`
+- RuntimeConfig 欠落時は `IPC.HTTP.CONFIG_MISSING` をログ出力する。
+
+## 7. セキュリティ/公開範囲
+- バインド先は loopback のみ（LAN/WAN 公開禁止）。
+- 認証情報・個人情報を payload として送る場合、ログには値を残さない。
+- 本契約はローカル統合チャネル用途であり、外部公開 API として運用しない。
+
+## 8. バージョニング
+- `dto_version` は semantic version を採用する。
+- 破壊的変更は major 更新。
+- minor/patch 更新では既存フィールド互換を維持する。
+
+## 9. U5受入チェック（契約観点）
+- [ ] `request_id` が header/body/response/log で一貫している。
+- [ ] 非成功時に `error_code` と `retryable` が収集できる。
+- [ ] `docs/05-dev/unity-test-result-collection-template.md` で artifact と原因を記録できる。
