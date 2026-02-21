@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="5" result="Passed" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.1072633">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="78" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.107263" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1088" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="78" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.097334" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="36492" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1089" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="78" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.095701" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1090" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="78" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.091480" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1091" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="78" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.090179" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1016" name="LoopbackHttpClientTests" fullname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" classname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.087394" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1017" name="PostJsonAsync_DisabledBridge_ReturnsDisabledError" fullname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests.PostJsonAsync_DisabledBridge_ReturnsDisabledError" methodname="PostJsonAsync_DisabledBridge_ReturnsDisabledError" classname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" runstate="Runnable" seed="1272121171" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.037045" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-20T16:38:53.0727307+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.disabled","request_id":"req-bridge-001","error_code":"","message":"loopback bridge is disabled","path":"","source_tier":"loopback_http","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1019" name="PostJsonAsync_GeneratesRequestId_WhenMissing" fullname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests.PostJsonAsync_GeneratesRequestId_WhenMissing" methodname="PostJsonAsync_GeneratesRequestId_WhenMissing" classname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" runstate="Runnable" seed="1288921952" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.021156" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-20T16:38:53.0926401+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.request","request_id":"req-b7c52b65e17b433e82ce08e8af322e57","error_code":"","message":"POST http://127.0.0.1:18080/health","path":"/health","source_tier":"loopback_http","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-20T16:38:53.1088784+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.response","request_id":"req-b7c52b65e17b433e82ce08e8af322e57","error_code":"","message":"response status: 200","path":"/health","source_tier":"loopback_http","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1018" name="PostJsonAsync_InjectsRequestIdIntoHeaderAndBody_WhenMissingInBody" fullname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests.PostJsonAsync_InjectsRequestIdIntoHeaderAndBody_WhenMissingInBody" methodname="PostJsonAsync_InjectsRequestIdIntoHeaderAndBody_WhenMissingInBody" classname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" runstate="Runnable" seed="1252451509" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.003596" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-20T16:38:53.1124714+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.request","request_id":"req-bridge-002","error_code":"","message":"POST http://127.0.0.1:18080/health","path":"/health","source_tier":"loopback_http","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-20T16:38:53.1134722+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.response","request_id":"req-bridge-002","error_code":"","message":"response status: 200","path":"/health","source_tier":"loopback_http","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1020" name="PostJsonAsync_NonSuccess_UsesErrorCodeAndRetryableFromResponseBody" fullname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests.PostJsonAsync_NonSuccess_UsesErrorCodeAndRetryableFromResponseBody" methodname="PostJsonAsync_NonSuccess_UsesErrorCodeAndRetryableFromResponseBody" classname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" runstate="Runnable" seed="331972634" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.004990" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-20T16:38:53.1170623+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.request","request_id":"req-bridge-003","error_code":"","message":"POST http://127.0.0.1:18080/v1/chat/send","path":"/v1/chat/send","source_tier":"loopback_http","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-20T16:38:53.1180875+00:00","level":"ERROR","component":"ipc","event_name":"ipc.http.response_failed","request_id":"req-bridge-003","error_code":"CORE.TIMEOUT","message":"upstream timeout","path":"/v1/chat/send","source_tier":"loopback_http","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1021" name="PostJsonAsync_ResponseRequestIdMismatch_ReturnsMismatchError" fullname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests.PostJsonAsync_ResponseRequestIdMismatch_ReturnsMismatchError" methodname="PostJsonAsync_ResponseRequestIdMismatch_ReturnsMismatchError" classname="MascotDesktop.Tests.EditMode.LoopbackHttpClientTests" runstate="Runnable" seed="141126944" result="Passed" start-time="2026-02-20 16:38:53Z" end-time="2026-02-20 16:38:53Z" duration="0.004083" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-20T16:38:53.1212231+00:00","level":"INFO","component":"ipc","event_name":"ipc.http.request","request_id":"req-bridge-004","error_code":"","message":"POST http://127.0.0.1:18080/health","path":"/health","source_tier":"loopback_http","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-20T16:38:53.1232957+00:00","level":"ERROR","component":"ipc","event_name":"ipc.http.request_id_mismatch","request_id":"req-bridge-004","error_code":"IPC.HTTP.REQUEST_ID_MISMATCH","message":"response request_id mismatch: expected=req-bridge-004, actual=req-bridge-other","path":"/health","source_tier":"loopback_http","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260221_013844.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

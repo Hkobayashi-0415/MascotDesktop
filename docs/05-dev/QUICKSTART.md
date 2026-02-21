@@ -1,36 +1,39 @@
-# QUICKSTART
+# QUICKSTART (Unity Runtime)
 
 - Status: active
 - Owner/Agent: codex
-- Last Updated: 2026-01-01
-- Scope: Minimal local startup (bootstrap -> run).
+- Last Updated: 2026-02-20
+- Scope: Unity Runtime の最短起動と画面確認。
 
-## Steps
+## Steps (Unity First)
 
-1) Move to workspace:
+1) Open Unity project:
 
-```powershell
-Set-Location C:\dev\MascotDesktop\workspace
+```text
+D:\dev\MascotDesktop\Unity_PJ\project
 ```
 
-2) Bootstrap (venv + deps):
+2) Enter Play Mode in Unity Editor (scene is arbitrary):
+- `SimpleModelBootstrap` が自動起動する。
+- 画面左上に `MascotDesktop Runtime HUD` が表示されることを確認する。
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/setup/bootstrap.ps1
-```
-
-3) Run (core + avatar + viewer):
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/run.ps1
-```
+3) Quick screen checks:
+- `Model: rescan(list)` -> `Model: next/prev`（モデル切替）
+- `State: happy/sleepy`
+- `Motion: wave`
+- `Toggle Topmost`
+- `Hide/Show`
 
 ## Expected
-- Core health: `http://127.0.0.1:8765/health`
-- Avatar health: `http://127.0.0.1:8770/avatar/health`
-- Viewer opens: `http://127.0.0.1:8770/viewer`
+- Runtime HUD が表示される。
+- モデル表示に成功すると `avatar.model.displayed` ログが出る。
+- モデル切替が `Model Path` に反映される。
 
-## Notes
-- Non-ASCII paths produce a WARN but continue. See `docs/PATHS.md` for ASCII migration.
-- Assets are not committed. Place PMX/VMD/texture under `data/assets_user/` (gitignored).
-- For slot-based motion demo, see `docs/MOTIONS_DEMO.md`.
+## Related Docs
+- Runtime手動確認: `docs/05-dev/unity-runtime-manual-check.md`
+- キャラクター切替運用: `docs/05-dev/unity-character-switch-operations.md`
+- Unity資産配置: `Unity_PJ/docs/02-architecture/assets/asset-layout.md`
+- Unity要件: `Unity_PJ/spec/latest/spec.md`
+
+## Legacy Reference (Read-Only)
+- 旧PoC実行手順: `docs/05-dev/run-poc.md`

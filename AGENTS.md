@@ -86,6 +86,7 @@
 - `docs/worklog/` に残す必須項目に `Report-Path` を含める。
 - `docs/worklog/` には `Obsidian-Log`（作成したObsidianログのパス、または未実施理由）を必ず記載する。
 - `Record Check` セクションで、`Report-Path` の実在確認・`Repo-Refs`/`Obsidian-Refs` の有無・`Obsidian-Log` 記載・`Execution-Tool`/`Execution-Agent`/`Execution-Model`・`Tags` を確認する。
+- ロールバック時は Obsidianログを削除しない。`docs/worklog/` にロールバック理由（何を・なぜ戻したか）を追記し、Obsidianログ側には `Rolled back` / `Superseded` 注記で履歴を残す。
 - 詳細手順・長文の経験談・補足は `D:\Obsidian\Programming` に蓄積してよい（ただし参照情報として扱い、worklog には識別子を残す）。
   - Obsidianログは `D:\Obsidian\Programming\MascotDesktop_obsidian_log_template.md` を使用し、背景/経緯/実行プラン/TODO と `agent`/`model`/`tool` を必ず含める。
   - 同日上書きを避けるため `MascotDesktop_phaseNA_log_YYMMDD_HHMM.md` で新規作成する。

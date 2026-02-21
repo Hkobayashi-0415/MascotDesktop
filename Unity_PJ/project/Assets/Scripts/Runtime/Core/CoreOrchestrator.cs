@@ -62,6 +62,166 @@ namespace MascotDesktop.Runtime.Core
             return rid;
         }
 
+        /// <summary>
+        /// Phase A (LLM Integration): bridge result を受け取り、state遷移とログ記録を行う。
+        /// bridge成功時はtextからstateを解析して遷移（将来はCore応答payloadを参照予定）。
+        /// bridge失敗時はローカルルールでfallbackし、error_code/retryableをログに記録する。
+        /// </summary>
+        public string SendChatWithBridgeResult(
+            string text,
+            string requestId,
+            bool bridgeSucceeded,
+            string bridgeErrorCode,
+            bool bridgeRetryable)
+        {
+            var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
+            var message = text ?? string.Empty;
+            var errorCode = bridgeErrorCode ?? string.Empty;
+
+            if (bridgeSucceeded)
+            {
+                RuntimeLog.Info(
+                    "core",
+                    "core.chat.bridge_success",
+                    rid,
+                    $"bridge chat succeeded; text_length={message.Length}",
+                    "/v1/chat/send",
+                    "core");
+
+                var derivedState = DetermineStateFromChat(message);
+                ApplyAvatarState(derivedState, rid);
+            }
+            else
+            {
+                RuntimeLog.Warn(
+                    "core",
+                    "core.chat.bridge_fallback",
+                    rid,
+                    errorCode,
+                    $"bridge chat failed (retryable={bridgeRetryable}); fallback to local rule",
+                    "/v1/chat/send",
+                    "core");
+
+                var derivedState = DetermineStateFromChat(message);
+                ApplyAvatarState(derivedState, rid);
+            }
+
+            return rid;
+        }
+
+        /// <summary>
+        /// Phase B (TTS Integration): bridge result を受け取り、再生可否に応じた motion を適用する。
+        /// 成功時は再生モーション、失敗時は fallback モーションを要求し、
+        /// error_code/retryable をログに記録する。
+        /// </summary>
+        public string SendTtsWithBridgeResult(
+            string text,
+            string requestId,
+            bool bridgeSucceeded,
+            string bridgeErrorCode,
+            bool bridgeRetryable)
+        {
+            var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
+            var message = text ?? string.Empty;
+            var errorCode = bridgeErrorCode ?? string.Empty;
+
+            if (bridgeSucceeded)
+            {
+                RuntimeLog.Info(
+                    "core",
+                    "core.tts.bridge_success",
+                    rid,
+                    $"bridge tts succeeded; text_length={message.Length}",
+                    "/v1/tts/play",
+                    "core");
+
+                RequestMotionSlot("wave", rid);
+            }
+            else
+            {
+                RuntimeLog.Warn(
+                    "core",
+                    "core.tts.bridge_fallback",
+                    rid,
+                    errorCode,
+                    $"bridge tts failed (retryable={bridgeRetryable}); fallback motion",
+                    "/v1/tts/play",
+                    "core");
+
+                RequestMotionSlot("idle", rid);
+            }
+
+            return rid;
+        }
+
+        /// <summary>
+        /// Phase C (STT Integration): bridge result を受け取り、partial/final を区別して処理する。
+        /// partial は状態遷移させず、final のみ chat 処理へ連結する。
+        /// 空finalは誤認識として無視し、状態破綻を回避する。
+        /// </summary>
+        public string SendSttWithBridgeResult(
+            string text,
+            string requestId,
+            bool isFinal,
+            bool bridgeSucceeded,
+            string bridgeErrorCode,
+            bool bridgeRetryable)
+        {
+            var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
+            var transcript = text ?? string.Empty;
+            var errorCode = bridgeErrorCode ?? string.Empty;
+
+            if (bridgeSucceeded)
+            {
+                RuntimeLog.Info(
+                    "core",
+                    "core.stt.bridge_success",
+                    rid,
+                    $"bridge stt event received; is_final={isFinal}; text_length={transcript.Length}",
+                    "/v1/stt/event",
+                    "core");
+            }
+            else
+            {
+                RuntimeLog.Warn(
+                    "core",
+                    "core.stt.bridge_fallback",
+                    rid,
+                    errorCode,
+                    $"bridge stt failed (retryable={bridgeRetryable}); is_final={isFinal}",
+                    "/v1/stt/event",
+                    "core");
+            }
+
+            if (!isFinal)
+            {
+                RuntimeLog.Info(
+                    "core",
+                    "core.stt.partial_accepted",
+                    rid,
+                    "partial transcript accepted",
+                    "/v1/stt/event",
+                    "core");
+                return rid;
+            }
+
+            if (string.IsNullOrWhiteSpace(transcript))
+            {
+                RuntimeLog.Warn(
+                    "core",
+                    "core.stt.final_ignored",
+                    rid,
+                    "CORE.STT.EMPTY_FINAL",
+                    "empty final transcript ignored",
+                    "/v1/stt/event",
+                    "core");
+                return rid;
+            }
+
+            SendChatWithBridgeResult(transcript, rid, bridgeSucceeded, errorCode, bridgeRetryable);
+            return rid;
+        }
+
         public void ApplyAvatarState(string state, string requestId = null)
         {
             var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
