@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using LibMMD.Material;
@@ -72,6 +73,46 @@ namespace MascotDesktop.Tests.EditMode
             Assert.That(selectedImages, Does.Contain("characters/demo/images/hair_main.png"));
             Assert.That(selectedImages, Does.Contain("characters/demo/images/main_albedo.png"));
             Assert.That(selectedImages, Does.Not.Contain("characters/demo/images/tex_extra.png"));
+        }
+
+        [Test]
+        public void BuildRelativeAssetPathsFromRoots_MergesDistinctRelativePathsAcrossRoots()
+        {
+            var tempRoot = Path.Combine(Path.GetTempPath(), "MascotDesktop_SceneCandidates_" + Guid.NewGuid().ToString("N"));
+            var rootA = Path.Combine(tempRoot, "A");
+            var rootB = Path.Combine(tempRoot, "B");
+
+            Directory.CreateDirectory(Path.Combine(rootA, "characters", "demo", "mmd"));
+            Directory.CreateDirectory(Path.Combine(rootB, "characters", "demo", "images"));
+            File.WriteAllText(Path.Combine(rootA, "characters", "demo", "mmd", "avatar.pmx"), "a");
+            File.WriteAllText(Path.Combine(rootB, "characters", "demo", "mmd", "avatar.pmx"), "b");
+            File.WriteAllText(Path.Combine(rootB, "characters", "demo", "images", "face.png"), "c");
+
+            try
+            {
+                var paths = SimpleModelBootstrap.BuildRelativeAssetPathsFromRoots(new[] { rootA, rootB });
+
+                Assert.That(paths, Is.EqualTo(new[]
+                {
+                    "characters/demo/images/face.png",
+                    "characters/demo/mmd/avatar.pmx"
+                }));
+            }
+            finally
+            {
+                if (Directory.Exists(tempRoot))
+                {
+                    Directory.Delete(tempRoot, recursive: true);
+                }
+            }
+        }
+
+        [Test]
+        public void BuildRelativeAssetPathsFromRoots_ReturnsEmpty_WhenRootsAreMissing()
+        {
+            var missing = Path.Combine(Path.GetTempPath(), "MascotDesktop_Missing_" + Guid.NewGuid().ToString("N"));
+            var paths = SimpleModelBootstrap.BuildRelativeAssetPathsFromRoots(new[] { missing, string.Empty, null });
+            Assert.That(paths, Is.Empty);
         }
 
         [Test]

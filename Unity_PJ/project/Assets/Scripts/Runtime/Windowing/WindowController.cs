@@ -43,6 +43,11 @@ namespace MascotDesktop.Runtime.Windowing
             var hwnd = GetActiveWindow();
             if (hwnd == IntPtr.Zero)
             {
+                hwnd = GetForegroundWindow();
+            }
+
+            if (hwnd == IntPtr.Zero)
+            {
                 RuntimeLog.Warn(
                     "window",
                     "window.topmost.change_failed",
@@ -68,6 +73,15 @@ namespace MascotDesktop.Runtime.Windowing
                     "window");
                 return;
             }
+#endif
+#if !UNITY_STANDALONE_WIN || UNITY_EDITOR
+            RuntimeLog.Info(
+                "window",
+                "window.topmost.simulated",
+                rid,
+                "native topmost is unavailable in this runtime; state is toggled for diagnostics",
+                string.Empty,
+                "window");
 #endif
             IsTopmost = enable;
             PlayerPrefs.SetInt(PrefTopmost, IsTopmost ? 1 : 0);

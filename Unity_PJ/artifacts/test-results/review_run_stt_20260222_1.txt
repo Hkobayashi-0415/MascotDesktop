@@ -1,0 +1,7 @@
+Write-Error: 
+Line |
+   2 |  … 222_1.txt'; & ./tools/run_unity_tests.ps1 -TestPlatform EditMode -Tes …
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | [run_unity_tests] Fallback launch also failed: Program 'Unity.com' failed to run: An error occurred trying to start process 'C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.com' with working directory 'D:\dev\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\dev\MascotDesktop\tools\run_unity_tests.ps1:99 char:9
++         & $comFallback @args
++         ~~~~~~~~~~~~~~~~~~~~.

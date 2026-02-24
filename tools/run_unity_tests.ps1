@@ -106,6 +106,22 @@ if (-not $launched) {
 }
 
 if ($RequireArtifacts) {
+    # Unity プロセスがファイル書き出しを遅延完了する場合があるため、リトライ待機する
+    $maxWaitSec = 60
+    $intervalSec = 5
+    $elapsed = 0
+
+    while ($elapsed -lt $maxWaitSec) {
+        $xmlExists = Test-Path $results
+        $logExists = Test-Path $log
+        if ($xmlExists -and $logExists) {
+            break
+        }
+        Write-Host "[run_unity_tests] Waiting for artifacts... ($elapsed/$maxWaitSec sec) xml=$xmlExists log=$logExists"
+        Start-Sleep -Seconds $intervalSec
+        $elapsed += $intervalSec
+    }
+
     $missingArtifacts = @()
     if (-not (Test-Path $results)) {
         $missingArtifacts += $results
@@ -115,7 +131,7 @@ if ($RequireArtifacts) {
     }
 
     if ($missingArtifacts.Count -gt 0) {
-        Write-Error "[run_unity_tests] Required artifacts were not generated. ExitCode=$exitCode Missing=$($missingArtifacts -join ', ')"
+        Write-Error "[run_unity_tests] Required artifacts were not generated after ${maxWaitSec}s wait. ExitCode=$exitCode Missing=$($missingArtifacts -join ', ')"
         exit 1
     }
 

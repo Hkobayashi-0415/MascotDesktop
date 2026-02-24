@@ -3,6 +3,11 @@
 ## 改訂履歴
 | Rev | Date | 変更内容 | 根拠 |
 |---|---|---|---|
+| R25 | 2026-02-23 | `run_unity_tests.ps1 -RequireArtifacts` を4スイートで再実行（00:07-00:08）。STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5 で全 Passed、artifact（xml/log）全件生成を確認。R3 Pass 根拠を追補し、R4 Done 判定を維持。 | `Unity_PJ/artifacts/test-results/editmode-20260223_000743.xml`, `Unity_PJ/artifacts/test-results/editmode-20260223_000753.xml`, `Unity_PJ/artifacts/test-results/editmode-20260223_000803.xml`, `Unity_PJ/artifacts/test-results/editmode-20260223_000813.xml`, `docs/worklog/2026-02-23_r4_postclosure_script_rerun_sync.md`, `docs/05-dev/dev-status.md`, `docs/05-dev/release-completion-plan.md` |
+| R24 | 2026-02-22 | R1/R2 Conditional Pass の「リリース完了扱い（Unity Scope）」基準を明文化し、R4 を Done 化。RLS-R4-01/02 の state/blocker/completion condition を3文書で一致。 | `docs/05-dev/release-completion-plan.md`, `docs/05-dev/dev-status.md`, `docs/worklog/2026-02-22_r4_closure_fullquality.md` |
+| R23 | 2026-02-22 | `run_unity_tests.ps1 -RequireArtifacts` で4スイート再実行（22:23-22:24）。Loopback 5/5, STT 4/4, TTS 3/3, LLM 5/5 で全 Passed、artifact（xml/log）全件生成を確認。R3 Pass 根拠を補強。R4 は R1/R2 Conditional Pass のリリース完了扱い未確定のため In Progress 継続。 | `Unity_PJ/artifacts/test-results/editmode-20260222_222339.xml`, `Unity_PJ/artifacts/test-results/editmode-20260222_222350.xml`, `Unity_PJ/artifacts/test-results/editmode-20260222_222401.xml`, `Unity_PJ/artifacts/test-results/editmode-20260222_222412.xml`, `docs/worklog/2026-02-22_rls_docsync_script_success_sync.md`, `docs/05-dev/dev-status.md`, `docs/05-dev/release-completion-plan.md` |
+| R22 | 2026-02-22 | R3/R4 判定根拠を再整理。Unity.exe 直接実行（18:02-18:07）で STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5 全 Passed。`run_unity_tests.ps1` は 20:54-20:58 の再テストで artifact 待機が機能した一方、21:31-21:32 の再実行では Unity.exe/Unity.com とも起動前失敗（exit 1）。R4 は R1/R2 Conditional Pass のリリース完了扱い未確定のため In Progress。 | `docs/worklog/2026-02-22_unity_recovery_r3_pass.md`, `docs/worklog/2026-02-22_deepfix_rls_docsync.md`, `docs/05-dev/dev-status.md`, `docs/05-dev/release-completion-plan.md` |
+| R21 | 2026-02-22 | RLS-S1 Release Gate Execution 実施。R1/R2 を Conditional Pass 判定（旧PoC手順は未更新、Unity側導線は整合）。R3-02 4スイートは当時記録で起動前失敗・artifact未生成（`174300`/`174535`/`174556`/`174722`）。その後、同タイムスタンプ artifact が存在し XML は全件 Passed であることを確認。R4 は当時 R3 Pass 待ちで Pending。 | `docs/worklog/2026-02-22_rls_s1_gate_execution.md`, `docs/05-dev/dev-status.md`, `docs/05-dev/release-completion-plan.md` |
 | R20 | 2026-02-21 | RLS-T2 最終バッチ回帰を追補。4スイート（STT/TTS/LLM/Loopback）が起動前失敗（`指定されたモジュールが見つかりません`）で artifact 未生成となり、`-RequireArtifacts` が全件 `exit 1` を検知（`222310` / `222441` / `222831` / `222910`）。 | `docs/worklog/2026-02-21_u6_completion_and_release_planning.md`, `docs/worklog/2026-02-21_rls_t2_result_sync.md`, `docs/05-dev/dev-status.md` |
 | R19 | 2026-02-21 | U6を完了化。U6-T2（回帰品質ゲート運用手順/記録テンプレート）を追加し、U6のDoDを更新。続けて旧計画（P0-P6）参照のリリース完了計画を新設。最終バッチ回帰はユーザー実行に引き継ぎ。 | `docs/05-dev/u6-regression-gate-operations.md`, `docs/05-dev/release-completion-plan.md`, `docs/05-dev/dev-status.md`, `docs/worklog/2026-02-21_u6_completion_and_release_planning.md` |
 | R18 | 2026-02-21 | U6-T1 の `-RequireArtifacts` 動作確認を追補。4スイート（STT/TTS/LLM/Loopback）すべてで起動前失敗時の artifact 未生成を `exit 1` として検知（`213239` / `213407` / `213441` / `213446`）。 | `docs/worklog/2026-02-21_u6_t1_kickoff.md`, `docs/05-dev/dev-status.md` |
@@ -125,8 +130,97 @@
 | ID | タスク | 優先度 | 状態 | 完了条件 |
 |---|---|---|---|---|
 | RLS-T1 | 旧計画（P0-P6）参照でリリース完了ゲートを策定する | High | Done | `docs/05-dev/release-completion-plan.md` に旧P0-P6対応とリリース判定ゲートが定義されている |
-| RLS-T2 | 最終バッチ回帰（STT/TTS/LLM/Loopback）を実行し、artifactを採取する | High | In Progress (Blocked: Unity起動前失敗) | 2026-02-21 22:23-22:29 実行で `-RequireArtifacts` は全件 `exit 1` 検知済み。artifact採取完了は環境復旧後の再実行で達成する |
-| RLS-T3 | リリース候補の運用導線（Packaging/Resident/Runtime Manual）を最終確認して判定する | Med | Pending | `docs/PACKAGING.md` / `docs/RESIDENT_MODE.md` / `docs/05-dev/unity-runtime-manual-check.md` の確認結果が `worklog` に記録される |
+| RLS-T2 | 最終バッチ回帰（STT/TTS/LLM/Loopback）を実行し、artifactを採取する | High | Done | Unity.exe 直接実行で全スイート Passed（STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5）。artifact 全件生成確認済み。`docs/worklog/2026-02-22_unity_recovery_r3_pass.md` |
+| RLS-T3 | リリース候補の運用導線（Packaging/Resident/Runtime Manual）を最終確認して判定する | Med | Done (Conditional Pass) | R1/R2 判定完了。旧PoC手順（`PACKAGING.md` / `RESIDENT_MODE.md`）は未更新だがUnity側導線は整合。Unity Scope 基準でリリース完了扱いへ確定。`docs/worklog/2026-02-22_r4_closure_fullquality.md` に記録済み。 |
+
+## 次セクション定義（2026-02-22 作成）: RLS-S1 Release Gate Execution
+### 目的
+- リリース完了ゲート `R1-R4` を実行可能な粒度に分解し、判定根拠を `worklog` と状態同期ドキュメントに残せる状態へ固定する。
+- Unity起動前失敗（`指定されたモジュールが見つかりません`）を「ユーザー実行環境で再実行する対象」として明示管理し、R3/R4 の実行主体を明確化する。
+
+### スコープ
+- 過去計画（`U0-U6` と `P0-P6 対比`）を根拠に、アプリケーション全体像・開発計画・機能一覧をリリース判定軸へ整理する。
+- `R1-R4` を実行タスクへ分解し、ID/優先度/依存関係/ブロッカー/完了条件を定義する。
+- `NEXT_TASKS` / `dev-status` の同期対象として、次セクションの状態表現を統一する。
+
+### 非スコープ
+- Unity実行環境の再インストールやOSレベル修復作業そのもの。
+- 新機能実装（Runtime/Core/UI/IPC のコード変更）。
+- CI自動化や通知導線の新規実装。
+
+### 完了条件（DoD）
+- [x] 次セクションの目的/スコープ/非スコープ/DoD が `NEXT_TASKS` と `dev-status` で一致している。
+- [x] `R1-R4` の実行タスクに ID・優先度・完了条件・依存関係・ブロッカーが定義されている。
+- [x] Unity起動前失敗事象の扱いが明記されている（断続的環境依存事象として記録、直接実行で回避し再実行完了）。
+- [x] 判定結果の記録先（`worklog` / `release-completion-plan` / `dev-status`）がタスクに紐付いている。
+
+### アプリケーション全体像（過去計画ベース）
+| 領域 | 全体像（機能観点） | 根拠 | 現在状態 |
+|---|---|---|---|
+| Runtime UX | Unity Runtime HUD でモデル表示/状態遷移/motion/ウィンドウ操作を提供する。 | `Unity_PJ/spec/latest/spec.md`（UR-002/004/005/006）, `docs/05-dev/QUICKSTART.md`, `docs/05-dev/unity-runtime-manual-check.md` | 稼働中（U1/U4 完了） |
+| Resident Operation | 常駐運用（Show/Hide/Exit/ログ導線）を提供し、Runtime導線と運用手順を接続する。 | `Unity_PJ/spec/latest/spec.md`（UR-003）, `docs/RESIDENT_MODE.md`, `docs/05-dev/release-completion-plan.md` | Conditional Pass（Gate R2） |
+| Core Integration | LLM/TTS/STT を loopback HTTP 境界で統合し、段階運用（LLM->TTS->STT）で品質を担保する。 | `docs/05-dev/u5-core-integration-plan.md`, `docs/05-dev/u5-llm-tts-stt-operations.md`, 本ファイル U5 | 実装完了（U5 Done） |
+| Observability & Gate | `request_id`/`error_code` と artifact必須判定で回帰品質ゲートを運用する。 | `Unity_PJ/spec/latest/spec.md`（UR-007/008/009）, `docs/05-dev/u6-regression-gate-operations.md`, 本ファイル U6 | 運用中（U6 Done、RLS-T2 Done） |
+| Packaging/Distribution | 配布導線と起動導線を整合させ、リリース判定へ接続する。 | `docs/PACKAGING.md`, `docs/05-dev/QUICKSTART.md`, `docs/05-dev/release-completion-plan.md` | Conditional Pass（Gate R1） |
+
+### 開発計画サマリー（過去計画 -> 現行）
+| 計画レイヤー | 主題 | 現行対応 | 状態 |
+|---|---|---|---|
+| P0-P2 | 起動導線/manifest/packaging | U0 + R1 | U0 Done / R1 Conditional Pass |
+| P3-P4 | Launcher/Resident UX | U1 + U4 + R2 | U1/U4 Done / R2 Conditional Pass |
+| P5 | キャラ切替と運用改善 | U4 + Runtime Manual | U4 Done |
+| P6 | Core統合（LLM/TTS/STT） | U5 + U6 + R3 | U5/U6 Done / R3 Pass |
+| Release Closure | 最終判定と状態同期 | R4 | Done（R1/R2 Conditional Pass をリリース完了扱いとして確定） |
+
+### 機能一覧（リリース判定対応）
+| 機能ID | 機能 | 現在状態 | 関連Gate | 判定時の確認ポイント |
+|---|---|---|---|---|
+| F-01 | Unity起動とRuntime HUD表示 | Ready | R1/R2 | `docs/05-dev/QUICKSTART.md` と Runtime Manual 手順一致 |
+| F-02 | モデル切替/状態遷移/motion操作 | Ready | R2 | `unity-runtime-manual-check` の合格条件を満たす |
+| F-03 | 常駐導線（Show/Hide/Exit/Logs） | Conditional Pass | R2 | 旧PoC常駐は未更新、Unity側導線は整合 |
+| F-04 | LLM連携（chat + fallback） | Done (Passed) | R3 | LLM 5/5 Passed (`editmode-20260222_180700.xml`) |
+| F-05 | TTS連携（`/v1/tts/play`） | Done (Passed) | R3 | TTS 3/3 Passed (`editmode-20260222_180600.xml`) |
+| F-06 | STT連携（partial/final） | Done (Passed) | R3 | STT 4/4 Passed (`editmode-20260222_180500.xml`) |
+| F-07 | Loopback契約検証（request_id/error schema） | Done (Passed) | R3 | Loopback 5/5 Passed (`editmode-20260222_180230.xml`) |
+| F-08 | 判定同期（NEXT_TASKS/dev-status/worklog） | Done | R4 | R1/R2 Conditional Pass のリリース完了扱い基準を確定し、R4判定を同期済み |
+
+### R1/R2 Conditional Pass のリリース完了扱い基準（Unity Scope）
+- Unityスコープ受入条件:
+  - R1: `docs/05-dev/QUICKSTART.md` の起動導線で運用可能。
+  - R2: `docs/05-dev/unity-runtime-manual-check.md` の Runtime/Resident 導線で運用可能。
+- 旧PoC文書未更新の扱い:
+  - `docs/PACKAGING.md` / `docs/RESIDENT_MODE.md` は legacy 参照（read-only）として扱い、Unityスコープ判定では non-blocking。
+  - Unityスコープ手順との矛盾が確認された場合のみ blocking に昇格。
+- 残課題の管理方針:
+  - Unityリリース機能に直接影響しない残課題は次フェーズ管理（worklog + 次アクション）へ移管し、R4を停止しない。
+  - Gate失敗、artifact欠損、重大不具合のようにUnityリリース機能へ直接影響する証跡がある場合のみ R4 を停止する。
+- 判定:
+  - 上記を満たす場合、R1/R2 の Conditional Pass を「リリース完了扱い（Unity Scope）」として確定する。
+
+### R1-R4 実行タスク分解（次セクション）
+| ID | Gate | タスク | 優先度 | 状態 | 依存関係 | ブロッカー | 完了条件 |
+|---|---|---|---|---|---|---|---|
+| RLS-R1-01 | R1 | 配布導線とUnity起動導線の差分確認（`PACKAGING` vs `QUICKSTART`） | High | Done | - | - | 差分有無と是正方針が `worklog` に記録されている |
+| RLS-R1-02 | R1 | Gate R1 判定（Pass/Fail/保留）を `release-completion-plan` と状態文書へ同期 | High | Done (Conditional Pass) | RLS-R1-01 | - | R1判定結果と根拠参照が3文書で一致している |
+| RLS-R2-01 | R2 | Runtime/Resident 運用導線の手順確認（参照切れ含む） | High | Done | - | - | `RESIDENT_MODE` / `unity-runtime-manual-check` の確認結果が `worklog` にある |
+| RLS-R2-02 | R2 | Gate R2 判定を記録し、運用可否を状態同期 | Med | Done (Conditional Pass) | RLS-R2-01 | - | R2判定と残課題が `NEXT_TASKS` / `dev-status` で一致 |
+| RLS-R3-01 | R3 | 4スイート再実行の前提条件（コマンド/記録形式）を確定する | High | Done | - | - | 実行コマンドと記録テンプレートが `worklog` に確定している |
+| RLS-R3-02 | R3 | 4スイート最終バッチ回帰を `-RequireArtifacts` 付きで実行する | High | Done (Passed: 直接実行) | RLS-R3-01 | - | STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5。artifact 全件生成。注: `run_unity_tests.ps1` は 20:54-20:58/22:23-22:24/2026-02-23 00:07-00:08 は exit 0、21:31-21:32 は起動前失敗で exit 1。 |
+| RLS-R3-03 | R3 | 実行結果（pass/fail, exit_code, artifact）を状態文書へ同期 | High | Done | RLS-R3-02 | - | `worklog` テーブルと `dev-status` 記載が一致 |
+| RLS-R4-01 | R4 | Gate R1-R3 結果を集約して最終判定を記録 | High | Done | RLS-R1-02, RLS-R2-02, RLS-R3-03 | - | R1/R2 Conditional Pass を「リリース完了扱い（Unity Scope）」として確定し、R4=Done を3文書で一致させる。 |
+| RLS-R4-02 | R4 | リリース判定履歴（根拠/残課題/ロールバック方針）を `worklog` に確定 | Med | Done | RLS-R4-01 | - | 最終判定履歴（根拠/残課題/ロールバック方針）を `worklog` に確定し、Report-Path/Obsidian-Log/Record Check を充足する。 |
+
+### 依存関係とブロッカー
+- `CTX-USER-EXECUTION`: 解除済み。
+- `run_unity_tests.ps1` に関する事実:
+  - 2026-02-22 20:54-20:58 の再テストでは、artifact 待機ログ出力後に check passed（`Unity_PJ/artifacts/test-results/script_retest_*.txt`）。
+  - 2026-02-22 21:31-21:32 の再実行では Unity.exe/Unity.com とも起動前失敗で exit 1（`Unity_PJ/artifacts/test-results/review_run_*_20260222_1.txt`）。
+  - 2026-02-22 22:23-22:24 の再実行では `run_unity_tests.ps1 -RequireArtifacts` で4スイート全て Passed（Loopback 5/5, STT 4/4, TTS 3/3, LLM 5/5）し、artifact（xml/log）全件生成。
+  - 2026-02-23 00:07-00:08 の再実行でも `run_unity_tests.ps1 -RequireArtifacts` で4スイート全て Passed（STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5）し、artifact（xml/log）全件生成。
+  - 2026-02-22 17:43-17:47 実行分（`174300` / `174535` / `174556` / `174722`）は当時記録が missing/exit1 だが、現存 artifact XML は全件 Passed。
+- `run_unity_tests.ps1` に関する仮説:
+  - 当時の exit 1 は artifact 判定タイミング要因と環境依存の起動前失敗が重なっていた可能性がある。単一原因は未確定。
+- R1/R2 は Conditional Pass（Unity Scope 基準でリリース完了扱い確定）。R3 は Pass（直接実行 + 22:23-22:24/2026-02-23 00:07-00:08 再実行成功）。R4 は Done。
 
 ## 既知の課題（モデル関連）
 - 2026-02-19時点: 解消済み（未解決項目なし）
@@ -174,3 +268,5 @@
 - `docs/RESIDENT_MODE.md`
 - `docs/worklog/2026-02-21_u6_completion_and_release_planning.md`
 - `docs/worklog/2026-02-21_rls_t2_result_sync.md`
+- `docs/worklog/2026-02-22_rls_s1_gate_execution.md`
+- `docs/worklog/2026-02-22_unity_recovery_r3_pass.md`
