@@ -28,9 +28,10 @@ D:\dev\MascotDesktop\Unity_PJ\project
 3) Quick screen checks:
 - HUD の高さより項目が多い場合はパネル内をスクロールして下段ボタン（`Motion: wave` / `Toggle Topmost` / `Hide/Show`）を表示する
 - `Model: rescan(list)` で候補一覧を再読込し、`Model: next/prev` で `Model Path` が変わることを確認
+- 候補探索はキャッシュ + バックオフで自動負荷抑制される。最新の配置反映が必要な場合は `Model: rescan(list)` を実行して強制再探索する
 - `State: happy/sleepy` 実行後に HUD の `Avatar State` と Console の `avatar.state.transitioned` が更新されることを確認
 - `Motion: wave` 実行後に HUD の `Motion Slot` と Console の `avatar.motion.slot_played` が更新されることを確認
-- `Toggle Topmost` / `Hide/Show` は Windows Standalone Player でネイティブ効果を確認（Unity Editor ではシミュレーションログ確認）
+- `Toggle Topmost` / `Hide/Show` は Windows Standalone Player でネイティブ効果を確認（Unity Editor ではシミュレーションログ確認）。`Hide/Show` は現仕様で最小化/復帰（`SW_MINIMIZE` / `SW_RESTORE`）
 
 ## Expected
 - Runtime HUD が表示される。

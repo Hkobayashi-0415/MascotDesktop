@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.InteropServices;
 using MascotDesktop.Runtime.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -48,13 +46,7 @@ namespace MascotDesktop.Runtime.Windowing
         {
             var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
-            {
-                hwnd = GetForegroundWindow();
-            }
-
-            if (hwnd == IntPtr.Zero)
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
                 RuntimeLog.Warn(
                     "window",
@@ -67,7 +59,18 @@ namespace MascotDesktop.Runtime.Windowing
                 return;
             }
 
-            ShowWindow(hwnd, SW_MINIMIZE);
+            if (!WindowNativeGateway.TryMinimizeWindow(hwnd))
+            {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.resident.hide_failed",
+                    rid,
+                    "WINDOW.RESIDENT.MINIMIZE_FAILED",
+                    "failed to minimize window for resident mode",
+                    string.Empty,
+                    "resident");
+                return;
+            }
 #else
             Application.runInBackground = true;
             RuntimeLog.Info(
@@ -93,13 +96,7 @@ namespace MascotDesktop.Runtime.Windowing
         {
             var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
-            {
-                hwnd = GetForegroundWindow();
-            }
-
-            if (hwnd == IntPtr.Zero)
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
                 RuntimeLog.Warn(
                     "window",
@@ -112,7 +109,18 @@ namespace MascotDesktop.Runtime.Windowing
                 return;
             }
 
-            ShowWindow(hwnd, SW_RESTORE);
+            if (!WindowNativeGateway.TryRestoreWindow(hwnd))
+            {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.resident.restore_failed",
+                    rid,
+                    "WINDOW.RESIDENT.RESTORE_FAILED",
+                    "failed to restore window from resident mode",
+                    string.Empty,
+                    "resident");
+                return;
+            }
 #else
             Application.runInBackground = false;
             RuntimeLog.Info(
@@ -147,18 +155,5 @@ namespace MascotDesktop.Runtime.Windowing
             Application.Quit();
         }
 
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        private const int SW_RESTORE = 9;
-        private const int SW_MINIMIZE = 6;
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetActiveWindow();
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-#endif
     }
 }
