@@ -98,17 +98,27 @@ namespace MascotDesktop.Runtime.Avatar
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureBootstrapObject()
         {
+            EnsureBootstrapForRuntime();
+        }
+
+        public static SimpleModelBootstrap EnsureBootstrapForRuntime()
+        {
             var existing = FindFirstObjectByType<SimpleModelBootstrap>();
             if (existing != null)
             {
                 EnsureRuntimeComponents(existing.gameObject);
-                return;
+                return existing;
             }
 
-            var go = new GameObject(BootstrapObjectName);
-            DontDestroyOnLoad(go);
+            var go = GameObject.Find(BootstrapObjectName);
+            if (go == null)
+            {
+                go = new GameObject(BootstrapObjectName);
+                DontDestroyOnLoad(go);
+            }
+
             EnsureRuntimeComponents(go);
-            go.AddComponent<SimpleModelBootstrap>();
+            return go.GetComponent<SimpleModelBootstrap>() ?? go.AddComponent<SimpleModelBootstrap>();
         }
 
         private static void EnsureRuntimeComponents(GameObject go)
@@ -193,21 +203,61 @@ namespace MascotDesktop.Runtime.Avatar
         private string[] DiscoverAllRelativeAssetPaths()
         {
             var requestId = RuntimeLog.NewRequestId();
-            var (_, _, unityPjRoot) = ResolveProjectRoots(requestId, logResolvedInfo: false);
-            if (string.IsNullOrWhiteSpace(unityPjRoot))
+            var (unityProjectRoot, _, unityPjRoot) = ResolveProjectRoots(requestId, logResolvedInfo: false);
+            var canonicalAssetsRoots = ResolveCanonicalAssetsRoots(unityProjectRoot, unityPjRoot);
+            var streamingAssetsRoot = Application.streamingAssetsPath;
+            var rootsToScan = canonicalAssetsRoots
+                .Concat(new[] { streamingAssetsRoot })
+                .ToArray();
+
+            var relativePaths = BuildRelativeAssetPathsFromRoots(rootsToScan);
+            var canonicalSummary = canonicalAssetsRoots.Length == 0
+                ? "(none)"
+                : string.Join("|", canonicalAssetsRoots);
+
+            RuntimeLog.Info(
+                "avatar",
+                "avatar.model.candidates.discovered",
+                requestId,
+                $"candidate discovery scanned roots: canonical_exists={canonicalAssetsRoots.Length > 0}, canonical_roots={canonicalAssetsRoots.Length}, streaming_exists={Directory.Exists(streamingAssetsRoot)}, paths={relativePaths.Length}",
+                $"canonical={canonicalSummary};streaming={streamingAssetsRoot}",
+                "assets");
+
+            return relativePaths;
+        }
+
+        public static string[] BuildRelativeAssetPathsFromRoots(IEnumerable<string> rootDirectories)
+        {
+            if (rootDirectories == null)
             {
                 return Array.Empty<string>();
             }
 
-            var assetsRoot = Path.Combine(unityPjRoot, "data", "assets_user");
-            if (!Directory.Exists(assetsRoot))
+            var candidates = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var rootDirectory in rootDirectories)
             {
-                return Array.Empty<string>();
+                if (string.IsNullOrWhiteSpace(rootDirectory) || !Directory.Exists(rootDirectory))
+                {
+                    continue;
+                }
+
+                var rootFullPath = Path.GetFullPath(rootDirectory);
+                foreach (var fullPath in Directory.EnumerateFiles(rootFullPath, "*.*", SearchOption.AllDirectories))
+                {
+                    var relative = fullPath
+                        .Substring(rootFullPath.Length)
+                        .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                        .Replace('\\', '/');
+
+                    if (!string.IsNullOrWhiteSpace(relative))
+                    {
+                        candidates.Add(relative);
+                    }
+                }
             }
 
-            return Directory
-                .EnumerateFiles(assetsRoot, "*.*", SearchOption.AllDirectories)
-                .Select(path => path.Substring(assetsRoot.Length + 1).Replace('\\', '/'))
+            return candidates
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
                 .ToArray();
         }
 
@@ -325,7 +375,7 @@ namespace MascotDesktop.Runtime.Avatar
             var requestId = RuntimeLog.NewRequestId();
             var relativePath = _config != null ? _config.modelRelativePath : string.Empty;
 
-            var (unityProjectRoot, repoRoot, unityPjRoot) = ResolveProjectRoots(requestId);
+            var (unityProjectRoot, _, unityPjRoot) = ResolveProjectRoots(requestId);
             if (string.IsNullOrWhiteSpace(unityProjectRoot))
             {
                 RuntimeLog.Error(
@@ -340,11 +390,22 @@ namespace MascotDesktop.Runtime.Avatar
                 return;
             }
 
+            var canonicalAssetsRoots = ResolveCanonicalAssetsRoots(unityProjectRoot, unityPjRoot);
+            var canonicalAssetsRoot = ResolveCanonicalAssetsRootForRelativePath(relativePath, canonicalAssetsRoots);
+            var streamingAssetsRoot = Application.streamingAssetsPath;
+            RuntimeLog.Info(
+                "avatar",
+                "avatar.paths.assets_roots_checked",
+                requestId,
+                $"asset root check: canonical_roots={canonicalAssetsRoots.Length}, selected_canonical_exists={Directory.Exists(canonicalAssetsRoot)}, streaming_exists={Directory.Exists(streamingAssetsRoot)}",
+                $"selected_canonical={canonicalAssetsRoot};streaming={streamingAssetsRoot}",
+                "assets");
+
             var resolver = new AssetPathResolver(
                 new AssetPathResolverOptions
                 {
-                    CanonicalAssetsRoot = Path.Combine(unityPjRoot, "data", "assets_user"),
-                    StreamingAssetsRoot = Application.streamingAssetsPath,
+                    CanonicalAssetsRoot = canonicalAssetsRoot,
+                    StreamingAssetsRoot = streamingAssetsRoot,
                     ForbidLegacyRoot = _config.forbidLegacyPath,
                     WarnOnNonAscii = _config.warnOnNonAsciiPath
                 });
@@ -394,7 +455,12 @@ namespace MascotDesktop.Runtime.Avatar
                 // Application.dataPath: <repo>/Unity_PJ/project/Assets
                 var assetsDir = Path.GetFullPath(Application.dataPath);
                 var projectRoot = Directory.GetParent(assetsDir)?.FullName;
-                var unityPjRoot = Directory.GetParent(projectRoot ?? string.Empty)?.FullName;
+                var unityPjRoot = TryFindUnityPjRoot(projectRoot);
+                if (string.IsNullOrWhiteSpace(unityPjRoot))
+                {
+                    unityPjRoot = Directory.GetParent(projectRoot ?? string.Empty)?.FullName;
+                }
+
                 var repoRoot = Directory.GetParent(unityPjRoot ?? string.Empty)?.FullName;
 
                 if (logResolvedInfo)
@@ -422,6 +488,118 @@ namespace MascotDesktop.Runtime.Avatar
                     "project",
                     ex);
                 return (null, null, null);
+            }
+        }
+
+        private static string TryFindUnityPjRoot(string startDirectory)
+        {
+            if (string.IsNullOrWhiteSpace(startDirectory))
+            {
+                return null;
+            }
+
+            var current = new DirectoryInfo(startDirectory);
+            while (current != null)
+            {
+                var assetsUser = Path.Combine(current.FullName, "data", "assets_user");
+                if (Directory.Exists(assetsUser))
+                {
+                    return current.FullName;
+                }
+
+                current = current.Parent;
+            }
+
+            return null;
+        }
+
+        private static string[] ResolveCanonicalAssetsRoots(string projectRoot, string unityPjRoot)
+        {
+            var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            AppendCanonicalAssetsRootCandidate(roots, Path.Combine(unityPjRoot ?? string.Empty, "data", "assets_user"));
+            AppendCanonicalAssetsRootCandidatesFromAncestors(roots, projectRoot);
+            AppendCanonicalAssetsRootCandidatesFromAncestors(roots, Directory.GetCurrentDirectory());
+            return roots
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
+        private static string ResolveCanonicalAssetsRootForRelativePath(string relativePath, string[] canonicalAssetsRoots)
+        {
+            if (canonicalAssetsRoots == null || canonicalAssetsRoots.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            if (!string.IsNullOrWhiteSpace(relativePath))
+            {
+                var normalizedRelative = relativePath
+                    .Replace('/', Path.DirectorySeparatorChar)
+                    .Replace('\\', Path.DirectorySeparatorChar);
+
+                foreach (var root in canonicalAssetsRoots)
+                {
+                    try
+                    {
+                        var candidate = Path.GetFullPath(Path.Combine(root, normalizedRelative));
+                        if (File.Exists(candidate))
+                        {
+                            return root;
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore malformed candidates and continue with the next root.
+                    }
+                }
+            }
+
+            return canonicalAssetsRoots[0];
+        }
+
+        private static void AppendCanonicalAssetsRootCandidatesFromAncestors(HashSet<string> roots, string startDirectory)
+        {
+            if (roots == null || string.IsNullOrWhiteSpace(startDirectory))
+            {
+                return;
+            }
+
+            DirectoryInfo current;
+            try
+            {
+                current = new DirectoryInfo(startDirectory);
+            }
+            catch
+            {
+                return;
+            }
+
+            while (current != null)
+            {
+                AppendCanonicalAssetsRootCandidate(roots, Path.Combine(current.FullName, "data", "assets_user"));
+                AppendCanonicalAssetsRootCandidate(roots, Path.Combine(current.FullName, "Unity_PJ", "data", "assets_user"));
+                current = current.Parent;
+            }
+        }
+
+        private static void AppendCanonicalAssetsRootCandidate(HashSet<string> roots, string candidatePath)
+        {
+            if (roots == null || string.IsNullOrWhiteSpace(candidatePath))
+            {
+                return;
+            }
+
+            try
+            {
+                var fullPath = Path.GetFullPath(candidatePath);
+                if (Directory.Exists(fullPath))
+                {
+                    roots.Add(fullPath);
+                }
+            }
+            catch
+            {
+                // Ignore invalid candidate paths.
             }
         }
 

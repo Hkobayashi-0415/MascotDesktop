@@ -51,6 +51,11 @@ namespace MascotDesktop.Runtime.Windowing
             var hwnd = GetActiveWindow();
             if (hwnd == IntPtr.Zero)
             {
+                hwnd = GetForegroundWindow();
+            }
+
+            if (hwnd == IntPtr.Zero)
+            {
                 RuntimeLog.Warn(
                     "window",
                     "window.resident.hide_failed",
@@ -65,6 +70,13 @@ namespace MascotDesktop.Runtime.Windowing
             ShowWindow(hwnd, SW_MINIMIZE);
 #else
             Application.runInBackground = true;
+            RuntimeLog.Info(
+                "window",
+                "window.resident.hide.simulated",
+                rid,
+                "native minimize is unavailable in this runtime; resident hide is simulated",
+                string.Empty,
+                "resident");
 #endif
             IsHidden = true;
 
@@ -84,6 +96,11 @@ namespace MascotDesktop.Runtime.Windowing
             var hwnd = GetActiveWindow();
             if (hwnd == IntPtr.Zero)
             {
+                hwnd = GetForegroundWindow();
+            }
+
+            if (hwnd == IntPtr.Zero)
+            {
                 RuntimeLog.Warn(
                     "window",
                     "window.resident.restore_failed",
@@ -98,6 +115,13 @@ namespace MascotDesktop.Runtime.Windowing
             ShowWindow(hwnd, SW_RESTORE);
 #else
             Application.runInBackground = false;
+            RuntimeLog.Info(
+                "window",
+                "window.resident.restore.simulated",
+                rid,
+                "native restore is unavailable in this runtime; resident restore is simulated",
+                string.Empty,
+                "resident");
 #endif
             IsHidden = false;
 
@@ -129,6 +153,9 @@ namespace MascotDesktop.Runtime.Windowing
 
         [DllImport("user32.dll")]
         private static extern IntPtr GetActiveWindow();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);

@@ -1,0 +1,3 @@
+[run_unity_tests] UnityPath=C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.exe
+[run_unity_tests] Args=-batchmode -nographics -projectPath D:\dev\MascotDesktop\Unity_PJ\project -runTests -testPlatform EditMode -testFilter MascotDesktop.Tests.EditMode.LoopbackHttpClientTests -testResults D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_201053.xml -logFile D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_201053.log
+Write-Error: [run_unity_tests] Required artifacts were not generated. ExitCode= Missing=D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_201053.xml, D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_201053.log

@@ -2,7 +2,7 @@
 
 - Status: active
 - Owner/Agent: codex
-- Last Updated: 2026-02-09
+- Last Updated: 2026-02-24
 - Scope: Trace inherited must requirements (`UR-001`..`UR-012`) to Unity runtime implementation and verification points.
 
 ## Requirement Trace Matrix
@@ -39,10 +39,12 @@
 - `Motion: wave`
 - `Toggle Topmost`
 - `Hide/Show`
+- Note: `Toggle Topmost` / `Hide/Show` native window effect is validated on Windows Standalone Player. In Unity Editor, validate simulation logs (`window.topmost.simulated`, `window.resident.*.simulated`).
 
 5. Validate logs:
 - Console contains JSON with `request_id`, `event_name`, `error_code`.
 - `avatar.model.displayed` is emitted when model/image is shown.
+- `avatar.model.candidates.discovered` で `canonical_exists` / `streaming_exists` を確認し、候補0時の原因を切り分ける。
 
 ## Batch Test Commands
 

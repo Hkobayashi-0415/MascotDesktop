@@ -1,0 +1,5 @@
+[run_unity_tests] UnityPath=C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.exe
+[run_unity_tests] Args=-batchmode -nographics -projectPath D:\dev\MascotDesktop\Unity_PJ\project -runTests -testPlatform EditMode -testFilter MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests -testResults D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_205507.xml -logFile D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_205507.log
+[run_unity_tests] Waiting for artifacts... (0/60 sec) xml=False log=False
+[run_unity_tests] Waiting for artifacts... (5/60 sec) xml=False log=True
+[run_unity_tests] Artifact check passed. xml=D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_205507.xml log=D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_205507.log

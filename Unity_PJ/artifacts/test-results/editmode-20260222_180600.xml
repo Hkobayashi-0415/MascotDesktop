@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.1195">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="90" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.119500" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1103" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="90" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.110324" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="29252" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1104" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="90" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.108926" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1105" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="90" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.107819" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1106" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="90" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.106662" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1027" name="CoreOrchestratorTtsIntegrationTests" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.100188" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1030" name="SendTtsWithBridgeResult_BridgeFailedRetryableFalse_UsesIdleFallbackAndRecordsRetryableFalse" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests.SendTtsWithBridgeResult_BridgeFailedRetryableFalse_UsesIdleFallbackAndRecordsRetryableFalse" methodname="SendTtsWithBridgeResult_BridgeFailedRetryableFalse_UsesIdleFallbackAndRecordsRetryableFalse" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests" runstate="Runnable" seed="385818998" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.048047" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-22T09:07:53.8588088+00:00","level":"WARN","component":"core","event_name":"core.tts.bridge_fallback","request_id":"req-tts-fallback-003","error_code":"CORE.TTS.NON_RETRYABLE","message":"bridge tts failed (retryable=False); fallback motion","path":"/v1/tts/play","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-22T09:07:53.8618997+00:00","level":"INFO","component":"core","event_name":"core.avatar.motion_requested","request_id":"req-tts-fallback-003","error_code":"","message":"motion slot requested","path":"idle","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1029" name="SendTtsWithBridgeResult_BridgeFailedRetryableTrue_UsesIdleFallbackAndRecordsRetryableTrue" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests.SendTtsWithBridgeResult_BridgeFailedRetryableTrue_UsesIdleFallbackAndRecordsRetryableTrue" methodname="SendTtsWithBridgeResult_BridgeFailedRetryableTrue_UsesIdleFallbackAndRecordsRetryableTrue" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests" runstate="Runnable" seed="1873608038" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.035859" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-22T09:07:53.9020803+00:00","level":"WARN","component":"core","event_name":"core.tts.bridge_fallback","request_id":"req-tts-fallback-002","error_code":"CORE.TTS.UNAVAILABLE","message":"bridge tts failed (retryable=True); fallback motion","path":"/v1/tts/play","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-22T09:07:53.9026173+00:00","level":"INFO","component":"core","event_name":"core.avatar.motion_requested","request_id":"req-tts-fallback-002","error_code":"","message":"motion slot requested","path":"idle","source_tier":"core","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1028" name="SendTtsWithBridgeResult_BridgeSuccess_RequestsWaveMotionWithSameRequestId" fullname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests.SendTtsWithBridgeResult_BridgeSuccess_RequestsWaveMotionWithSameRequestId" methodname="SendTtsWithBridgeResult_BridgeSuccess_RequestsWaveMotionWithSameRequestId" classname="MascotDesktop.Tests.EditMode.CoreOrchestratorTtsIntegrationTests" runstate="Runnable" seed="2005472184" result="Passed" start-time="2026-02-22 09:07:53Z" end-time="2026-02-22 09:07:53Z" duration="0.001682" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-22T09:07:53.9374045+00:00","level":"INFO","component":"core","event_name":"core.tts.bridge_success","request_id":"req-tts-success-001","error_code":"","message":"bridge tts succeeded; text_length=5","path":"/v1/tts/play","source_tier":"core","exception_type":"","exception_message":""}
+{"timestamp":"2026-02-22T09:07:53.9386125+00:00","level":"INFO","component":"core","event_name":"core.avatar.motion_requested","request_id":"req-tts-success-001","error_code":"","message":"motion slot requested","path":"wave","source_tier":"core","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_180600.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

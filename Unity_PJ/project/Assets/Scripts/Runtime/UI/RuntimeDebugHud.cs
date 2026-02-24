@@ -12,6 +12,13 @@ namespace MascotDesktop.Runtime.UI
 {
     public sealed class RuntimeDebugHud : MonoBehaviour
     {
+        private const float AutoRescanIntervalSeconds = 0.5f;
+        private const float MissingBootstrapLogIntervalSeconds = 2f;
+        private const float HudMargin = 12f;
+        private const float HudMaxWidth = 420f;
+        private const float HudMinHeight = 260f;
+        private const float HudFallbackHeight = 700f;
+
         private enum CandidateMode
         {
             Model,
@@ -37,10 +44,25 @@ namespace MascotDesktop.Runtime.UI
         private int _renderFactorIndex = -1;
         private string _lastBridgeStatus = "n/a";
         private string _lastBridgeRequestId = "n/a";
+        private float _nextAutoRescanAt;
+        private float _nextMissingBootstrapLogAt;
+        private bool _bootstrapRecoveredLogged;
+        private Vector2 _scrollPosition = Vector2.zero;
 
         private void Awake()
         {
             CacheDependencies();
+        }
+
+        private void Update()
+        {
+            if (!showHud)
+            {
+                return;
+            }
+
+            CacheDependencies();
+            EnsureAutoCandidateRescan();
         }
 
         private void OnGUI()
@@ -52,7 +74,12 @@ namespace MascotDesktop.Runtime.UI
 
             CacheDependencies();
 
-            GUILayout.BeginArea(new Rect(12f, 12f, 420f, 700f), GUI.skin.box);
+            var areaWidth = Mathf.Min(HudMaxWidth, Mathf.Max(320f, Screen.width - (HudMargin * 2f)));
+            var computedHeight = Screen.height - (HudMargin * 2f);
+            var areaHeight = computedHeight > 0f ? Mathf.Max(HudMinHeight, computedHeight) : HudFallbackHeight;
+
+            GUILayout.BeginArea(new Rect(HudMargin, HudMargin, areaWidth, areaHeight), GUI.skin.box);
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, true);
             GUILayout.Label("MascotDesktop Runtime HUD");
             GUILayout.Space(8f);
             GUILayout.Label($"Avatar State: {_avatarStateController?.CurrentState ?? "n/a"}");
@@ -68,6 +95,7 @@ namespace MascotDesktop.Runtime.UI
             GUILayout.Label($"Model Index: {FormatModelIndex()}");
             EnsureRenderFactors();
             GUILayout.Label($"Render Factor: {FormatRenderFactor()}");
+            GUILayout.Label(GetWindowOpsCapabilityLabel());
             GUILayout.Label($"HTTP Bridge: {_runtimeConfig?.enableHttpBridge.ToString() ?? "n/a"}");
             GUILayout.Label($"Bridge Last: {_lastBridgeStatus}");
             GUILayout.Label($"Bridge RequestId: {_lastBridgeRequestId}");
@@ -189,14 +217,12 @@ namespace MascotDesktop.Runtime.UI
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Motion: idle", GUILayout.Height(26f)))
             {
-                _coreOrchestrator?.RequestMotionSlot("idle");
-                _motionSlotPlayer?.PlaySlot("idle");
+                TriggerMotionSlot("idle");
             }
 
             if (GUILayout.Button("Motion: wave", GUILayout.Height(26f)))
             {
-                _coreOrchestrator?.RequestMotionSlot("wave");
-                _motionSlotPlayer?.PlaySlot("wave");
+                TriggerMotionSlot("wave");
             }
             GUILayout.EndHorizontal();
 
@@ -224,6 +250,7 @@ namespace MascotDesktop.Runtime.UI
             }
             GUILayout.EndHorizontal();
 
+            GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
 
@@ -273,6 +300,36 @@ namespace MascotDesktop.Runtime.UI
             {
                 _simpleModelBootstrap = FindFirstObjectByType<SimpleModelBootstrap>();
             }
+
+            if (_simpleModelBootstrap == null)
+            {
+                _simpleModelBootstrap = SimpleModelBootstrap.EnsureBootstrapForRuntime();
+                if (_simpleModelBootstrap != null && !_bootstrapRecoveredLogged)
+                {
+                    _bootstrapRecoveredLogged = true;
+                    RuntimeLog.Warn(
+                        "ui",
+                        "ui.hud.bootstrap_recovered",
+                        RuntimeLog.NewRequestId(),
+                        "UI.HUD.BOOTSTRAP_RECOVERED",
+                        "simple model bootstrap was missing and recovered by runtime hud",
+                        string.Empty,
+                        "runtime_hud");
+                }
+            }
+
+            if (_simpleModelBootstrap != null)
+            {
+                var bootstrapObject = _simpleModelBootstrap.gameObject;
+                _coreOrchestrator ??= bootstrapObject.GetComponent<CoreOrchestrator>();
+                _motionSlotPlayer ??= bootstrapObject.GetComponent<MotionSlotPlayer>();
+                _avatarStateController ??= bootstrapObject.GetComponent<AvatarStateController>();
+                _modelConfig ??= bootstrapObject.GetComponent<SimpleModelConfig>();
+                _windowController ??= bootstrapObject.GetComponent<WindowController>();
+                _residentController ??= bootstrapObject.GetComponent<ResidentController>();
+                _runtimeConfig ??= bootstrapObject.GetComponent<RuntimeConfig>();
+                _loopbackHttpClient ??= bootstrapObject.GetComponent<LoopbackHttpClient>();
+            }
         }
 
         private void EnsureModelCandidates()
@@ -280,13 +337,7 @@ namespace MascotDesktop.Runtime.UI
             var activeCandidates = GetActiveCandidates();
             if (activeCandidates.Length == 0)
             {
-                RescanModelCandidates();
-                activeCandidates = GetActiveCandidates();
-                if (activeCandidates.Length == 0)
-                {
-                    _modelIndex = -1;
-                    return;
-                }
+                _modelIndex = -1;
                 return;
             }
 
@@ -296,12 +347,45 @@ namespace MascotDesktop.Runtime.UI
             }
         }
 
+        private void EnsureAutoCandidateRescan()
+        {
+            if (Time.unscaledTime < _nextAutoRescanAt)
+            {
+                return;
+            }
+
+            if (GetActiveCandidates().Length > 0)
+            {
+                return;
+            }
+
+            _nextAutoRescanAt = Time.unscaledTime + AutoRescanIntervalSeconds;
+            RescanModelCandidates();
+        }
+
         private void RescanModelCandidates()
         {
             if (_simpleModelBootstrap == null)
             {
+                CacheDependencies();
+            }
+
+            if (_simpleModelBootstrap == null)
+            {
                 _modelCandidates = Array.Empty<string>();
                 _imageCandidates = Array.Empty<string>();
+                if (Time.unscaledTime >= _nextMissingBootstrapLogAt)
+                {
+                    _nextMissingBootstrapLogAt = Time.unscaledTime + MissingBootstrapLogIntervalSeconds;
+                    RuntimeLog.Warn(
+                        "ui",
+                        "ui.hud.bootstrap_missing",
+                        RuntimeLog.NewRequestId(),
+                        "UI.HUD.BOOTSTRAP_MISSING",
+                        "simple model bootstrap is missing; candidate discovery skipped",
+                        string.Empty,
+                        "runtime_hud");
+                }
             }
             else
             {
@@ -310,6 +394,13 @@ namespace MascotDesktop.Runtime.UI
             }
 
             SyncCurrentModelIndex();
+            RuntimeLog.Info(
+                "ui",
+                "ui.hud.model_candidates_rescanned",
+                RuntimeLog.NewRequestId(),
+                $"candidate lists updated: models={_modelCandidates.Length}, images={_imageCandidates.Length}, mode={GetCandidateModeLabel()}",
+                string.Empty,
+                "runtime_hud");
         }
 
         private void EnsureRenderFactors()
@@ -375,6 +466,14 @@ namespace MascotDesktop.Runtime.UI
             var activeCandidates = GetActiveCandidates();
             if (_simpleModelBootstrap == null || activeCandidates.Length == 0)
             {
+                RuntimeLog.Warn(
+                    "ui",
+                    "ui.hud.model_switch_skipped",
+                    RuntimeLog.NewRequestId(),
+                    "UI.HUD.MODEL_CANDIDATES_EMPTY",
+                    "model switch skipped because candidate list is empty",
+                    string.Empty,
+                    "runtime_hud");
                 return;
             }
 
@@ -387,6 +486,13 @@ namespace MascotDesktop.Runtime.UI
             {
                 _modelIndex = direction >= 0 ? 0 : activeCandidates.Length - 1;
                 _simpleModelBootstrap.LoadModelByRelativePath(activeCandidates[_modelIndex]);
+                RuntimeLog.Info(
+                    "ui",
+                    "ui.hud.model_switched",
+                    RuntimeLog.NewRequestId(),
+                    $"model switched to index={_modelIndex + 1}/{activeCandidates.Length}",
+                    activeCandidates[_modelIndex],
+                    "runtime_hud");
                 return;
             }
 
@@ -402,6 +508,13 @@ namespace MascotDesktop.Runtime.UI
 
             _modelIndex = next;
             _simpleModelBootstrap.LoadModelByRelativePath(activeCandidates[_modelIndex]);
+            RuntimeLog.Info(
+                "ui",
+                "ui.hud.model_switched",
+                RuntimeLog.NewRequestId(),
+                $"model switched to index={_modelIndex + 1}/{activeCandidates.Length}",
+                activeCandidates[_modelIndex],
+                "runtime_hud");
         }
 
         private string[] GetActiveCandidates()
@@ -423,6 +536,34 @@ namespace MascotDesktop.Runtime.UI
 
             _candidateMode = mode;
             SyncCurrentModelIndex();
+            RuntimeLog.Info(
+                "ui",
+                "ui.hud.candidate_mode_changed",
+                RuntimeLog.NewRequestId(),
+                $"candidate mode changed to {GetCandidateModeLabel()}",
+                string.Empty,
+                "runtime_hud");
+        }
+
+        private void TriggerMotionSlot(string slotName)
+        {
+            var requestId = RuntimeLog.NewRequestId();
+            if (_coreOrchestrator != null)
+            {
+                _coreOrchestrator.RequestMotionSlot(slotName, requestId);
+                return;
+            }
+
+            _motionSlotPlayer?.PlaySlot(slotName, requestId);
+        }
+
+        private static string GetWindowOpsCapabilityLabel()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            return "Window Ops: native (Windows player)";
+#else
+            return "Window Ops: editor simulation (native effect requires Windows player)";
+#endif
         }
 
         private void SwitchRenderFactor(int direction)

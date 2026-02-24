@@ -1,0 +1,13 @@
+[run_unity_tests] UnityPath=C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.exe
+[run_unity_tests] Args=-batchmode -nographics -projectPath D:\dev\MascotDesktop\Unity_PJ\project -runTests -testPlatform EditMode -testFilter MascotDesktop.Tests.EditMode.LoopbackHttpClientTests -testResults D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_210537.xml -logFile D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260222_210537.log
+[run_unity_tests] Primary launch failed: Program 'Unity.exe' failed to run: An error occurred trying to start process 'C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.exe' with working directory 'D:\dev\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\dev\MascotDesktop\tools\run_unity_tests.ps1:76 char:5
++     & $UnityPath @args
++     ~~~~~~~~~~~~~~~~~~.
+[run_unity_tests] Fallback to Unity.com: C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.com
+Write-Error: 
+Line |
+   2 |  … pback.txt'; & ./tools/run_unity_tests.ps1 -TestPlatform EditMode -Tes …
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | [run_unity_tests] Fallback launch also failed: Program 'Unity.com' failed to run: An error occurred trying to start process 'C:\Program Files\Unity\Hub\Editor\6000.3.7f1\Editor\Unity.com' with working directory 'D:\dev\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\dev\MascotDesktop\tools\run_unity_tests.ps1:99 char:9
++         & $comFallback @args
++         ~~~~~~~~~~~~~~~~~~~~.
