@@ -83,6 +83,7 @@ namespace MascotDesktop.Tests.EditMode
             var rootB = Path.Combine(tempRoot, "B");
 
             Directory.CreateDirectory(Path.Combine(rootA, "characters", "demo", "mmd"));
+            Directory.CreateDirectory(Path.Combine(rootB, "characters", "demo", "mmd"));
             Directory.CreateDirectory(Path.Combine(rootB, "characters", "demo", "images"));
             File.WriteAllText(Path.Combine(rootA, "characters", "demo", "mmd", "avatar.pmx"), "a");
             File.WriteAllText(Path.Combine(rootB, "characters", "demo", "mmd", "avatar.pmx"), "b");

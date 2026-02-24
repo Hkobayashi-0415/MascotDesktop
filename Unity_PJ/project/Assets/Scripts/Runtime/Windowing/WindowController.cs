@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using MascotDesktop.Runtime.Diagnostics;
 using UnityEngine;
 
@@ -40,13 +39,7 @@ namespace MascotDesktop.Runtime.Windowing
         {
             var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
-            {
-                hwnd = GetForegroundWindow();
-            }
-
-            if (hwnd == IntPtr.Zero)
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
                 RuntimeLog.Warn(
                     "window",
@@ -59,9 +52,7 @@ namespace MascotDesktop.Runtime.Windowing
                 return;
             }
 
-            var target = enable ? HWND_TOPMOST : HWND_NOTOPMOST;
-            var ok = SetWindowPos(hwnd, target, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-            if (!ok)
+            if (!WindowNativeGateway.TrySetTopmost(hwnd, enable))
             {
                 RuntimeLog.Warn(
                     "window",
@@ -98,8 +89,7 @@ namespace MascotDesktop.Runtime.Windowing
         {
             var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
                 RuntimeLog.Warn(
                     "window",
@@ -112,8 +102,19 @@ namespace MascotDesktop.Runtime.Windowing
                 return;
             }
 
-            ReleaseCapture();
-            SendMessage(hwnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            if (!WindowNativeGateway.TryBeginDrag(hwnd))
+            {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.drag.failed",
+                    rid,
+                    "WINDOW.DRAG.BEGIN_FAILED",
+                    "failed to begin native drag operation",
+                    string.Empty,
+                    "window");
+                return;
+            }
+
             RuntimeLog.Info("window", "window.drag.started", rid, "window drag started", string.Empty, "window");
 #else
             RuntimeLog.Info("window", "window.drag.skipped", rid, "window drag is only available on Windows player", string.Empty, "window");
@@ -128,14 +129,30 @@ namespace MascotDesktop.Runtime.Windowing
             }
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
+            var rid = RuntimeLog.NewRequestId();
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.rect.save_failed",
+                    rid,
+                    "WINDOW.HWND.NOT_FOUND",
+                    "window handle is unavailable",
+                    string.Empty,
+                    "window");
                 return;
             }
 
-            if (!GetWindowRect(hwnd, out var rect))
+            if (!WindowNativeGateway.TryGetWindowRect(hwnd, out var rect))
             {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.rect.save_failed",
+                    rid,
+                    "WINDOW.RECT.READ_FAILED",
+                    "failed to read native window rectangle",
+                    string.Empty,
+                    "window");
                 return;
             }
 
@@ -168,13 +185,7 @@ namespace MascotDesktop.Runtime.Windowing
         private void ApplyFramelessWindow(string requestId)
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
-            {
-                hwnd = GetForegroundWindow();
-            }
-
-            if (hwnd == IntPtr.Zero)
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
                 RuntimeLog.Warn(
                     "window",
@@ -187,9 +198,20 @@ namespace MascotDesktop.Runtime.Windowing
                 return;
             }
 
-            var style = GetWindowLongPtr(hwnd, GWL_STYLE).ToInt64();
-            var newStyle = style & ~WS_CAPTION & ~WS_THICKFRAME & ~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX;
-            if (newStyle == style)
+            if (!WindowNativeGateway.TryApplyFramelessStyle(hwnd, out var alreadyFrameless))
+            {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.frameless.failed",
+                    requestId,
+                    "WINDOW.FRAMELESS.STYLE_NOT_APPLIED",
+                    "failed to apply frameless style flags",
+                    string.Empty,
+                    "window");
+                return;
+            }
+
+            if (alreadyFrameless)
             {
                 RuntimeLog.Info(
                     "window",
@@ -201,8 +223,18 @@ namespace MascotDesktop.Runtime.Windowing
                 return;
             }
 
-            SetWindowLongPtr(hwnd, GWL_STYLE, new IntPtr(newStyle));
-            SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+            if (!WindowNativeGateway.TryRefreshWindowFrame(hwnd))
+            {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.frameless.failed",
+                    requestId,
+                    "WINDOW.FRAMELESS.FRAME_UPDATE_FAILED",
+                    "failed to refresh window frame after style update",
+                    string.Empty,
+                    "window");
+                return;
+            }
 
             RuntimeLog.Info(
                 "window",
@@ -238,9 +270,16 @@ namespace MascotDesktop.Runtime.Windowing
             }
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            var hwnd = GetActiveWindow();
-            if (hwnd == IntPtr.Zero)
+            if (!WindowNativeGateway.TryGetTargetWindowHandle(out var hwnd))
             {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.rect.restore_failed",
+                    requestId,
+                    "WINDOW.HWND.NOT_FOUND",
+                    "window handle is unavailable",
+                    string.Empty,
+                    "window");
                 return;
             }
 
@@ -249,14 +288,24 @@ namespace MascotDesktop.Runtime.Windowing
             var w = Math.Max(640, PlayerPrefs.GetInt(PrefW));
             var h = Math.Max(360, PlayerPrefs.GetInt(PrefH));
 
-            var ok = SetWindowPos(hwnd, IntPtr.Zero, x, y, w, h, SWP_NOZORDER | SWP_SHOWWINDOW);
-            if (ok)
+            if (WindowNativeGateway.TrySetWindowRect(hwnd, x, y, w, h))
             {
                 RuntimeLog.Info(
                     "window",
                     "window.rect.restored",
                     requestId,
                     "window rectangle restored",
+                    $"{x},{y},{w},{h}",
+                    "window");
+            }
+            else
+            {
+                RuntimeLog.Warn(
+                    "window",
+                    "window.rect.restore_failed",
+                    requestId,
+                    "WINDOW.RECT.RESTORE_FAILED",
+                    "failed to apply native window rectangle",
                     $"{x},{y},{w},{h}",
                     "window");
             }
@@ -271,77 +320,5 @@ namespace MascotDesktop.Runtime.Windowing
 #endif
         }
 
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
-        private static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
-        private const int GWL_STYLE = -16;
-        private const long WS_CAPTION = 0x00C00000L;
-        private const long WS_THICKFRAME = 0x00040000L;
-        private const long WS_MINIMIZEBOX = 0x00020000L;
-        private const long WS_MAXIMIZEBOX = 0x00010000L;
-        private const int SWP_NOSIZE = 0x0001;
-        private const int SWP_NOMOVE = 0x0002;
-        private const int SWP_NOZORDER = 0x0004;
-        private const int SWP_SHOWWINDOW = 0x0040;
-        private const int SWP_FRAMECHANGED = 0x0020;
-        private const int WM_NCLBUTTONDOWN = 0x00A1;
-        private const int HTCAPTION = 0x0002;
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct Rect
-        {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
-        }
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetActiveWindow();
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool SetWindowPos(
-            IntPtr hWnd,
-            IntPtr hWndInsertAfter,
-            int x,
-            int y,
-            int cx,
-            int cy,
-            int uFlags);
-
-        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
-        private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
-        private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-        [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
-        private static extern IntPtr GetWindowLong32(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
-        private static extern IntPtr SetWindowLong32(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-        private static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
-        {
-            return IntPtr.Size == 8 ? GetWindowLongPtr64(hWnd, nIndex) : GetWindowLong32(hWnd, nIndex);
-        }
-
-        private static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
-        {
-            return IntPtr.Size == 8 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong) : SetWindowLong32(hWnd, nIndex, dwNewLong);
-        }
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
-
-        [DllImport("user32.dll")]
-        private static extern bool ReleaseCapture();
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
-#endif
     }
 }

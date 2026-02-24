@@ -38,6 +38,10 @@ namespace MascotDesktop.Runtime.Avatar
         private const int MinAntiAliasingSamples = 4;
         private const float DefaultKeyLightShadowStrength = 0.7f;
         private const int MaxSelectedImagesPerCharacter = 4;
+        private const float CandidateMinScanIntervalSeconds = 1f;
+        private const float CandidateCacheTtlSeconds = 5f;
+        private const float CandidateEmptyScanBaseBackoffSeconds = 1f;
+        private const float CandidateEmptyScanMaxBackoffSeconds = 16f;
         private const string MainTextureStatusTag = "MASCOT_MAIN_TEX_STATUS";
         private const string MainTextureStatusMissingSpec = "missing_spec";
         private const string MainTextureStatusMissingResolve = "missing_resolve";
@@ -94,6 +98,7 @@ namespace MascotDesktop.Runtime.Avatar
         private GameObject _activeModelRoot;
         private int _renderFactorIndex;
         private int _placementStabilizationFramesRemaining;
+        private readonly AssetCatalogService _assetCatalogService = new AssetCatalogService();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureBootstrapObject()
@@ -165,14 +170,16 @@ namespace MascotDesktop.Runtime.Avatar
             StabilizeActiveModelPlacement();
         }
 
-        public string[] DiscoverModelCandidates()
+        public string[] DiscoverModelCandidates(bool forceRefresh = false)
         {
-            return BuildModelCandidatesFromRelativePaths(DiscoverAllRelativeAssetPaths());
+            var snapshot = DiscoverAllRelativeAssetPaths(forceRefresh);
+            return BuildModelCandidatesFromRelativePaths(snapshot.RelativePaths);
         }
 
-        public string[] DiscoverImageCandidates()
+        public string[] DiscoverImageCandidates(bool forceRefresh = false)
         {
-            return BuildImageCandidatesFromRelativePaths(DiscoverAllRelativeAssetPaths());
+            var snapshot = DiscoverAllRelativeAssetPaths(forceRefresh);
+            return BuildImageCandidatesFromRelativePaths(snapshot.RelativePaths);
         }
 
         public static string[] BuildModelCandidatesFromRelativePaths(IEnumerable<string> allRelativePaths)
@@ -200,7 +207,7 @@ namespace MascotDesktop.Runtime.Avatar
                 .ToArray();
         }
 
-        private string[] DiscoverAllRelativeAssetPaths()
+        private AssetCatalogSnapshot DiscoverAllRelativeAssetPaths(bool forceRefresh)
         {
             var requestId = RuntimeLog.NewRequestId();
             var (unityProjectRoot, _, unityPjRoot) = ResolveProjectRoots(requestId, logResolvedInfo: false);
@@ -209,30 +216,39 @@ namespace MascotDesktop.Runtime.Avatar
             var rootsToScan = canonicalAssetsRoots
                 .Concat(new[] { streamingAssetsRoot })
                 .ToArray();
-
-            var relativePaths = BuildRelativeAssetPathsFromRoots(rootsToScan);
+            var catalogRequest = new AssetCatalogRequest(
+                scanPaths: () => BuildRelativeAssetPathsFromRoots(rootsToScan, requestId),
+                minScanIntervalSeconds: CandidateMinScanIntervalSeconds,
+                cacheTtlSeconds: CandidateCacheTtlSeconds,
+                emptyScanBaseBackoffSeconds: CandidateEmptyScanBaseBackoffSeconds,
+                maxBackoffSeconds: CandidateEmptyScanMaxBackoffSeconds);
+            var snapshot = _assetCatalogService.GetOrRefresh(catalogRequest, forceRefresh);
             var canonicalSummary = canonicalAssetsRoots.Length == 0
                 ? "(none)"
                 : string.Join("|", canonicalAssetsRoots);
 
-            RuntimeLog.Info(
-                "avatar",
-                "avatar.model.candidates.discovered",
-                requestId,
-                $"candidate discovery scanned roots: canonical_exists={canonicalAssetsRoots.Length > 0}, canonical_roots={canonicalAssetsRoots.Length}, streaming_exists={Directory.Exists(streamingAssetsRoot)}, paths={relativePaths.Length}",
-                $"canonical={canonicalSummary};streaming={streamingAssetsRoot}",
-                "assets");
+            if (snapshot.DidScan)
+            {
+                RuntimeLog.Info(
+                    "avatar",
+                    "avatar.model.candidates.discovered",
+                    requestId,
+                    $"candidate discovery scanned roots: canonical_exists={canonicalAssetsRoots.Length > 0}, canonical_roots={canonicalAssetsRoots.Length}, streaming_exists={Directory.Exists(streamingAssetsRoot)}, paths={snapshot.RelativePaths.Length}",
+                    $"canonical={canonicalSummary};streaming={streamingAssetsRoot}",
+                    "assets");
+            }
 
-            return relativePaths;
+            return snapshot;
         }
 
-        public static string[] BuildRelativeAssetPathsFromRoots(IEnumerable<string> rootDirectories)
+        public static string[] BuildRelativeAssetPathsFromRoots(IEnumerable<string> rootDirectories, string requestId = null)
         {
             if (rootDirectories == null)
             {
                 return Array.Empty<string>();
             }
 
+            var rid = string.IsNullOrWhiteSpace(requestId) ? RuntimeLog.NewRequestId() : requestId;
             var candidates = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var rootDirectory in rootDirectories)
             {
@@ -242,17 +258,32 @@ namespace MascotDesktop.Runtime.Avatar
                 }
 
                 var rootFullPath = Path.GetFullPath(rootDirectory);
-                foreach (var fullPath in Directory.EnumerateFiles(rootFullPath, "*.*", SearchOption.AllDirectories))
+                try
                 {
-                    var relative = fullPath
-                        .Substring(rootFullPath.Length)
-                        .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                        .Replace('\\', '/');
-
-                    if (!string.IsNullOrWhiteSpace(relative))
+                    foreach (var fullPath in Directory.EnumerateFiles(rootFullPath, "*.*", SearchOption.AllDirectories))
                     {
-                        candidates.Add(relative);
+                        var relative = fullPath
+                            .Substring(rootFullPath.Length)
+                            .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                            .Replace('\\', '/');
+
+                        if (!string.IsNullOrWhiteSpace(relative))
+                        {
+                            candidates.Add(relative);
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    RuntimeLog.Warn(
+                        "avatar",
+                        "avatar.model.candidates.root_scan_failed",
+                        rid,
+                        "AVATAR.CANDIDATE.SCAN_ROOT_FAILED",
+                        "failed to enumerate files from candidate root",
+                        rootFullPath,
+                        "assets",
+                        ex);
                 }
             }
 

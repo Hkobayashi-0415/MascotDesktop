@@ -48,6 +48,8 @@ namespace MascotDesktop.Runtime.UI
         private float _nextMissingBootstrapLogAt;
         private bool _bootstrapRecoveredLogged;
         private Vector2 _scrollPosition = Vector2.zero;
+        private int _lastLoggedModelCandidateCount = -1;
+        private int _lastLoggedImageCandidateCount = -1;
 
         private void Awake()
         {
@@ -133,7 +135,7 @@ namespace MascotDesktop.Runtime.UI
 
             if (GUILayout.Button("Model: rescan(list)", GUILayout.Height(26f)))
             {
-                RescanModelCandidates();
+                RescanModelCandidates(forceLog: true, forceRefresh: true);
             }
             GUILayout.EndHorizontal();
 
@@ -363,7 +365,7 @@ namespace MascotDesktop.Runtime.UI
             RescanModelCandidates();
         }
 
-        private void RescanModelCandidates()
+        private void RescanModelCandidates(bool forceLog = false, bool forceRefresh = false)
         {
             if (_simpleModelBootstrap == null)
             {
@@ -389,18 +391,26 @@ namespace MascotDesktop.Runtime.UI
             }
             else
             {
-                _modelCandidates = _simpleModelBootstrap.DiscoverModelCandidates();
-                _imageCandidates = _simpleModelBootstrap.DiscoverImageCandidates();
+                _modelCandidates = _simpleModelBootstrap.DiscoverModelCandidates(forceRefresh);
+                _imageCandidates = _simpleModelBootstrap.DiscoverImageCandidates(forceRefresh);
             }
 
             SyncCurrentModelIndex();
-            RuntimeLog.Info(
-                "ui",
-                "ui.hud.model_candidates_rescanned",
-                RuntimeLog.NewRequestId(),
-                $"candidate lists updated: models={_modelCandidates.Length}, images={_imageCandidates.Length}, mode={GetCandidateModeLabel()}",
-                string.Empty,
-                "runtime_hud");
+            var candidateCountsChanged =
+                _modelCandidates.Length != _lastLoggedModelCandidateCount ||
+                _imageCandidates.Length != _lastLoggedImageCandidateCount;
+            if (forceLog || candidateCountsChanged)
+            {
+                _lastLoggedModelCandidateCount = _modelCandidates.Length;
+                _lastLoggedImageCandidateCount = _imageCandidates.Length;
+                RuntimeLog.Info(
+                    "ui",
+                    "ui.hud.model_candidates_rescanned",
+                    RuntimeLog.NewRequestId(),
+                    $"candidate lists updated: models={_modelCandidates.Length}, images={_imageCandidates.Length}, mode={GetCandidateModeLabel()}",
+                    string.Empty,
+                    "runtime_hud");
+            }
         }
 
         private void EnsureRenderFactors()

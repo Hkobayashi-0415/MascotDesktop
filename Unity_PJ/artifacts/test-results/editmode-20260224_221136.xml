@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="9" result="Passed" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.0655769">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.065577" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1112" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.055808" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="47540" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1113" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.053832" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1114" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.052294" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1115" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.050761" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1063" name="RuntimeLogTests" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.044804" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1067" name="Error_AssignsDefaultErrorCode_WhenMissing" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Error_AssignsDefaultErrorCode_WhenMissing" methodname="Error_AssignsDefaultErrorCode_WhenMissing" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="1049904318" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.013037" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1255491+00:00","level":"ERROR","component":"tests","event_name":"tests.runtime.error_missing_code","request_id":"req-test-error","error_code":"RUNTIME.ERROR.UNSPECIFIED","message":"","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1070" name="Error_IncludesExceptionInfo" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Error_IncludesExceptionInfo" methodname="Error_IncludesExceptionInfo" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="775613844" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.001061" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1362610+00:00","level":"ERROR","component":"test","event_name":"test.exception","request_id":"req-test-ex","error_code":"TEST.EX.CODE","message":"with exception","path":"","source_tier":"","exception_type":"System.InvalidOperationException","exception_message":"Test exception message"}
+]]></output>
+              </test-case>
+              <test-case id="1068" name="Info_NormalizesOptionalFieldsToEmptyString" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Info_NormalizesOptionalFieldsToEmptyString" methodname="Info_NormalizesOptionalFieldsToEmptyString" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="55008795" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.000733" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1385103+00:00","level":"INFO","component":"tests","event_name":"tests.runtime.info_defaults","request_id":"req-test-info","error_code":"","message":"","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1069" name="Info_OutputsLogWithInfoLevel" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Info_OutputsLogWithInfoLevel" methodname="Info_OutputsLogWithInfoLevel" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="2002367947" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.000622" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1395457+00:00","level":"INFO","component":"test","event_name":"test.event","request_id":"req-test-info-level","error_code":"","message":"test message","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1065" name="NewRequestId_GeneratesUniqueIds" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.NewRequestId_GeneratesUniqueIds" methodname="NewRequestId_GeneratesUniqueIds" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="1994890725" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.007691" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1064" name="NewRequestId_HasExpectedFormat" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.NewRequestId_HasExpectedFormat" methodname="NewRequestId_HasExpectedFormat" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="918821361" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.000557" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1066" name="Warn_AssignsDefaultErrorCode_WhenMissing" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Warn_AssignsDefaultErrorCode_WhenMissing" methodname="Warn_AssignsDefaultErrorCode_WhenMissing" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="944977686" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.000900" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1487353+00:00","level":"WARN","component":"tests","event_name":"tests.runtime.warn_missing_code","request_id":"req-test-warn","error_code":"RUNTIME.WARN.UNSPECIFIED","message":"","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1071" name="Write_FillsDefaultComponent_WhenEmpty" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Write_FillsDefaultComponent_WhenEmpty" methodname="Write_FillsDefaultComponent_WhenEmpty" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="1934469085" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.000711" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1497714+00:00","level":"INFO","component":"runtime","event_name":"test.event","request_id":"req-test-default-component","error_code":"","message":"message","path":"","source_tier":"","exception_type":"","exception_message":""}
+]]></output>
+              </test-case>
+              <test-case id="1072" name="Write_FillsDefaultEventName_WhenEmpty" fullname="MascotDesktop.Tests.EditMode.RuntimeLogTests.Write_FillsDefaultEventName_WhenEmpty" methodname="Write_FillsDefaultEventName_WhenEmpty" classname="MascotDesktop.Tests.EditMode.RuntimeLogTests" runstate="Runnable" seed="1885961252" result="Passed" start-time="2026-02-24 13:11:43Z" end-time="2026-02-24 13:11:43Z" duration="0.000771" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{"timestamp":"2026-02-24T13:11:43.1503068+00:00","level":"INFO","component":"test","event_name":"runtime.event","request_id":"req-test-default-event","error_code":"","message":"message","path":"","source_tier":"","exception_type":"","exception_message":""}
+Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260224_221136.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

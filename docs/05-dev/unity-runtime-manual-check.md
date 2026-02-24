@@ -24,8 +24,9 @@
 3. 画面左上に `MascotDesktop Runtime HUD` が表示されることを確認する。
    - HUD内に表示しきれない項目がある場合はパネルをスクロールし、下段ボタンまで確認する。
 4. 以下の順で最小操作を行う:
-   - `Model: rescan(list)`
-   - `Model: next`（または `Model: prev`）
+    - `Model: rescan(list)`
+      - 候補探索はキャッシュ + バックオフで自動負荷抑制されるため、`Model: rescan(list)` は強制再探索操作として扱う
+    - `Model: next`（または `Model: prev`）
    - `State: happy`
    - `Motion: wave`
    - `Toggle Topmost`
@@ -38,7 +39,7 @@
 - `State: happy` 実行で `Avatar State` と `avatar.state.transitioned` が更新される。
 - `Motion: wave` 実行で `Motion Slot` と `avatar.motion.slot_played` が更新される。
 - `Model: rescan(list)` は候補更新のみで、`Model Path` は変化しない（仕様）。
-- `Toggle Topmost` / `Hide/Show` のネイティブ効果確認は Windows Standalone Player で実施し、Unity Editor ではシミュレーションログ（`window.topmost.simulated` / `window.resident.*.simulated`）を確認する。
+- `Toggle Topmost` / `Hide/Show` のネイティブ効果確認は Windows Standalone Player で実施し、Unity Editor ではシミュレーションログ（`window.topmost.simulated` / `window.resident.*.simulated`）を確認する。`Hide/Show` は現仕様で最小化/復帰（`SW_MINIMIZE` / `SW_RESTORE`）。
 - 操作時にエラーコード付きログで失敗原因を追える。
 - 候補探索ログ `avatar.model.candidates.discovered` の `canonical_exists` / `streaming_exists` が想定通りである。
 - ルート確認ログ `avatar.paths.assets_roots_checked` の `selected_canonical` / `streaming` が期待パスを指している。
