@@ -1,0 +1,6 @@
+{"timestamp":"2026-02-24T10:10:00.0000000+00:00","level":"INFO","component":"avatar","event_name":"avatar.model.displayed","request_id":"req-fail-0001","error_code":"","message":"model displayed"}
+{"timestamp":"2026-02-24T10:10:01.0000000+00:00","level":"WARN","component":"ui","event_name":"ui.hud.bootstrap_missing","request_id":"req-fail-0002","error_code":"UI.HUD.BOOTSTRAP_MISSING","message":"bootstrap missing"}
+{"timestamp":"2026-02-24T10:10:02.0000000+00:00","level":"INFO","component":"ui","event_name":"ui.hud.model_candidates_rescanned","request_id":"req-fail-0003","error_code":"","message":"rescan"}
+{"timestamp":"2026-02-24T10:10:03.0000000+00:00","level":"WARN","component":"ui","event_name":"ui.hud.bootstrap_missing","request_id":"req-fail-0004","error_code":"UI.HUD.BOOTSTRAP_MISSING","message":"bootstrap missing"}
+{"timestamp":"2026-02-24T10:10:04.0000000+00:00","level":"WARN","component":"ui","event_name":"ui.hud.bootstrap_missing","request_id":"req-fail-0005","error_code":"UI.HUD.BOOTSTRAP_MISSING","message":"bootstrap missing"}
+{"timestamp":"2026-02-24T10:10:08.0000000+00:00","level":"INFO","component":"ui","event_name":"ui.hud.model_candidates_rescanned","request_id":"req-fail-0006","error_code":"","message":"rescan"}

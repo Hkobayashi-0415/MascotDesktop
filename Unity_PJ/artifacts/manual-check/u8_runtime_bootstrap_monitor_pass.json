@@ -1,0 +1,29 @@
+{
+  "reason": "ok",
+  "log_pattern": "runtime-20260224-pass.jsonl",
+  "status": "PASS",
+  "parse_error_count": 0,
+  "max_sequence": {
+    "file": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8-runtime-log-samples\\runtime-20260224-pass.jsonl",
+    "start_line": 2,
+    "end_line": 4,
+    "start_timestamp": "2026-02-24T19:00:01.0000000+09:00",
+    "end_timestamp": "2026-02-24T19:00:03.0000000+09:00"
+  },
+  "threshold_consecutive": 3,
+  "target_event": "ui.hud.bootstrap_missing",
+  "checked_files": [
+    "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8-runtime-log-samples\\runtime-20260224-pass.jsonl"
+  ],
+  "reset_events": [
+    "ui.hud.bootstrap_recovered",
+    "avatar.model.displayed"
+  ],
+  "max_gap_seconds": 5.0,
+  "parse_errors": [],
+  "artifact_generated_at_utc": "2026-02-24T17:26:58.4885482+00:00",
+  "log_dir": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8-runtime-log-samples",
+  "max_consecutive": 2,
+  "total_lines": 7,
+  "matched_events": 3
+}

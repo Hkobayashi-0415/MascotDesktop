@@ -1,0 +1,18 @@
+{
+  "run_at_utc": "2000-01-01T00:00:00+00:00",
+  "profile": "Custom",
+  "runtime_check_exit": 0,
+  "docs_sync_check_exit": 0,
+  "runtime_artifact": "test-only-stale-dummy",
+  "docs_sync_artifact": "test-only-stale-dummy",
+  "options": {
+    "log_pattern": "runtime-*.jsonl",
+    "fail_on_parse_error": false,
+    "threshold_consecutive": 3,
+    "require_same_day": false,
+    "max_lag_days": 0,
+    "max_gap_seconds": 5.0,
+    "allow_no_logs": true
+  },
+  "_note": "固定時刻ダミー artifact。鮮度チェックの Stale/Pass 判定テスト用（run_at_utc=2000-01-01 は常に stale）。"
+}

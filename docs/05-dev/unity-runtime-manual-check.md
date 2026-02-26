@@ -2,7 +2,7 @@
 
 - Status: active
 - Owner/Agent: codex
-- Last Updated: 2026-02-24
+- Last Updated: 2026-02-25
 - Scope: Unity Editor での画面確認（Runtime HUD + 基本操作）
 
 ## 根拠
@@ -17,6 +17,7 @@
 2. アセット配置: `Unity_PJ/data/assets_user/characters/<slug>/...`
    - Windows Standalone で `Unity_PJ` 外にビルドする場合は `<Player>_Data/StreamingAssets/characters/...` 側にも配置が必要
 3. 実行環境エラー時は `docs/05-dev/unity-test-environment-recovery.md` を参照
+4. `SimpleModelBootstrap` は通常起動で自動初期化される前提とし、`ui.hud.bootstrap_recovered` には依存しない
 
 ## 手順
 1. Unity Editor で `Unity_PJ/project` を開く。
@@ -40,6 +41,9 @@
 - `Motion: wave` 実行で `Motion Slot` と `avatar.motion.slot_played` が更新される。
 - `Model: rescan(list)` は候補更新のみで、`Model Path` は変化しない（仕様）。
 - `Toggle Topmost` / `Hide/Show` のネイティブ効果確認は Windows Standalone Player で実施し、Unity Editor ではシミュレーションログ（`window.topmost.simulated` / `window.resident.*.simulated`）を確認する。`Hide/Show` は現仕様で最小化/復帰（`SW_MINIMIZE` / `SW_RESTORE`）。
+- `ui.hud.bootstrap_missing` が連続出力しない（通常起動で bootstrap recovery 依存が発生していない）。
+  - 連続出力の判定は `./tools/check_runtime_bootstrap_missing.ps1`（既定: `ThresholdConsecutive=3`, `MaxGapSeconds=5`）で自動化する。
+  - 文書同期チェックを同時に行う場合は `./tools/run_u8_ops_checks.ps1 -Profile Gate` を使用する。
 - 操作時にエラーコード付きログで失敗原因を追える。
 - 候補探索ログ `avatar.model.candidates.discovered` の `canonical_exists` / `streaming_exists` が想定通りである。
 - ルート確認ログ `avatar.paths.assets_roots_checked` の `selected_canonical` / `streaming` が期待パスを指している。
@@ -54,4 +58,5 @@
 ## 参照
 - `docs/05-dev/QUICKSTART.md`
 - `docs/05-dev/unity-character-switch-operations.md`
+- `docs/05-dev/u8-operations-automation.md`
 - `Unity_PJ/docs/05-dev/phase3-parity-verification.md`

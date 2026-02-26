@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.0546748">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.054675" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1112" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.043698" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="44312" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1113" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.041385" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1114" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.039306" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1115" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.037247" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1110" name="WindowNativeGatewayTests" fullname="MascotDesktop.Tests.EditMode.WindowNativeGatewayTests" classname="MascotDesktop.Tests.EditMode.WindowNativeGatewayTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.028032" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1111" name="GatewayMethods_NonNativeRuntime_ReturnDeterministicFallbacks" fullname="MascotDesktop.Tests.EditMode.WindowNativeGatewayTests.GatewayMethods_NonNativeRuntime_ReturnDeterministicFallbacks" methodname="GatewayMethods_NonNativeRuntime_ReturnDeterministicFallbacks" classname="MascotDesktop.Tests.EditMode.WindowNativeGatewayTests" runstate="Runnable" seed="472244308" result="Passed" start-time="2026-02-24 16:04:40Z" end-time="2026-02-24 16:04:40Z" duration="0.015291" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260225_010433.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

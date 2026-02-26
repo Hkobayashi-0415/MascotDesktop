@@ -23,7 +23,9 @@ namespace MascotDesktop.Tests.EditMode
             _gameObject = new GameObject("LoopbackHttpClientTests");
             _runtimeConfig = _gameObject.AddComponent<RuntimeConfig>();
             _runtimeConfig.enableHttpBridge = false;
+            _runtimeConfig.runtimeMode = RuntimeConfig.RuntimeMode.Loopback;
             _runtimeConfig.loopbackBaseUrl = "http://127.0.0.1:18080";
+            _runtimeConfig.coreBaseUrl = "http://127.0.0.1:8769";
             _runtimeConfig.httpTimeoutMs = 2000;
             _client = _gameObject.AddComponent<LoopbackHttpClient>();
             InjectRuntimeConfig(_runtimeConfig);
@@ -50,9 +52,10 @@ namespace MascotDesktop.Tests.EditMode
         }
 
         [Test]
-        public async Task PostJsonAsync_InjectsRequestIdIntoHeaderAndBody_WhenMissingInBody()
+        public async Task PostJsonAsync_InjectsRequestIdIntoHeaderAndBody_WhenMissingInBody_UsingCoreModeBaseUrl()
         {
             _runtimeConfig.enableHttpBridge = true;
+            _runtimeConfig.runtimeMode = RuntimeConfig.RuntimeMode.Core;
             var handler = new CapturingHandler(HttpStatusCode.OK, "{\"status\":\"ok\"}");
             ReplaceHttpClient(handler);
 
@@ -62,7 +65,7 @@ namespace MascotDesktop.Tests.EditMode
             Assert.That(result.Success, Is.True);
             Assert.That(result.RequestId, Is.EqualTo(requestId));
             Assert.That(handler.LastMethod, Is.EqualTo(HttpMethod.Post));
-            Assert.That(handler.LastUrl, Is.EqualTo("http://127.0.0.1:18080/health"));
+            Assert.That(handler.LastUrl, Is.EqualTo("http://127.0.0.1:8769/health"));
             Assert.That(handler.LastRequestIdHeader, Is.EqualTo(requestId));
             Assert.That(handler.LastBody, Does.Contain("\"request_id\":\"req-bridge-002\""));
             Assert.That(handler.LastBody, Does.Contain("\"payload\""));
@@ -90,18 +93,21 @@ namespace MascotDesktop.Tests.EditMode
             const string requestId = "req-bridge-003";
             var handler = new CapturingHandler(
                 HttpStatusCode.ServiceUnavailable,
-                "{\"status\":\"error\",\"request_id\":\"req-bridge-003\",\"error_code\":\"CORE.TIMEOUT\",\"message\":\"upstream timeout\",\"retryable\":true}");
+                "{\"status\":\"error\",\"request_id\":\"req-bridge-003\",\"core_request_id\":\"core-003\",\"error_code\":\"E1001\",\"error_name\":\"LLM_TIMEOUT\",\"message\":\"upstream timeout\",\"retryable\":true,\"attempt\":2}");
             ReplaceHttpClient(handler);
 
-            UnityEngine.TestTools.LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(".*CORE\\.TIMEOUT.*"));
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(".*E1001.*"));
             var result = await _client.PostJsonAsync("/v1/chat/send", requestId, "{\"payload\":{\"text\":\"hello\"}}");
 
             Assert.That(result.Success, Is.False);
             Assert.That(result.RequestId, Is.EqualTo(requestId));
             Assert.That(result.ResponseRequestId, Is.EqualTo(requestId));
-            Assert.That(result.ErrorCode, Is.EqualTo("CORE.TIMEOUT"));
+            Assert.That(result.CoreRequestId, Is.EqualTo("core-003"));
+            Assert.That(result.ErrorCode, Is.EqualTo("E1001"));
+            Assert.That(result.ErrorName, Is.EqualTo("LLM_TIMEOUT"));
             Assert.That(result.Message, Is.EqualTo("upstream timeout"));
             Assert.That(result.Retryable, Is.True);
+            Assert.That(result.Attempt, Is.EqualTo(2));
         }
 
         [Test]
@@ -111,7 +117,7 @@ namespace MascotDesktop.Tests.EditMode
             const string requestId = "req-bridge-004";
             var handler = new CapturingHandler(
                 HttpStatusCode.OK,
-                "{\"status\":\"ok\",\"request_id\":\"req-bridge-other\"}");
+                "{\"status\":\"ok\",\"request_id\":\"req-bridge-other\",\"core_request_id\":\"core-other\"}");
             ReplaceHttpClient(handler);
 
             UnityEngine.TestTools.LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex(".*IPC\\.HTTP\\.REQUEST_ID_MISMATCH.*"));
@@ -120,7 +126,9 @@ namespace MascotDesktop.Tests.EditMode
             Assert.That(result.Success, Is.False);
             Assert.That(result.RequestId, Is.EqualTo(requestId));
             Assert.That(result.ResponseRequestId, Is.EqualTo("req-bridge-other"));
+            Assert.That(result.CoreRequestId, Is.EqualTo("core-other"));
             Assert.That(result.ErrorCode, Is.EqualTo("IPC.HTTP.REQUEST_ID_MISMATCH"));
+            Assert.That(result.ErrorName, Is.EqualTo("IPC_HTTP_REQUEST_ID_MISMATCH"));
             Assert.That(result.Retryable, Is.False);
         }
 

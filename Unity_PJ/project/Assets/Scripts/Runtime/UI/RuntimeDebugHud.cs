@@ -46,7 +46,6 @@ namespace MascotDesktop.Runtime.UI
         private string _lastBridgeRequestId = "n/a";
         private float _nextAutoRescanAt;
         private float _nextMissingBootstrapLogAt;
-        private bool _bootstrapRecoveredLogged;
         private Vector2 _scrollPosition = Vector2.zero;
         private int _lastLoggedModelCandidateCount = -1;
         private int _lastLoggedImageCandidateCount = -1;
@@ -99,8 +98,14 @@ namespace MascotDesktop.Runtime.UI
             GUILayout.Label($"Render Factor: {FormatRenderFactor()}");
             GUILayout.Label(GetWindowOpsCapabilityLabel());
             GUILayout.Label($"HTTP Bridge: {_runtimeConfig?.enableHttpBridge.ToString() ?? "n/a"}");
+            GUILayout.Label($"Runtime Mode: {_runtimeConfig?.runtimeMode.ToString() ?? "n/a"}");
             GUILayout.Label($"Bridge Last: {_lastBridgeStatus}");
             GUILayout.Label($"Bridge RequestId: {_lastBridgeRequestId}");
+            GUILayout.Label($"Degraded: {_coreOrchestrator?.DegradedSummary ?? "n/a"}");
+            if (IsAdminDebugEnabled())
+            {
+                GUILayout.Label($"Degraded detail: llm={_coreOrchestrator?.IsFeatureDegraded("llm")}, tts={_coreOrchestrator?.IsFeatureDegraded("tts")}, stt={_coreOrchestrator?.IsFeatureDegraded("stt")}");
+            }
             GUILayout.Space(8f);
 
             GUILayout.BeginHorizontal();
@@ -191,11 +196,6 @@ namespace MascotDesktop.Runtime.UI
             if (GUILayout.Button("Bridge: config/get", GUILayout.Height(26f)))
             {
                 TriggerBridgeConfigGet();
-            }
-
-            if (GUILayout.Button("Bridge: config/set", GUILayout.Height(26f)))
-            {
-                TriggerBridgeConfigSet();
             }
             GUILayout.EndHorizontal();
 
@@ -301,23 +301,6 @@ namespace MascotDesktop.Runtime.UI
             if (_simpleModelBootstrap == null)
             {
                 _simpleModelBootstrap = FindFirstObjectByType<SimpleModelBootstrap>();
-            }
-
-            if (_simpleModelBootstrap == null)
-            {
-                _simpleModelBootstrap = SimpleModelBootstrap.EnsureBootstrapForRuntime();
-                if (_simpleModelBootstrap != null && !_bootstrapRecoveredLogged)
-                {
-                    _bootstrapRecoveredLogged = true;
-                    RuntimeLog.Warn(
-                        "ui",
-                        "ui.hud.bootstrap_recovered",
-                        RuntimeLog.NewRequestId(),
-                        "UI.HUD.BOOTSTRAP_RECOVERED",
-                        "simple model bootstrap was missing and recovered by runtime hud",
-                        string.Empty,
-                        "runtime_hud");
-                }
             }
 
             if (_simpleModelBootstrap != null)
@@ -625,13 +608,6 @@ namespace MascotDesktop.Runtime.UI
             _ = PostBridgeOnlyAsync("/v1/config/get", payload, "ipc.hud.config_get");
         }
 
-        private void TriggerBridgeConfigSet()
-        {
-            var desiredTopmost = _windowController != null && !_windowController.IsTopmost;
-            var payload = "{\"dto_version\":\"1.0.0\",\"payload\":{\"topmost\":" + (desiredTopmost ? "true" : "false") + "}}";
-            _ = PostBridgeOnlyAsync("/v1/config/set", payload, "ipc.hud.config_set");
-        }
-
         private void TriggerSttPartial()
         {
             _ = SendSttEventWithBridgeAsync("i am", isFinal: false);
@@ -683,7 +659,10 @@ namespace MascotDesktop.Runtime.UI
                     requestId,
                     succeeded,
                     errorCode,
-                    retryable);
+                    retryable,
+                    bridgeErrorName: bridgeResult?.ErrorName ?? string.Empty,
+                    coreRequestId: bridgeResult?.CoreRequestId ?? string.Empty,
+                    attempt: bridgeResult?.Attempt ?? 0);
             }
 
             // Phase B: chat導線からTTS bridgeへ連結する。
@@ -724,7 +703,10 @@ namespace MascotDesktop.Runtime.UI
                 ttsRequestId,
                 succeeded,
                 errorCode,
-                retryable);
+                retryable,
+                bridgeErrorName: ttsBridgeResult?.ErrorName ?? string.Empty,
+                coreRequestId: ttsBridgeResult?.CoreRequestId ?? string.Empty,
+                attempt: ttsBridgeResult?.Attempt ?? 0);
         }
 
         private async Task SendSttEventWithBridgeAsync(string text, bool isFinal)
@@ -762,7 +744,10 @@ namespace MascotDesktop.Runtime.UI
                 isFinal,
                 succeeded,
                 errorCode,
-                retryable);
+                retryable,
+                bridgeErrorName: sttBridgeResult?.ErrorName ?? string.Empty,
+                coreRequestId: sttBridgeResult?.CoreRequestId ?? string.Empty,
+                attempt: sttBridgeResult?.Attempt ?? 0);
         }
 
         private async Task PostBridgeOnlyAsync(string path, string payload, string eventName)
@@ -835,6 +820,11 @@ namespace MascotDesktop.Runtime.UI
             var state = result.Success ? "ok" : $"ng:{result.ErrorCode}";
             _lastBridgeStatus = $"{path} [{result.StatusCode}] {state}";
             _lastBridgeRequestId = string.IsNullOrWhiteSpace(result.RequestId) ? "n/a" : result.RequestId;
+        }
+
+        private bool IsAdminDebugEnabled()
+        {
+            return _runtimeConfig != null && _runtimeConfig.adminDebugMode;
         }
 
         private static string EscapeJson(string message)

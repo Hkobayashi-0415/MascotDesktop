@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.0507932">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.050793" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1112" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.040214" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="51696" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1113" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.038817" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1114" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.037889" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1115" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.036947" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="AssetCatalogServiceTests" fullname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests" classname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.034124" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1005" name="ComputeEmptyBackoffSeconds_UsesExponentialBackoffWithCap" fullname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests.ComputeEmptyBackoffSeconds_UsesExponentialBackoffWithCap" methodname="ComputeEmptyBackoffSeconds_UsesExponentialBackoffWithCap" classname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests" runstate="Runnable" seed="887634548" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.014979" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="GetOrRefresh_ForceRefreshBypassesThrottle" fullname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests.GetOrRefresh_ForceRefreshBypassesThrottle" methodname="GetOrRefresh_ForceRefreshBypassesThrottle" classname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests" runstate="Runnable" seed="1588750900" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.001713" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="GetOrRefresh_ThrottlesConsecutiveEmptyScans" fullname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests.GetOrRefresh_ThrottlesConsecutiveEmptyScans" methodname="GetOrRefresh_ThrottlesConsecutiveEmptyScans" classname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests" runstate="Runnable" seed="141158308" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.000576" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="GetOrRefresh_UsesCachedResultsWithinTtl" fullname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests.GetOrRefresh_UsesCachedResultsWithinTtl" methodname="GetOrRefresh_UsesCachedResultsWithinTtl" classname="MascotDesktop.Tests.EditMode.AssetCatalogServiceTests" runstate="Runnable" seed="838303885" result="Passed" start-time="2026-02-24 15:00:01Z" end-time="2026-02-24 15:00:01Z" duration="0.000361" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260224_235953.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

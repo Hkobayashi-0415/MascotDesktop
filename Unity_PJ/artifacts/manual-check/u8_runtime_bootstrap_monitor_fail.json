@@ -1,0 +1,29 @@
+{
+  "status": "FAIL",
+  "target_event": "ui.hud.bootstrap_missing",
+  "parse_errors": [],
+  "artifact_generated_at_utc": "2026-02-24T17:26:58.5442624+00:00",
+  "max_sequence": {
+    "file": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8-runtime-log-samples\\runtime-20260224-fail.jsonl",
+    "start_line": 2,
+    "end_line": 5,
+    "start_timestamp": "2026-02-24T19:10:01.0000000+09:00",
+    "end_timestamp": "2026-02-24T19:10:04.0000000+09:00"
+  },
+  "checked_files": [
+    "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8-runtime-log-samples\\runtime-20260224-fail.jsonl"
+  ],
+  "reason": "threshold_exceeded",
+  "max_gap_seconds": 5.0,
+  "total_lines": 6,
+  "reset_events": [
+    "ui.hud.bootstrap_recovered",
+    "avatar.model.displayed"
+  ],
+  "parse_error_count": 0,
+  "log_pattern": "runtime-20260224-fail.jsonl",
+  "threshold_consecutive": 3,
+  "log_dir": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8-runtime-log-samples",
+  "max_consecutive": 3,
+  "matched_events": 3
+}

@@ -1,5 +1,13 @@
 # パッケージング ガイド（PACKAGING.md）
 
+- Status: legacy-reference
+- Last Updated: 2026-02-25
+- Scope: 旧PoC（Python/PyInstaller）向けの参照情報。現行 Unity Runtime の起動導線は対象外。
+
+> [!IMPORTANT]
+> この文書は旧PoC手順の参照です。現行 Unity Runtime の運用は `docs/05-dev/QUICKSTART.md` と
+> `docs/05-dev/unity-runtime-manual-check.md` を優先してください。
+
 ローカル配布用のスタンドアロン実行環境を PyInstaller で作成する方法。
 
 ## 目次
@@ -152,4 +160,6 @@ cd dist\mascot_avatar
 - [PATHS.md](PATHS.md) — ASCIIパス移行ガイド
 - [ASSETS_PLACEMENT.md](ASSETS_PLACEMENT.md) — アセット配置ガイド
 - [README.md](../README.md) — Quick Start
+- [docs/05-dev/QUICKSTART.md](05-dev/QUICKSTART.md) — 現行 Unity Runtime 起動導線
+- [docs/05-dev/unity-runtime-manual-check.md](05-dev/unity-runtime-manual-check.md) — 現行 Unity Runtime 手動確認
 

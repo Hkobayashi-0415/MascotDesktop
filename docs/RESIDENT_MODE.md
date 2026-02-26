@@ -1,6 +1,24 @@
 # 常駐モード ガイド（RESIDENT_MODE.md）
 
+- Status: legacy-reference
+- Last Updated: 2026-02-25
+- Scope: 旧PoC常駐（tray host）向けの参照情報。現行 Unity Runtime の常駐操作は対象外。
+
+> [!IMPORTANT]
+> この文書は旧PoC手順の参照です。現行 Unity Runtime では `docs/05-dev/QUICKSTART.md` と
+> `docs/05-dev/unity-runtime-manual-check.md` の手順を優先してください。
+
 MascotDesktopをトレイ常駐で運用する方法。
+
+## Unity Scope（Current）
+
+- `Hide/Show` は現仕様で最小化/復帰（`SW_MINIMIZE` / `SW_RESTORE`）。
+- `Toggle Topmost` / `Hide/Show` / `Drag Window` は Windows Standalone Player でネイティブ効果を確認する。
+- 受入時は runtime ログで以下イベントを確認する:
+  - `window.resident.hidden`
+  - `window.resident.restored`
+  - `window.topmost.changed`
+- 詳細は `docs/05-dev/QUICKSTART.md` / `docs/05-dev/unity-runtime-manual-check.md` を参照。
 
 ## 概要
 
@@ -74,3 +92,5 @@ start http://127.0.0.1:8770/viewer
 ## 関連ドキュメント
 - [PACKAGING.md](PACKAGING.md) — ビルド手順
 - [ASSETS_PLACEMENT.md](ASSETS_PLACEMENT.md) — アセット配置
+- [docs/05-dev/QUICKSTART.md](05-dev/QUICKSTART.md) — 現行 Unity Runtime 起動導線
+- [docs/05-dev/unity-runtime-manual-check.md](05-dev/unity-runtime-manual-check.md) — 現行 Unity Runtime 手動確認

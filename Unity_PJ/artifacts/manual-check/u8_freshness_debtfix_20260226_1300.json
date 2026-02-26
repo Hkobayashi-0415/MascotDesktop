@@ -1,0 +1,14 @@
+{
+  "invalid_files": 0,
+  "status": "Pass",
+  "checked_at": "2026-02-26T03:59:02.5963976+00:00",
+  "profile_filter": "Any",
+  "elapsed_hours": 0.03,
+  "latest_artifact": "u8_ops_checks_run_gate_20260226_125729.json",
+  "warn_hours": 22.0,
+  "scanned_files": 14,
+  "latest_profile": "Gate",
+  "latest_run_at_utc": "2026-02-26T12:57:31.0000000+09:00",
+  "threshold_hours": 25.0,
+  "reason": "OK"
+}
