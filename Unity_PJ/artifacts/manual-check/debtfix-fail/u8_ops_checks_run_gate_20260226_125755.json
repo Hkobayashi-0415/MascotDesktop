@@ -1,0 +1,19 @@
+{
+  "runtime_check_exit": 1,
+  "docs_sync_check_error": null,
+  "runtime_check_error": "[check_runtime_bootstrap_missing] FAIL: no logs found. dir=D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\_nonexistent_logs_for_gate_fail_v6 pattern=runtime-*.jsonl",
+  "docs_sync_check_exit": 0,
+  "run_at_utc": "2026-02-26T03:57:55.6520444+00:00",
+  "docs_sync_artifact": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\debtfix-fail\\u8_docs_sync_summary_gate_20260226_125755.json",
+  "runtime_artifact": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\debtfix-fail\\u8_runtime_monitor_summary_gate_20260226_125755.json",
+  "profile": "Gate",
+  "options": {
+    "max_lag_days": 0,
+    "fail_on_parse_error": false,
+    "threshold_consecutive": 3,
+    "allow_no_logs": false,
+    "max_gap_seconds": 5.0,
+    "log_pattern": "runtime-*.jsonl",
+    "require_same_day": true
+  }
+}

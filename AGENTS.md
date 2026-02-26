@@ -34,6 +34,20 @@
 - PJ が不明な場合は確認し、PJ が確定するまで作業を開始しない。
 - 以降の応答も必要なら `Project: <PJ>` を1行目に記載する。
 
+## 0.4) Persona Operation (MUST)
+- チャット応答のキャラクター性は `character_persona/` 配下の Markdown ファイルを参照して適用する（`README.md` は除外）。
+- `character_persona/` 配下で `README.md` を除く Markdown が1ファイルでない場合は、キャラクター性を適用せず通常文体で継続する。
+- ただし以下にはキャラクター性を適用しない（常に業務文体・事実優先）：
+  - PLAN
+  - Findings
+  - テスト結果
+  - 差分要約
+  - `docs/worklog/` 記録
+  - Record Check
+  - 最終報告フォーマット
+- 競合時の優先順位は `AGENTS.md` 既存ルールを優先し、ペルソナ指示は上書きしない。
+- `character_persona/` が存在しない、または参照不可の場合は通常文体で継続する。
+
 ## 1) Workflow Gate: Plan → Approve → Execute (理由・根拠必須)
 ### 1.1 Plan（必ず最初）
 コマンド実行・ファイル編集の前に、必ず PLAN を提示する（理由と根拠を含む）：

@@ -1,0 +1,27 @@
+{
+  "artifact_generated_at_utc": "2026-02-26T03:56:07.8639292+00:00",
+  "log_dir": "C:\\Users\\sugar\\AppData\\LocalLow\\DefaultCompany\\project\\logs",
+  "checked_files": [
+    "C:\\Users\\sugar\\AppData\\LocalLow\\DefaultCompany\\project\\logs\\runtime-20260224-00.jsonl",
+    "C:\\Users\\sugar\\AppData\\LocalLow\\DefaultCompany\\project\\logs\\runtime-20260224-01.jsonl",
+    "C:\\Users\\sugar\\AppData\\LocalLow\\DefaultCompany\\project\\logs\\runtime-20260224-02.jsonl",
+    "C:\\Users\\sugar\\AppData\\LocalLow\\DefaultCompany\\project\\logs\\runtime-20260224-03.jsonl",
+    "C:\\Users\\sugar\\AppData\\LocalLow\\DefaultCompany\\project\\logs\\runtime-20260225-00.jsonl"
+  ],
+  "max_consecutive": 0,
+  "parse_errors": [],
+  "status": "PASS",
+  "total_lines": 9709,
+  "max_gap_seconds": 5.0,
+  "parse_error_count": 0,
+  "target_event": "ui.hud.bootstrap_missing",
+  "reset_events": [
+    "ui.hud.bootstrap_recovered",
+    "avatar.model.displayed"
+  ],
+  "threshold_consecutive": 3,
+  "reason": "ok",
+  "matched_events": 0,
+  "log_pattern": "runtime-*.jsonl",
+  "max_sequence": null
+}

@@ -1,0 +1,11 @@
+{
+  "profile_filter": "Any",
+  "artifact_dir": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\NONEXISTENT_DIR_XYZ",
+  "status": "Fail",
+  "latest_artifact": null,
+  "reason": "NoArtifact",
+  "checked_at": "2026-02-25T12:32:43.4716618+00:00",
+  "warn_hours": 22.0,
+  "elapsed_hours": null,
+  "threshold_hours": 25.0
+}

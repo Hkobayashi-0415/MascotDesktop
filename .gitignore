@@ -82,3 +82,21 @@ refs/
 
 # MMD assets (local only, not for public repo)
 /MMD/
+
+# Local IDE / Claude Code settings
+.claude/
+
+# Character persona (local only)
+character_persona/
+
+# Unity build outputs (platform dev)
+Unity_PJ/project/platform_dev/
+Unity_PJ/artifacts/manual-check/D3D12/
+Unity_PJ/artifacts/manual-check/MonoBleedingEdge/
+Unity_PJ/artifacts/manual-check/project_Data/
+
+# Temporary worklog files
+docs/worklog/_tmp_*/
+
+# Root-level test artifacts
+/u8_ops_checks_run_*.json

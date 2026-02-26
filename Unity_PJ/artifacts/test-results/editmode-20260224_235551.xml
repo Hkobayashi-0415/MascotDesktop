@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="36" result="Passed" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.1170633">
+  <test-suite type="TestSuite" id="1000" name="project" fullname="project" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.117063" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1112" name="MascotDesktop.Tests.EditMode.dll" fullname="D:/dev/MascotDesktop/Unity_PJ/project/Library/ScriptAssemblies/MascotDesktop.Tests.EditMode.dll" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.105701" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38880" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1113" name="MascotDesktop" fullname="MascotDesktop" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.103620" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1114" name="Tests" fullname="MascotDesktop.Tests" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.101633" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1115" name="EditMode" fullname="MascotDesktop.Tests.EditMode" runstate="Runnable" testcasecount="97" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.093297" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1073" name="SimpleModelBootstrapTests" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" testcasecount="36" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.089789" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1076" name="BuildImageCandidatesFromRelativePaths_LimitsImagesPerGroupToFour" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.BuildImageCandidatesFromRelativePaths_LimitsImagesPerGroupToFour" methodname="BuildImageCandidatesFromRelativePaths_LimitsImagesPerGroupToFour" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1014956187" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.021482" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1074" name="BuildModelCandidatesFromRelativePaths_IncludesModelFormatsOnly" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.BuildModelCandidatesFromRelativePaths_IncludesModelFormatsOnly" methodname="BuildModelCandidatesFromRelativePaths_IncludesModelFormatsOnly" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="895001207" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000541" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="BuildModelCandidatesFromRelativePaths_ReturnsSortedDistinctList" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.BuildModelCandidatesFromRelativePaths_ReturnsSortedDistinctList" methodname="BuildModelCandidatesFromRelativePaths_ReturnsSortedDistinctList" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="843310704" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000484" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1077" name="BuildRelativeAssetPathsFromRoots_MergesDistinctRelativePathsAcrossRoots" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.BuildRelativeAssetPathsFromRoots_MergesDistinctRelativePathsAcrossRoots" methodname="BuildRelativeAssetPathsFromRoots_MergesDistinctRelativePathsAcrossRoots" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1690493602" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.017353" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="BuildRelativeAssetPathsFromRoots_ReturnsEmpty_WhenRootsAreMissing" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.BuildRelativeAssetPathsFromRoots_ReturnsEmpty_WhenRootsAreMissing" methodname="BuildRelativeAssetPathsFromRoots_ReturnsEmpty_WhenRootsAreMissing" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="880183541" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000877" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="ComputeCameraFitScale_ReturnsLessThanOne_WhenModelExceedsView" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.ComputeCameraFitScale_ReturnsLessThanOne_WhenModelExceedsView" methodname="ComputeCameraFitScale_ReturnsLessThanOne_WhenModelExceedsView" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1108196867" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.003471" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="ComputeCameraFitScale_ReturnsOne_WhenModelAlreadyFits" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.ComputeCameraFitScale_ReturnsOne_WhenModelAlreadyFits" methodname="ComputeCameraFitScale_ReturnsOne_WhenModelAlreadyFits" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1814362240" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000521" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="ComputeImagePlaneScale_FitsLandscapeIntoFallbackBounds" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.ComputeImagePlaneScale_FitsLandscapeIntoFallbackBounds" methodname="ComputeImagePlaneScale_FitsLandscapeIntoFallbackBounds" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="859233720" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000342" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="ComputeImagePlaneScale_FitsPortraitIntoFallbackBounds" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.ComputeImagePlaneScale_FitsPortraitIntoFallbackBounds" methodname="ComputeImagePlaneScale_FitsPortraitIntoFallbackBounds" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="257477591" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000226" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1081" name="ComputeImagePlaneScale_ReturnsFallback_WhenTextureSizeInvalid" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.ComputeImagePlaneScale_ReturnsFallback_WhenTextureSizeInvalid" methodname="ComputeImagePlaneScale_ReturnsFallback_WhenTextureSizeInvalid" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1519228863" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.002237" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="ComputeModelScaleFactor_ClampsToConfiguredRange" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.ComputeModelScaleFactor_ClampsToConfiguredRange" methodname="ComputeModelScaleFactor_ClampsToConfiguredRange" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="492772589" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000417" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1099" name="DiagnosticsHelpers_BuildRemediationHint_PrefersAssetResolutionWhenResolveMissingExists" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_BuildRemediationHint_PrefersAssetResolutionWhenResolveMissingExists" methodname="DiagnosticsHelpers_BuildRemediationHint_PrefersAssetResolutionWhenResolveMissingExists" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1955065368" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000737" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1100" name="DiagnosticsHelpers_BuildRemediationHint_PrefersMaterialLoaderWhenTextureAlphaDominates" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_BuildRemediationHint_PrefersMaterialLoaderWhenTextureAlphaDominates" methodname="DiagnosticsHelpers_BuildRemediationHint_PrefersMaterialLoaderWhenTextureAlphaDominates" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1267220653" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000256" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1102" name="DiagnosticsHelpers_BuildRemediationHint_PrefersShaderLightingWhenBrightDiffuseIsHigh" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_BuildRemediationHint_PrefersShaderLightingWhenBrightDiffuseIsHigh" methodname="DiagnosticsHelpers_BuildRemediationHint_PrefersShaderLightingWhenBrightDiffuseIsHigh" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="655402735" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000168" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1101" name="DiagnosticsHelpers_BuildRemediationHint_PrefersShaderLightingWhenEdgeAlphaDominates" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_BuildRemediationHint_PrefersShaderLightingWhenEdgeAlphaDominates" methodname="DiagnosticsHelpers_BuildRemediationHint_PrefersShaderLightingWhenEdgeAlphaDominates" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="871238504" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000140" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1103" name="DiagnosticsHelpers_BuildRemediationHint_ReturnsMixedWhenNoDominantSignal" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_BuildRemediationHint_ReturnsMixedWhenNoDominantSignal" methodname="DiagnosticsHelpers_BuildRemediationHint_ReturnsMixedWhenNoDominantSignal" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="661548201" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000149" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1097" name="DiagnosticsHelpers_CountMissingTextureStatus_ClassifiesSpecResolveUnknown" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_CountMissingTextureStatus_ClassifiesSpecResolveUnknown" methodname="DiagnosticsHelpers_CountMissingTextureStatus_ClassifiesSpecResolveUnknown" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="834100164" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000828" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1096" name="DiagnosticsHelpers_HasTransparentReason_SplitsCombinedTag" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_HasTransparentReason_SplitsCombinedTag" methodname="DiagnosticsHelpers_HasTransparentReason_SplitsCombinedTag" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1319757871" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.001075" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1089" name="DiagnosticsHelpers_IsTextureFilePath_DetectsKnownExtensions" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_IsTextureFilePath_DetectsKnownExtensions" methodname="DiagnosticsHelpers_IsTextureFilePath_DetectsKnownExtensions" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="654693895" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000484" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1098" name="DiagnosticsHelpers_IsTextureStatus_MatchesIgnoreCase" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_IsTextureStatus_MatchesIgnoreCase" methodname="DiagnosticsHelpers_IsTextureStatus_MatchesIgnoreCase" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="377541555" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000303" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="DiagnosticsHelpers_SkipRootPlaceholderSkinnedRenderer" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_SkipRootPlaceholderSkinnedRenderer" methodname="DiagnosticsHelpers_SkipRootPlaceholderSkinnedRenderer" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="2047748532" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.002514" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1086" name="DiagnosticsHelpers_SkipsMaterialsWithoutMainTexAndStatusTag" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.DiagnosticsHelpers_SkipsMaterialsWithoutMainTexAndStatusTag" methodname="DiagnosticsHelpers_SkipsMaterialsWithoutMainTexAndStatusTag" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1494502050" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.002168" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1105" name="MaterialLoaderToonFallback_DoesNotUseWhiteFallbackForMissingResolve" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderToonFallback_DoesNotUseWhiteFallbackForMissingResolve" methodname="MaterialLoaderToonFallback_DoesNotUseWhiteFallbackForMissingResolve" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1469693252" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.001096" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1104" name="MaterialLoaderToonFallback_UsesWhiteFallbackForMissingSpec" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderToonFallback_UsesWhiteFallbackForMissingSpec" methodname="MaterialLoaderToonFallback_UsesWhiteFallbackForMissingSpec" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="38180758" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000266" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1094" name="MaterialLoaderTransparencyHeuristic_CalculatesRequiredPixelsAtBoundary" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderTransparencyHeuristic_CalculatesRequiredPixelsAtBoundary" methodname="MaterialLoaderTransparencyHeuristic_CalculatesRequiredPixelsAtBoundary" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="582987739" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000851" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1093" name="MaterialLoaderTransparencyHeuristic_DoesNotTriggerOnLargeTextureSparseStrongAlpha" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderTransparencyHeuristic_DoesNotTriggerOnLargeTextureSparseStrongAlpha" methodname="MaterialLoaderTransparencyHeuristic_DoesNotTriggerOnLargeTextureSparseStrongAlpha" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1792419873" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.001735" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1090" name="MaterialLoaderTransparencyHeuristic_IgnoresSparseAlphaNoise" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderTransparencyHeuristic_IgnoresSparseAlphaNoise" methodname="MaterialLoaderTransparencyHeuristic_IgnoresSparseAlphaNoise" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="58937401" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000989" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1091" name="MaterialLoaderTransparencyHeuristic_UsesSemiTransparentRatioThreshold" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderTransparencyHeuristic_UsesSemiTransparentRatioThreshold" methodname="MaterialLoaderTransparencyHeuristic_UsesSemiTransparentRatioThreshold" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1604159572" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000667" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1092" name="MaterialLoaderTransparencyHeuristic_UsesStrongTransparentRatioThreshold" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderTransparencyHeuristic_UsesStrongTransparentRatioThreshold" methodname="MaterialLoaderTransparencyHeuristic_UsesStrongTransparentRatioThreshold" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1165350386" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000558" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1095" name="MaterialLoaderTransparentReasonTag_BuildsExpectedValues" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderTransparentReasonTag_BuildsExpectedValues" methodname="MaterialLoaderTransparentReasonTag_BuildsExpectedValues" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="661154465" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.002028" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1109" name="MaterialLoaderWhiteFallback_DoesNotUseFallbackWhenMaterialIsNull" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderWhiteFallback_DoesNotUseFallbackWhenMaterialIsNull" methodname="MaterialLoaderWhiteFallback_DoesNotUseFallbackWhenMaterialIsNull" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1394006589" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000892" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1106" name="MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForOpaqueMaterial" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForOpaqueMaterial" methodname="MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForOpaqueMaterial" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1712853100" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000353" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1108" name="MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForShadowMaterial" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForShadowMaterial" methodname="MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForShadowMaterial" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1532999252" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000286" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1107" name="MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForTransparentMaterial" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForTransparentMaterial" methodname="MaterialLoaderWhiteFallback_UsesMissingSpecFallbackForTransparentMaterial" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1967990649" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000281" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1087" name="TextureLoaderScore_PrefersModelNearbyCandidate" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.TextureLoaderScore_PrefersModelNearbyCandidate" methodname="TextureLoaderScore_PrefersModelNearbyCandidate" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="588313747" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.001886" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1088" name="TextureLoaderScore_PrefersTextureFolderWhenDistanceMatches" fullname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests.TextureLoaderScore_PrefersTextureFolderWhenDistanceMatches" methodname="TextureLoaderScore_PrefersTextureFolderWhenDistanceMatches" classname="MascotDesktop.Tests.EditMode.SimpleModelBootstrapTests" runstate="Runnable" seed="1232679770" result="Passed" start-time="2026-02-24 14:55:58Z" end-time="2026-02-24 14:55:58Z" duration="0.000407" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: D:\dev\MascotDesktop\Unity_PJ\artifacts\test-results\editmode-20260224_235551.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -1,0 +1,19 @@
+{
+  "runtime_artifact": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8_runtime_monitor_summary_gate_20260226_125729.json",
+  "docs_sync_artifact": "D:\\dev\\MascotDesktop\\Unity_PJ\\artifacts\\manual-check\\u8_docs_sync_summary_gate_20260226_125729.json",
+  "runtime_check_error": null,
+  "runtime_check_exit": 0,
+  "docs_sync_check_exit": 0,
+  "docs_sync_check_error": null,
+  "run_at_utc": "2026-02-26T03:57:31.6006526+00:00",
+  "options": {
+    "fail_on_parse_error": false,
+    "log_pattern": "runtime-*.jsonl",
+    "require_same_day": true,
+    "threshold_consecutive": 3,
+    "max_lag_days": 0,
+    "max_gap_seconds": 5.0,
+    "allow_no_logs": false
+  },
+  "profile": "Gate"
+}

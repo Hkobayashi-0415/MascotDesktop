@@ -1,0 +1,14 @@
+{
+  "profile_filter": "Any",
+  "scanned_files": 1,
+  "latest_run_at_utc": "2000-01-01T09:00:00.0000000+09:00",
+  "status": "Pass",
+  "latest_artifact": "u8_ops_checks_run_custom_freshness_test_stale.json",
+  "reason": "OK",
+  "checked_at": "2026-02-25T12:32:43.4602355+00:00",
+  "invalid_files": 0,
+  "warn_hours": 9999998.0,
+  "elapsed_hours": 229260.55,
+  "latest_profile": "Custom",
+  "threshold_hours": 9999999.0
+}

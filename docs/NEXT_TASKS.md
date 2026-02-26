@@ -3,6 +3,21 @@
 ## 改訂履歴
 | Rev | Date | 変更内容 | 根拠 |
 |---|---|---|---|
+| R40 | 2026-02-26 | APP-T2 実装着手（Phase 1-2）。`RuntimeConfig` の `mode=loopback|core` と endpoint別 timeout/retry、`LoopbackHttpClient` の retry/backoff・拡張スキーマ（`core_request_id/error_name/attempt`）、`CoreOrchestrator` degraded管理を反映。テスト実行は Unity起動前失敗で未完了。 | `Unity_PJ/project/Assets/Scripts/Runtime/Config/RuntimeConfig.cs`, `Unity_PJ/project/Assets/Scripts/Runtime/Ipc/LoopbackHttpClient.cs`, `Unity_PJ/project/Assets/Scripts/Runtime/Core/CoreOrchestrator.cs`, `Unity_PJ/project/Assets/Tests/EditMode/LoopbackHttpClientTests.cs`, `docs/worklog/2026-02-26_app_t2_impl_phase12.md` |
+| R39 | 2026-02-26 | APP-T2 実装前詳細設計を確定。Endpoint契約、Runtime/Core境界、degraded mode、DoD、テスト戦略を `app-t2-full-core-design.md` に固定し、実装着手条件を明文化。 | `docs/05-dev/app-t2-full-core-design.md`, `docs/worklog/2026-02-26_app_t2_full_core_design.md` |
+| R38 | 2026-02-26 | APP-T1 完了。アプリケーション機能仕様（`app-spec-and-roadmap.md`）を新規作成し、F-01〜F-12 の受入条件・Phase分割・依存関係・リスク対策を確定。APP-T2/T3 が着手可能な粒度で定義。 | `docs/05-dev/app-spec-and-roadmap.md`, `docs/worklog/2026-02-26_app_t1_spec_and_roadmap.md` |
+| R37 | 2026-02-26 | 技術的負債対応。`run_u8_ops_checks.ps1` を異常系でも run summary を必ず出力する実装へ修正し、`diagnose_u8_scheduler.ps1` に executable probe 再試行診断を追加。legacy docs 同期チェックを再実行し同期済みを確認。 | `tools/run_u8_ops_checks.ps1`, `tools/diagnose_u8_scheduler.ps1`, `Unity_PJ/artifacts/manual-check/debtfix-pass/u8_ops_checks_run_gate_20260226_125744.json`, `Unity_PJ/artifacts/manual-check/debtfix-fail/u8_ops_checks_run_gate_20260226_125755.json`, `Unity_PJ/artifacts/manual-check/u8_docs_sync_debtfix_20260226_1300.json` |
+| R36 | 2026-02-26 | U9最終クローズを再検証。運用ゲート1コマンド判定の正常/異常証跡を再採取し、Scheduler診断の最新結果（`can_register=false`）を管理済み制約として再固定。App Dev移行可判定を維持。 | `Unity_PJ/artifacts/manual-check/u8_ops_checks_run_gate_20260226_000657.json`, `Unity_PJ/artifacts/manual-check/u8_runtime_monitor_summary_gate_20260226_000716.json`, `Unity_PJ/artifacts/manual-check/u8_scheduler_diag_closure_20260226_000657.json`, `docs/worklog/2026-02-26_u9_final_closure_revalidation.md` |
+| R35 | 2026-02-25 | U9最終安定化クローズ。環境依存Schedulerを「管理済み制約（non-blocking）」として整理（今回セッションは `can_register=true` ）、最終ゲートチェック（Gate profile Pass）証跡採取、App Dev移行判定を文書化。 | `Unity_PJ/artifacts/manual-check/u8_ops_checks_run_gate_20260225_232337.json`, `docs/worklog/2026-02-25_u9_final_closure.md` |
+| R34 | 2026-02-25 | U8鮮度チェックの互換性不具合を修正（`Profile=Any` + 旧artifactの`profile`欠損で例外停止）。再監査でクラッシュ解消と再実行性を確認。 | `tools/check_u8_ops_freshness.ps1`, `Unity_PJ/artifacts/manual-check/audit_fix_freshness_any_default_20260225_220408.json`, `docs/worklog/2026-02-25_u8_ops_freshness_fix_audit.md` |
+| R33 | 2026-02-25 | U8残件4項目一括実装（証跡整合クリーンアップ / 鮮度チェック / Fail記録テンプレ / Scheduler事前診断）。Scheduler実登録成功（断続的環境依存）を確認し文書化。 | `tools/check_u8_ops_freshness.ps1`, `tools/diagnose_u8_scheduler.ps1`, `docs/worklog/_templates/u8_ops_fail_template.md`, `docs/05-dev/u8-operations-automation.md`, `docs/worklog/2026-02-25_u8_ops_extension_closeout.md` |
+| R32 | 2026-02-25 | U8運用チェックを一気通貫化。`Daily/Gate` プロファイルを追加し、Task Scheduler 登録/削除スクリプトを整備。 | `tools/run_u8_ops_checks.ps1`, `tools/register_u8_ops_checks_task.ps1`, `tools/unregister_u8_ops_checks_task.ps1`, `docs/05-dev/u8-operations-automation.md`, `docs/worklog/2026-02-25_u8_ops_full_closeout.md` |
+| R31 | 2026-02-25 | U8運用定着を実施。実ログパス接続で一括チェック（`run_u8_ops_checks`）を実行し、失敗時一次対応を文書化。 | `tools/run_u8_ops_checks.ps1`, `docs/05-dev/u8-operations-automation.md`, `Unity_PJ/artifacts/manual-check/u8_ops_checks_run_custom_20260225_174453.json`, `docs/worklog/2026-02-25_u8_operations_operationalization.md` |
+| R30 | 2026-02-24 | U8運用自動化を実装。`ui.hud.bootstrap_missing` 連続監視チェックと Unity導線/legacy文書同期チェックを追加し、運用基準を文書化。 | `tools/check_runtime_bootstrap_missing.ps1`, `tools/check_unity_legacy_docs_sync.ps1`, `docs/05-dev/u8-operations-automation.md`, `docs/worklog/2026-02-24_u8_operations_automation.md` |
+| R29 | 2026-02-25 | 旧PoC文書（`PACKAGING.md` / `RESIDENT_MODE.md`）を legacy-reference として明示し、現行 Unity導線への参照を追記。U7完了後の文書整合タスクを同期。 | `docs/PACKAGING.md`, `docs/RESIDENT_MODE.md`, `docs/worklog/2026-02-25_legacy_docs_alignment.md`, `docs/05-dev/dev-status.md` |
+| R28 | 2026-02-25 | U7-T5 差分に対する EditMode 再実行（Unity Editor 終了後）を完了。4スイート 50/50 Passed を確認し、worklog 追補・dev-status 同期。 | `docs/worklog/2026-02-24_u7_t4_t5_execution.md`（追補）, `docs/05-dev/dev-status.md` |
+| R27 | 2026-02-24 | U7-T4/U7-T5 を実施完了。Standalone runtime証跡（必須イベント5種）と bootstrap recovery 非依存化（HUD自己回復の撤去、運用手順同期）を反映。 | `docs/worklog/2026-02-24_u7_t4_t5_execution.md`, `docs/05-dev/QUICKSTART.md`, `docs/05-dev/unity-runtime-manual-check.md`, `docs/05-dev/dev-status.md` |
+| R26 | 2026-02-24 | 根本治療リファクタ（`AssetCatalogService` / `WindowNativeGateway`）と U7 4スイート検証結果（最終 50/50 Passed）を反映し、リリース後安定化フェーズ `U7` と残タスクを追加。 | `docs/worklog/2026-02-24_root_cause_refactor_execution.md`, `docs/worklog/2026-02-24_test_execution_u7_four_suites.md`, `docs/05-dev/dev-status.md` |
 | R25 | 2026-02-23 | `run_unity_tests.ps1 -RequireArtifacts` を4スイートで再実行（00:07-00:08）。STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5 で全 Passed、artifact（xml/log）全件生成を確認。R3 Pass 根拠を追補し、R4 Done 判定を維持。 | `Unity_PJ/artifacts/test-results/editmode-20260223_000743.xml`, `Unity_PJ/artifacts/test-results/editmode-20260223_000753.xml`, `Unity_PJ/artifacts/test-results/editmode-20260223_000803.xml`, `Unity_PJ/artifacts/test-results/editmode-20260223_000813.xml`, `docs/worklog/2026-02-23_r4_postclosure_script_rerun_sync.md`, `docs/05-dev/dev-status.md`, `docs/05-dev/release-completion-plan.md` |
 | R24 | 2026-02-22 | R1/R2 Conditional Pass の「リリース完了扱い（Unity Scope）」基準を明文化し、R4 を Done 化。RLS-R4-01/02 の state/blocker/completion condition を3文書で一致。 | `docs/05-dev/release-completion-plan.md`, `docs/05-dev/dev-status.md`, `docs/worklog/2026-02-22_r4_closure_fullquality.md` |
 | R23 | 2026-02-22 | `run_unity_tests.ps1 -RequireArtifacts` で4スイート再実行（22:23-22:24）。Loopback 5/5, STT 4/4, TTS 3/3, LLM 5/5 で全 Passed、artifact（xml/log）全件生成を確認。R3 Pass 根拠を補強。R4 は R1/R2 Conditional Pass のリリース完了扱い未確定のため In Progress 継続。 | `Unity_PJ/artifacts/test-results/editmode-20260222_222339.xml`, `Unity_PJ/artifacts/test-results/editmode-20260222_222350.xml`, `Unity_PJ/artifacts/test-results/editmode-20260222_222401.xml`, `Unity_PJ/artifacts/test-results/editmode-20260222_222412.xml`, `docs/worklog/2026-02-22_rls_docsync_script_success_sync.md`, `docs/05-dev/dev-status.md`, `docs/05-dev/release-completion-plan.md` |
@@ -98,6 +113,21 @@
   - [x] U6-T2（運用手順/記録テンプレート）が `docs/05-dev/u6-regression-gate-operations.md` に定義されている。
   - [x] 最終バッチ回帰実行をユーザー実行として引き継ぐ方針が `dev-status` / `worklog` に明記されている。
 
+### U7: リリース後安定化・保守性強化（Done）
+- [x] 高頻度候補探索の根本治療（`AssetCatalogService`: cache + empty-scan backoff）
+- [x] Windowing ネイティブ境界の責務統合（`WindowNativeGateway` 導入）
+- [x] U7対象4スイート（AssetCatalog/WindowNativeGateway/SimpleModelBootstrap/RuntimeLog）最終通過確認（50/50）
+- [x] Standalone 実機の安定稼働確認（Hide/Show/Topmost/Drag + ログ証跡）を最新実装で再採取
+- [x] Runtime 初期化時の `ui.hud.bootstrap_recovered` 発生条件を運用側で解消（通常起動は bootstrap recovery 非依存）
+- [x] 旧PoC文書（`PACKAGING.md` / `RESIDENT_MODE.md`）に legacy-reference と Unity導線参照を明記
+
+### U8: 運用自動化（Done）
+- [x] `runtime-*.jsonl` の `ui.hud.bootstrap_missing` 連続出力監視を自動化（既定: 3連続, gap 5秒）
+- [x] Unity導線更新時の legacy文書同期漏れチェックを自動化（`QUICKSTART` / `unity-runtime-manual-check` vs `PACKAGING` / `RESIDENT_MODE`）
+- [x] 判定基準と再実行手順を `docs/05-dev/u8-operations-automation.md` に明文化
+- [x] 一括実行ラッパー（`run_u8_ops_checks`）と失敗時一次対応を運用手順へ反映し、実ログで実行証跡を採取
+- [x] 推奨運用プロファイル（`Daily`/`Gate`）と Task Scheduler 導線（登録/削除）を追加
+
 ## 新規タスク（2026-02-19 作成）
 | ID | タスク | 優先度 | 状態 | 完了条件 |
 |---|---|---|---|---|
@@ -125,6 +155,51 @@
 |---|---|---|---|---|
 | U6-T1 | `tools/run_unity_tests.ps1` に `-RequireArtifacts` を追加し、artifact未生成を fail 判定できるようにする | High | Done | `-RequireArtifacts` 実装済みで、指定4スイート実行時の起動前失敗/artifact未生成を記録済み（`docs/worklog/2026-02-21_u6_t1_kickoff.md`） |
 | U6-T2 | 回帰品質ゲートの標準運用（実行手順/記録テンプレート/判定ルール）を `docs/05-dev` に定義する | Med | Done | `docs/05-dev/u6-regression-gate-operations.md` が作成され、4スイート運用手順と記録テンプレートが明記されている |
+
+## U7タスク（2026-02-24 作成）
+| ID | タスク | 優先度 | 状態 | 完了条件 |
+|---|---|---|---|---|
+| U7-T1 | 候補探索の根本治療（cache/backoff + 強制再探索導線）を実装 | High | Done | `AssetCatalogService` 追加、`SimpleModelBootstrap` / `RuntimeDebugHud` 連携、`AssetCatalogServiceTests` が存在する |
+| U7-T2 | Windowing ネイティブ呼び出しを gateway 化して責務を統合 | High | Done | `WindowNativeGateway` 追加、`ResidentController` / `WindowController` が gateway 経由、`WindowNativeGatewayTests` が存在する |
+| U7-T3 | U7対象4スイートの EditMode 検証を完了 | High | Done | AssetCatalog 4/4, WindowNativeGateway 1/1, SimpleModelBootstrap 36/36, RuntimeLog 9/9 で最終 Passed（`docs/worklog/2026-02-24_test_execution_u7_four_suites.md`） |
+| U7-T4 | Standalone 安定稼働の受入確認（Hide/Show/Topmost/Drag + 必須ログ）を再採取 | Med | Done | 最新 `runtime-20260224-03.jsonl` で必須イベント（`avatar.model.displayed`, `avatar.motion.slot_played`, `window.resident.hidden`, `window.resident.restored`, `window.topmost.changed`）を確認し、証跡を `docs/worklog/2026-02-24_u7_t4_t5_execution.md` に記録 |
+| U7-T5 | Runtime 初期化導線の簡素化（bootstrap recovery 依存の恒常運用を解消） | Med | Done | `RuntimeDebugHud` の bootstrap自己回復導線を撤去し、通常起動を `SimpleModelBootstrap` 自動初期化に固定。`QUICKSTART` / `unity-runtime-manual-check` を同期済み |
+
+## U8タスク（2026-02-24 作成）
+| ID | タスク | 優先度 | 状態 | 完了条件 |
+|---|---|---|---|---|
+| U8-T1 | `runtime-*.jsonl` から `ui.hud.bootstrap_missing` の連続出力を検知する自動チェックを追加 | High | Done | `tools/check_runtime_bootstrap_missing.ps1` が追加され、しきい値/判定基準が `docs/05-dev/u8-operations-automation.md` に記載されている |
+| U8-T2 | Unity導線更新時の legacy文書同期漏れ（`PACKAGING` / `RESIDENT_MODE`）を検知する軽量チェックを追加 | Med | Done | `tools/check_unity_legacy_docs_sync.ps1` が追加され、`Last Updated` 基準と参照リンク基準で Fail 判定できる |
+| U8-T3 | U8チェックの一括実行導線を追加し、実ログで運用証跡を採取する | Med | Done | `tools/run_u8_ops_checks.ps1` が追加され、`u8_ops_checks_run_custom_20260225_174453.json` が生成されている |
+| U8-T4 | U8運用の推奨設定（Daily/Gate）と定期実行導線を整備する | Med | Done | `run_u8_ops_checks` に `Profile` を追加し、`register/unregister_u8_ops_checks_task.ps1` が利用可能 |
+| U8-T5 | U8残件4項目（証跡整合 / 鮮度チェック / Fail記録テンプレ / Scheduler診断）を実装する | Med | Done | `tools/check_u8_ops_freshness.ps1` / `tools/diagnose_u8_scheduler.ps1` / `docs/worklog/_templates/u8_ops_fail_template.md` が追加され、証跡整合クリーンアップと文書更新が完了。Scheduler実登録・確認・削除の実績あり。 |
+| U8-T6 | `check_u8_ops_freshness` の旧artifact互換性不具合（`profile`欠損で例外）を修正し、再監査で確認する | Med | Done | `Resolve-ProfileFromArtifact` により `profile` 欠損を許容し、`Profile=Any` 実行でクラッシュしない。`audit_fix_freshness_any_default_20260225_220408.json` で再確認済み。 |
+
+### U9: 最終安定化クローズ（Done）
+- [x] 環境依存制約（Scheduler断続障害）を「管理済み制約 (non-blocking)」として整理（最新診断 `2026-02-26 00:07` は `can_register=false`。過去実績として `can_register=true` も保持。事前診断 + 手動日次代替を必須運用として固定）
+- [x] 最終ゲートチェック実行（`run_u8_ops_checks.ps1 -Profile Gate`）と証跡採取（正常: `u8_ops_checks_run_gate_20260226_000657.json` / 異常: `u8_runtime_monitor_summary_gate_20260226_000716.json`）
+- [x] 技術的負債対応（`run_u8_ops_checks` の失敗時run summary欠落を解消、`diagnose_u8_scheduler` に再試行診断を追加）
+- [x] App Dev 移行条件の明文化と文書同期（NEXT_TASKS / dev-status）
+
+## 次セクション: アプリケーション開発
+
+### 移行判定
+- U0〜U9 完了・RLS-S1 R1〜R4 Done・50/50 テスト Pass・運用チェック正常
+- 残件ゼロ（または凍結済み non-blocking）確認済み
+- **判定: アプリケーション開発へ移行可 ✅**
+
+### 移行を妨げない根拠（非ゼロ残件の場合）
+| 残件 | 重大度 | 根拠 |
+|---|---|---|
+| Scheduler 断続障害 | Low (管理済み制約) | 代替手順（手動日次）が `u8-operations-automation.md` に固定済み。診断スクリプトで事前確認可能。アプリ機能に直接影響しない。 |
+
+### APP タスク一覧
+
+| ID | タスク | 優先度 | 状態 | 前提 | 完了条件 |
+|---|---|---|---|---|---|
+| APP-T1 | アプリケーション機能仕様とロードマップの確定（優先機能リスト/受入条件） | High | **Done** | U9 Done | `docs/05-dev/app-spec-and-roadmap.md` に F-01〜F-12・Phase分割・DoD・依存・リスクが定義され、NEXT_TASKS / dev-status が同期済み |
+| APP-T2 | Full Core接続（loopbackダミーから実LLM/TTS/STTエンドポイントへ切り替え） | High | In Progress（Phase 1-2実装済み / テスト継続） | APP-T1 Done | `docs/05-dev/app-t2-full-core-design.md` に整合した実装であること。`RuntimeConfig` でエンドポイントが切替可能であること。全4スイート（LLM/TTS/STT/Loopback）が Full Core 接続状態で Pass すること。切替手順が `docs/05-dev` に記載されていること。 |
+| APP-T3 | 配布パッケージング整備（PACKAGING.md 更新・インストーラー導線確立） | Med | Not Started | APP-T1 Done | Unity Windows Standalone Player ビルドが成功すること。`docs/PACKAGING.md` が Unity 向け手順へ更新されていること。配布テスト手順が `docs/05-dev` に記載されていること。 |
 
 ## リリース完了タスク（2026-02-21 作成）
 | ID | タスク | 優先度 | 状態 | 完了条件 |
@@ -270,3 +345,5 @@
 - `docs/worklog/2026-02-21_rls_t2_result_sync.md`
 - `docs/worklog/2026-02-22_rls_s1_gate_execution.md`
 - `docs/worklog/2026-02-22_unity_recovery_r3_pass.md`
+- `docs/05-dev/app-spec-and-roadmap.md`
+- `docs/worklog/2026-02-26_app_t1_spec_and_roadmap.md`

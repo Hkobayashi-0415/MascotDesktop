@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-02-26T03:55:06.2032013+00:00",
+  "task_name": "MascotDesktop_U8_DailyOpsChecks",
+  "start_time": "09:00",
+  "can_register": false,
+  "blockers": [
+    "schtasks.exe exists but failed executable probe after 2 attempt(s). last_error=attempt=2 error=Program 'schtasks.exe' failed to run: An error occurred trying to start process 'C:\\WINDOWS\\system32\\schtasks.exe' with working directory 'D:\\dev\\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\\dev\\MascotDesktop\\tools\\diagnose_u8_scheduler.ps1:67 char:21\r\n+             $null = & $schtasksPath \"/?\" 2>&1\r\n+                     ~~~~~~~~~~~~~~~~~~~~~~~~~."
+  ],
+  "diagnostics": {
+    "schtasks_found": true,
+    "schtasks_path": "C:\\WINDOWS\\system32\\schtasks.exe",
+    "schtasks_executable": false,
+    "executable_probe_retries": 2,
+    "executable_probe_retry_interval_ms": 250,
+    "executable_probe_attempts": 2,
+    "executable_probe_errors": [
+      "attempt=1 error=Program 'schtasks.exe' failed to run: An error occurred trying to start process 'C:\\WINDOWS\\system32\\schtasks.exe' with working directory 'D:\\dev\\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\\dev\\MascotDesktop\\tools\\diagnose_u8_scheduler.ps1:67 char:21\r\n+             $null = & $schtasksPath \"/?\" 2>&1\r\n+                     ~~~~~~~~~~~~~~~~~~~~~~~~~.",
+      "attempt=2 error=Program 'schtasks.exe' failed to run: An error occurred trying to start process 'C:\\WINDOWS\\system32\\schtasks.exe' with working directory 'D:\\dev\\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\\dev\\MascotDesktop\\tools\\diagnose_u8_scheduler.ps1:67 char:21\r\n+             $null = & $schtasksPath \"/?\" 2>&1\r\n+                     ~~~~~~~~~~~~~~~~~~~~~~~~~."
+    ],
+    "task_exists": false,
+    "execution_policy_localmachine": "RemoteSigned",
+    "execution_policy_ok": true,
+    "run_script_found": true,
+    "run_script_path": "D:\\dev\\MascotDesktop\\tools\\run_u8_ops_checks.ps1"
+  },
+  "recommended_command": null
+}

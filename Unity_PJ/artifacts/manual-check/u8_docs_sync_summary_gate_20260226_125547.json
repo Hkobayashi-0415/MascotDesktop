@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "max_lag_days": 0,
+  "require_same_day": true,
+  "require_unity_refs_in_legacy": true,
+  "unity_docs": {
+    "quickstart": {
+      "path": "D:\\dev\\MascotDesktop\\docs\\05-dev\\QUICKSTART.md",
+      "last_updated": "2026-02-25"
+    },
+    "manual_check": {
+      "path": "D:\\dev\\MascotDesktop\\docs\\05-dev\\unity-runtime-manual-check.md",
+      "last_updated": "2026-02-25"
+    },
+    "unity_latest": "2026-02-25"
+  },
+  "legacy_docs": [
+    {
+      "path": "D:\\dev\\MascotDesktop\\docs\\PACKAGING.md",
+      "last_updated": "2026-02-25",
+      "lag_days_from_unity_latest": 0
+    },
+    {
+      "path": "D:\\dev\\MascotDesktop\\docs\\RESIDENT_MODE.md",
+      "last_updated": "2026-02-25",
+      "lag_days_from_unity_latest": 0
+    }
+  ],
+  "violations": [],
+  "artifact_generated_at_utc": "2026-02-26T03:55:47.5507811+00:00"
+}

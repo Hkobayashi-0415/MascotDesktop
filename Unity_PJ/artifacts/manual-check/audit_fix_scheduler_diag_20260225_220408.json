@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-02-25T13:04:09.0419980+00:00",
+  "task_name": "MascotDesktop_U8_DailyOpsChecks",
+  "start_time": "09:00",
+  "can_register": false,
+  "blockers": [
+    "schtasks.exe found but launch failed: Program 'schtasks.exe' failed to run: An error occurred trying to start process 'C:\\WINDOWS\\system32\\schtasks.exe' with working directory 'D:\\dev\\MascotDesktop'. 指定されたモジュールが見つかりません。At D:\\dev\\MascotDesktop\\tools\\diagnose_u8_scheduler.ps1:53 char:19\r\n+         $output = & $schtasksPath \"/?\" 2>&1\r\n+                   ~~~~~~~~~~~~~~~~~~~~~~~~~.",
+    "schtasks.exe exists but is not executable (possible module load error)"
+  ],
+  "diagnostics": {
+    "schtasks_found": true,
+    "schtasks_path": "C:\\WINDOWS\\system32\\schtasks.exe",
+    "schtasks_executable": false,
+    "task_exists": false,
+    "execution_policy_localmachine": "RemoteSigned",
+    "execution_policy_ok": true,
+    "run_script_found": true,
+    "run_script_path": "D:\\dev\\MascotDesktop\\tools\\run_u8_ops_checks.ps1"
+  },
+  "recommended_command": null
+}

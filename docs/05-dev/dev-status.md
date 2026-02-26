@@ -1,4 +1,4 @@
-# Dev Status (2026-02-23)
+# Dev Status (2026-02-26)
 
 ## 現状サマリー（Unity移行後）
 - `U0`/`U1`/`U2` は完了（移行基盤、Runtime基盤、エラーハンドリング/ログ強化）。
@@ -21,6 +21,22 @@
   - R3: **Pass**（Unity.exe直接実行で全スイート Passed。STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5）
   - R4: **Done**（R1/R2 Conditional Pass をリリース完了扱いとして確定）
 - 最新再実行（2026-02-23 00:07-00:08）: `run_unity_tests.ps1 -RequireArtifacts` で4スイート全て Passed（STT 4/4, TTS 3/3, LLM 5/5, Loopback 5/5）。artifact（xml/log）全件生成を確認。
+- U7 根本治療リファクタ（2026-02-24）を実施: `AssetCatalogService`（候補探索cache/backoff）と `WindowNativeGateway`（Win32呼び出し集約）を導入。
+- U7 対象4スイート（AssetCatalog/WindowNativeGateway/SimpleModelBootstrap/RuntimeLog）をユーザー環境で再実行し、最終 50/50 Passed を確認（`docs/worklog/2026-02-24_test_execution_u7_four_suites.md`）。
+- U7-T4/U7-T5 を完了（2026-02-24）: 最新 Standalone runtime ログで必須5イベントを確認し、通常起動の bootstrap recovery 依存を解消（`docs/worklog/2026-02-24_u7_t4_t5_execution.md`）。
+- U7完了後の文書整合（2026-02-25）: `docs/PACKAGING.md` / `docs/RESIDENT_MODE.md` を legacy-reference として整理し、現行 Unity導線への参照を追記。
+- U8運用自動化（2026-02-24）を実装: `ui.hud.bootstrap_missing` 連続監視チェックと Unity導線/legacy文書同期チェックを追加し、判定基準を `docs/05-dev/u8-operations-automation.md` に固定。
+- U8運用定着（2026-02-25）: 一括実行ラッパー `tools/run_u8_ops_checks.ps1` を追加し、実ログパス（`C:\Users\sugar\AppData\LocalLow\DefaultCompany\project\logs`）で実行証跡を採取。
+  - 最新実行（2026-02-25 17:43）: `runtime-20260225-*.jsonl` を対象に Custom/Daily/Gate すべて runtime monitor/docs sync Pass（`u8_ops_checks_run_custom_20260225_174453.json`, `u8_ops_checks_run_daily_20260225_174307.json`, `u8_ops_checks_run_gate_20260225_174307.json`）。
+- U8最終整備（2026-02-25）: `run_u8_ops_checks` に `Daily/Gate` プロファイルを追加し、Task Scheduler の登録/削除スクリプトを整備。
+  - `schtasks.exe` はこの環境では起動時にモジュール不足エラー。`-DryRun` 検証のみ実施。
+- U8監査修正（2026-02-25 22:04）: `check_u8_ops_freshness.ps1` の `Profile=Any` 実行時クラッシュ（旧artifactの `profile` 欠損）を修正し、再監査で回帰なしを確認。
+- U9最終安定化クローズ（2026-02-25 23:23）: 環境依存制約（Scheduler断続障害）を「管理済み制約（non-blocking）」として整理確定。最終ゲートチェック（Gate profile）Pass（`u8_ops_checks_run_gate_20260225_232337.json`）。App Dev 移行判定を確定。
+- U9再検証（2026-02-26 00:06-00:07）: 運用ゲート1コマンド判定の正常/異常証跡を再採取（正常: `u8_ops_checks_run_gate_20260226_000657.json`、異常: `u8_runtime_monitor_summary_gate_20260226_000716.json`）。Scheduler診断は `can_register=false`（`schtasks.exe` モジュール不足）を再確認し、管理済み制約として運用固定を維持。
+- U9負債対応（2026-02-26 12:57）: `run_u8_ops_checks.ps1` を異常系でも run summary を必ず生成する実装へ修正し、`diagnose_u8_scheduler.ps1` に executable probe 再試行（既定2回）を追加。legacy docs同期チェック（`-RequireSameDay`）は Pass。
+- APP-T1 完了（2026-02-26）: アプリケーション機能仕様（`docs/05-dev/app-spec-and-roadmap.md`）を新規作成。F-01〜F-12 の受入条件・Phase分割・依存関係・リスク対策を確定。APP-T2/T3 が着手可能な粒度で定義済み。
+- APP-T2 設計確定（2026-02-26）: 実装前詳細設計（Endpoint契約、Runtime/Core境界、degraded mode、DoD、テスト戦略）を `docs/05-dev/app-t2-full-core-design.md` に固定。実装コードは未着手。
+- APP-T2 実装着手（2026-02-26）: `RuntimeConfig` core切替/endpoint別 timeout-retry、`LoopbackHttpClient` retry/backoff + 拡張スキーマ、`CoreOrchestrator` degraded管理、HUD表示を実装。`LoopbackHttpClientTests` は更新済み。Unity起動前失敗（モジュール不足）により4スイート実行は継続対応。
 
 ## 現状OK
 - 品質ゲート対象テストは直近の通過実績あり:
@@ -64,6 +80,20 @@
    - `editmode-20260221_222910.xml`（LoopbackHttpClientTests: missing / exit 1 検知）
   - 根拠: `docs/worklog/2026-02-19_test_run_debug.md`, `docs/worklog/2026-02-19_manual_test_exec.md`, `docs/worklog/2026-02-20_u5_t2_minimal_core_bridge.md`, `docs/worklog/2026-02-21_u5_t3_logassert_fix.md`, `docs/worklog/2026-02-21_u5_t4_phase_a_llm_impl.md`, `docs/worklog/2026-02-21_u5_t4_phase_b_tts_impl.md`, `docs/worklog/2026-02-21_u5_t4_phase_c_stt_integration.md`
 - Unity実行環境: UNITY_COM（`Unity.com`）で回避できるケースはあるが、同一エラーの再発事例が継続している。
+- 2026-02-24 U7 4スイート検証:
+  - `editmode-20260224_220045.xml`（AssetCatalogServiceTests: 4/4 Passed）
+  - `editmode-20260224_220544.xml`（WindowNativeGatewayTests: 1/1 Passed）
+  - `editmode-20260224_220843.xml`（SimpleModelBootstrapTests: 35/36 Failed, テストセットアップ不備）
+  - `editmode-20260224_221052.xml`（SimpleModelBootstrapTests: 36/36 Passed, 修正後）
+  - `editmode-20260224_221136.xml`（RuntimeLogTests: 9/9 Passed）
+- 2026-02-24/25 U7-T5差分・4スイート確認再実行（Unity Editor 終了後）:
+  - `editmode-20260224_235551.xml`（SimpleModelBootstrapTests: 36/36 Passed）
+  - `editmode-20260224_235601.xml`（RuntimeLogTests: 9/9 Passed）
+  - `editmode-20260224_235953.xml`（AssetCatalogServiceTests: 4/4 Passed）
+  - `editmode-20260225_000003.xml`（WindowNativeGatewayTests: 1/1 Passed）
+  - `editmode-20260225_000014.xml`（SimpleModelBootstrapTests: 36/36 Passed）
+  - `editmode-20260225_000024.xml`（RuntimeLogTests: 9/9 Passed）
+  - 合計 50/50 Passed。U7-T5 差分（bootstrap 自己回復削除）に対する回帰なし確認済み。
 - Unityテスト運用ドキュメントを標準化済み:
   - 復旧手順: `docs/05-dev/unity-test-environment-recovery.md`
   - 結果収集テンプレ: `docs/05-dev/unity-test-result-collection-template.md`
@@ -97,7 +127,7 @@
 - リリース計画差分:
   - 旧P0-P6対応のゲート定義: `docs/05-dev/release-completion-plan.md`
 
-## 次セクション計画（RLS-S1 Release Gate Execution）
+## 直近完了セクション（RLS-S1 Release Gate Execution）
 - 目的:
   - `R1-R4` を実行可能タスクへ分解し、判定根拠の記録先（`worklog` / `release-completion-plan` / 状態文書）を固定する。
   - Unity起動前失敗事象を「ユーザー実行環境で再実行する対象」として管理し、R3/R4 の実行主体を統一する。
@@ -158,6 +188,37 @@
   - 当時の exit 1 は artifact 判定タイミング要因と環境依存の起動前失敗が重なっていた可能性がある。単一原因は未確定。
 - R1/R2 は Conditional Pass（Unity Scope 基準でリリース完了扱い確定）。R3 は Pass（直接実行 + 22:23-22:24/2026-02-23 00:07-00:08 再実行成功）。R4 は Done。
 
+## 移行完了フェーズ（U9: 最終安定化クローズ → App Dev 移行可）
+- 目的:
+  - U7完了後の監視/文書同期を手動運用から再実行可能な自動チェックへ移行する。
+  - 実行環境差異を考慮し、判定結果を artifact + worklog に残せる形へ固定する。
+- 進捗:
+- U8-T1 完了（`tools/check_runtime_bootstrap_missing.ps1` 追加）。
+- U8-T2 完了（`tools/check_unity_legacy_docs_sync.ps1` 追加）。
+- U8-T3 完了（`tools/run_u8_ops_checks.ps1` 追加、実ログ実行artifact採取）。
+- U8-T4 完了（`Daily/Gate` プロファイル + Task Scheduler導線）。
+- U8-T5 完了（残件4項目: 証跡整合クリーンアップ / 鮮度チェック / Fail記録テンプレ / Scheduler事前診断）。
+  - `tools/check_u8_ops_freshness.ps1`: run summary の鮮度チェック（ThresholdHours=25, WarnHours=22, Profile=Any）。3ケーステスト Pass。
+  - `tools/diagnose_u8_scheduler.ps1`: Scheduler 登録前診断（5項目, can_register true/false でexit 0/1）。実診断は環境依存で true/false の両方実績あり。
+  - `docs/worklog/_templates/u8_ops_fail_template.md`: U8 Fail 記録テンプレ追加。
+  - 証跡整合: `2026-02-25_u8_operations_operationalization.md` と artifact md に Legacy Artifact Note 追記。
+  - Scheduler 実登録（2026-02-25 延長セッション）: 登録→`/QUERY` 確認→削除まで成功。断続的環境依存事象として記録。
+- U8-T6 完了（鮮度チェック互換性修正）:
+  - `tools/check_u8_ops_freshness.ps1` に `Resolve-ProfileFromArtifact` を追加し、`profile` 欠損artifactでも `latest_profile` を安全に解決（`Custom|Daily|Gate|Unknown`）。
+  - 再監査結果: `Profile=Any(default)` / `ThresholdHours=9999999` / `NoArtifact` / `Profile=Custom` の各ケースで想定どおり動作。
+  - 最新 Scheduler 診断（2026-02-25 22:04）: `can_register=false`（`schtasks.exe` 起動失敗: 指定されたモジュールが見つかりません）。
+- 判定基準/実行手順を `docs/05-dev/u8-operations-automation.md` へ同期済み。
+- 根拠:
+- `tools/check_runtime_bootstrap_missing.ps1`
+- `tools/check_unity_legacy_docs_sync.ps1`
+- `tools/run_u8_ops_checks.ps1`
+- `tools/register_u8_ops_checks_task.ps1`
+- `tools/unregister_u8_ops_checks_task.ps1`
+- `tools/check_u8_ops_freshness.ps1`
+- `tools/diagnose_u8_scheduler.ps1`
+- `docs/05-dev/u8-operations-automation.md`
+- `docs/worklog/_templates/u8_ops_fail_template.md`
+
 ## 現状NG / リスク
 - Unity実行環境差異により、テスト起動前に `指定されたモジュールが見つかりません` が発生する場合がある。
   - `tools/run_unity_tests.ps1` は Unity.exe 失敗時に Unity.com フォールバックを実装済みだが、この環境では Unity.com 側も同エラーで起動失敗する場合がある。
@@ -196,7 +257,36 @@
 - Runtime画面確認: `docs/05-dev/unity-runtime-manual-check.md`
 - 進捗とタスク状態: `docs/NEXT_TASKS.md`
 
-## 次アクション
-- `run_unity_tests.ps1` の成功/失敗混在（20:54-20:58 成功 / 21:31-21:32 失敗 / 22:23-22:24 成功 / 2026-02-23 00:07-00:08 成功）を事実/仮説分離で継続監視する。
-- 旧PoC文書（`PACKAGING.md` / `RESIDENT_MODE.md`）の更新要否を次フェーズバックログで管理する。
-- R4 Done 判定の根拠一式を `worklog` / Obsidian ログで固定し、追補時は `Superseded` 注記ルールを維持する。
+## U9 クローズ詳細（2026-02-25 / 2026-02-26 再検証）
+
+- U9-CLOSE 完了:
+  - 残件整理: F1 Scheduler=管理済み制約（non-blocking）を維持。legacy docs は同期チェック Pass により「非同期リスク」扱いを解消。
+  - 最終ゲートチェック（正常）: `run_u8_ops_checks.ps1 -Profile Gate -ArtifactDir debtfix-pass` → exit 0 / `debtfix-pass/u8_ops_checks_run_gate_20260226_125744.json`。
+  - 最終ゲートチェック（異常）: `run_u8_ops_checks.ps1 -Profile Gate -LogDir <missing> -ArtifactDir debtfix-fail` → exit 1 / `debtfix-fail/u8_ops_checks_run_gate_20260226_125755.json`（run summary 生成を確認）。
+  - 鮮度チェック: `check_u8_ops_freshness.ps1` → exit 0（elapsed 0h）。
+  - Scheduler診断: `diagnose_u8_scheduler.ps1` → exit 1 / `can_register=false`（最新 2026-02-26 12:57）。過去セッションでは `can_register=true` 実績あり。再試行診断（2回）で状態を記録（`u8_scheduler_diag_debtfix_20260226_1300.json`）。
+  - 移行判定: **アプリケーション開発へ移行可 ✅**
+
+## App Dev 移行条件（確定）
+
+| 条件 | 状態 | 根拠 |
+|---|---|---|
+| U0〜U9 全フェーズ完了 | ✅ Done | 本ファイル・docs/NEXT_TASKS.md |
+| RLS-S1 R1〜R4 完了 | ✅ Done（R1/R2: Conditional Pass） | docs/05-dev/release-completion-plan.md |
+| 50/50 テスト Pass | ✅ | editmode-20260225_000024.xml 他 |
+| 運用チェック正常 | ✅ | u8_ops_checks_run_gate_20260226_000657.json |
+| 残件ゼロ or 凍結（non-blocking） | ✅ | F1: 管理済み制約 |
+
+## 標準運用（U8監視）
+
+- 日次監視は `./tools/run_u8_ops_checks.ps1 -Profile Daily` を実行する（Task Scheduler 連携可）。
+- Standalone受入/リリース判定は `./tools/run_u8_ops_checks.ps1 -Profile Gate` を実行する。
+- 鮮度チェックは `./tools/check_u8_ops_freshness.ps1` を実行する（しきい値: Fail=25h, Warn=22h）。
+- Fail時は `docs/worklog/_templates/u8_ops_fail_template.md` をコピーして記録し、`docs/05-dev/u8-operations-automation.md` の一次対応フローに従って復旧する。
+- Task Scheduler 実登録前は `./tools/diagnose_u8_scheduler.ps1` で事前診断し、`can_register=true` を確認してから `register_u8_ops_checks_task.ps1 -Force` を実行する。
+
+## 次アクション（App Dev 移行後）
+
+- ~~APP-T1: アプリケーション機能仕様とロードマップを確定する。~~ **Done** → `docs/05-dev/app-spec-and-roadmap.md`
+- APP-T2: Full Core接続（loopbackダミー → 実LLM/TTS/STTエンドポイントへ切り替え）を継続実装し、4スイート実行と手動確認（通常/劣化/復帰）を完了させる。前提: `docs/05-dev/app-spec-and-roadmap.md` §8 と `docs/05-dev/app-t2-full-core-design.md` を参照。
+- APP-T3: 配布パッケージング整備（`docs/PACKAGING.md` 更新・インストーラー導線確立）を実施する。前提: APP-T1 Done。

@@ -2,7 +2,7 @@
 
 - Status: active
 - Owner/Agent: codex
-- Last Updated: 2026-02-24
+- Last Updated: 2026-02-25
 - Scope: Unity Runtime の最短起動と画面確認。
 
 ## Steps (Unity First)
@@ -38,19 +38,23 @@ D:\dev\MascotDesktop\Unity_PJ\project
 - モデル表示に成功すると `avatar.model.displayed` ログが出る。
 - モデル切替が `Model Path` に反映される。
 - `Model: rescan(list)` は候補リスト更新のみ（モデル自体は切替えない）。
+- 通常起動では `SimpleModelBootstrap` が自動初期化され、`ui.hud.bootstrap_recovered` を前提にしない。
 
 ## Troubleshooting (Standalone)
 - `Model Candidates: 0` / `Image Candidates: 0`:
   - `avatar.model.candidates.discovered` ログの `canonical_exists` / `streaming_exists` を確認。
   - `avatar.paths.assets_roots_checked` ログで `selected_canonical` / `streaming` の実パスを確認。
   - `false` になっている側の配置を修正する。
-  - `ui.hud.bootstrap_missing` が出る場合は bootstrap初期化失敗。最新版ビルドで再確認し、`ui.hud.bootstrap_recovered` の有無を確認する。
+- `ui.hud.bootstrap_missing` が出る場合は bootstrap初期化失敗。Player/Play Mode を再起動し、`avatar.model.candidates.discovered` / `avatar.model.displayed` が出る導線へ戻ることを確認する。
+  - 継続監視は `./tools/check_runtime_bootstrap_missing.ps1` を使用し、`ui.hud.bootstrap_missing` の連続出力（既定: 3回以上）を自動判定する。
+  - 文書同期チェックを含む一括実行は `./tools/run_u8_ops_checks.ps1` を使用する（通常は `-Profile Daily`）。
 - 画面がマゼンタのカプセル:
   - モデル解決失敗でフォールバック表示中の可能性が高い。
   - `avatar.model.resolve_failed` / `avatar.model.fallback_used` の `error_code` を確認。
 
 ## Related Docs
 - Runtime手動確認: `docs/05-dev/unity-runtime-manual-check.md`
+- 運用自動化（U8）: `docs/05-dev/u8-operations-automation.md`
 - キャラクター切替運用: `docs/05-dev/unity-character-switch-operations.md`
 - Unity資産配置: `Unity_PJ/docs/02-architecture/assets/asset-layout.md`
 - Unity要件: `Unity_PJ/spec/latest/spec.md`

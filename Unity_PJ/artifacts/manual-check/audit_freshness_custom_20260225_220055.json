@@ -1,0 +1,14 @@
+{
+  "latest_artifact": "u8_ops_checks_run_custom_20260225_174453.json",
+  "status": "Pass",
+  "reason": "OK",
+  "latest_profile": "Custom",
+  "warn_hours": 22.0,
+  "invalid_files": 0,
+  "threshold_hours": 25.0,
+  "checked_at": "2026-02-25T13:00:55.3363356+00:00",
+  "profile_filter": "Custom",
+  "elapsed_hours": 4.27,
+  "scanned_files": 2,
+  "latest_run_at_utc": "2026-02-25T17:44:53.0000000+09:00"
+}
